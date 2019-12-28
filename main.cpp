@@ -17,7 +17,7 @@ static int callback(void* data, int argc, char** argv, char** azColName) {
 	for (i = 0;i < argc;i++) {
 		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
 		printf("this: %s",argv[i]);
-		std::string str = "flite -voice slt -t '";
+		std::string str = "flite -voice cmu_us_slt -t '";
 		str = str + argv[i] + "'"; 
 		const char *command = str.c_str(); 
 		system(command);
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 	PcdReset ();
 	M500PcdConfigISOType('A');
 	printf("Start NFC scan\r\n");
-	std::string str = "flite -voice slt -t ";
+	std::string str = "flite -voice cmu_us_slt -t ";
 	str = str + "'Please scan a tag.'"; 
 	const char *command = str.c_str(); 
 	system(command);
