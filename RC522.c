@@ -21,9 +21,9 @@ void RC522_RST(uint8_t v)
 }
 
 /**
-  * @brief  读RC522寄存器
-  * @param  ucAddress，寄存器地址
-  * @retval 寄存器的当前值
+  * @brief  读RC522寄存器 //Read the RC522 register
+  * @param  ucAddress，寄存器地址 //Register address
+  * @retval 寄存器的当前值 //Register's current value
   */
 uint8_t ReadRawRC ( uint8_t ucAddress )
 {
@@ -39,10 +39,10 @@ uint8_t ReadRawRC ( uint8_t ucAddress )
 }
 
 /**
-  * @brief  写RC522寄存器
-  * @param  ucAddress，寄存器地址
-  * @param  ucValue，写入寄存器的值
-  * @retval 无
+  * @brief  写RC522寄存器 //Write to RC522 register
+  * @param  ucAddress，寄存器地址 //Register address
+  * @param  ucValue，写入寄存器的值 //Value written to register
+  * @retval 无 //nothing
   */
 void WriteRawRC ( uint8_t ucAddress, uint8_t ucValue )
 {
@@ -56,10 +56,10 @@ void WriteRawRC ( uint8_t ucAddress, uint8_t ucValue )
 }
 
 /**
-  * @brief  对RC522寄存器置位
-  * @param  ucReg，寄存器地址
-  * @param   ucMask，置位值
-  * @retval 无
+  * @brief  对RC522寄存器置位 //Set the RC522 register
+  * @param  ucReg，寄存器地址 //Register address
+  * @param   ucMask，置位值 //置位值
+  * @retval 无 //nothing
   */
 void SetBitMask ( uint8_t ucReg, uint8_t ucMask )
 {
@@ -70,10 +70,10 @@ void SetBitMask ( uint8_t ucReg, uint8_t ucMask )
 }
 
 /**
-  * @brief  对RC522寄存器清位
-  * @param  ucReg，寄存器地址
-  * @param  ucMask，清位值
-  * @retval 无
+  * @brief  对RC522寄存器清位 //Clear the RC522 register
+  * @param  ucReg，寄存器地址 //Register address
+  * @param  ucMask，清位值 //Clearance value
+  * @retval 无 //nothing
   */
 void ClearBitMask ( uint8_t ucReg, uint8_t ucMask )
 {
@@ -84,9 +84,9 @@ void ClearBitMask ( uint8_t ucReg, uint8_t ucMask )
 }
 
 /**
-  * @brief  开启天线
-  * @param  无
-  * @retval 无
+  * @brief  开启天线 //Turn on the antenna
+  * @param  无 //none
+  * @retval 无 //nothing
   */
 void PcdAntennaOn ( void )
 {
@@ -99,9 +99,9 @@ void PcdAntennaOn ( void )
 }
 
 /**
-  * @brief  关闭天线
-  * @param  无
-  * @retval 无
+  * @brief  关闭天线 //Turn off the antenna
+  * @param  无 //none
+  * @retval 无 //nothing
   */
 void PcdAntennaOff ( void )
 {
@@ -109,9 +109,9 @@ void PcdAntennaOff ( void )
 }
 
 /**
-  * @brief  复位RC522
-  * @param  无
-  * @retval 无
+  * @brief  复位RC522 //Reset RC522
+  * @param  无 //none
+  * @retval 无 //nothing
   */
 void PcdReset ( void )
 {
@@ -124,19 +124,19 @@ void PcdReset ( void )
 	WriteRawRC ( CommandReg, 0x0f );
 	while ( ReadRawRC ( CommandReg ) & 0x10 );
 	delayMicroseconds ( 1 );
-	//定义发送和接收常用模式 和Mifare卡通讯，CRC初始值0x6363
+	//定义发送和接收常用模式 和Mifare卡通讯，CRC初始值0x6363 // Define the common mode of sending and receiving Communication with Mifare card, initial value of CRC 0x6363
 	WriteRawRC ( ModeReg, 0x3D );
-	WriteRawRC ( TReloadRegL, 30 );      //16位定时器低位
-	WriteRawRC ( TReloadRegH, 0 );			 //16位定时器高位
-	WriteRawRC ( TModeReg, 0x8D );			 //定义内部定时器的设置
-	WriteRawRC ( TPrescalerReg, 0x3E );	 //设置定时器分频系数
-	WriteRawRC ( TxAutoReg, 0x40 );			 //调制发送信号为100%ASK
+	WriteRawRC ( TReloadRegL, 30 );      //16位定时器低位 //16-bit timer low
+	WriteRawRC ( TReloadRegH, 0 );			 //16位定时器高位 //16-bit timer high
+	WriteRawRC ( TModeReg, 0x8D );			 //定义内部定时器的设置 //Define the settings of the internal timer
+	WriteRawRC ( TPrescalerReg, 0x3E );	 //设置定时器分频系数 //Set timer divide factor
+	WriteRawRC ( TxAutoReg, 0x40 );			 //调制发送信号为100%ASK //Modulation send signal is 100% ASK
 }
 
 /**
-  * @brief  设置RC522的工作方式
-  * @param  ucType，工作方式
-  * @retval 无
+  * @brief  设置RC522的工作方式 //Set the working mode of RC522
+  * @param  ucType，工作方式 //Way of working
+  * @retval 无 //nothing
   */
 void M500PcdConfigISOType ( uint8_t ucType )
 {
@@ -150,18 +150,18 @@ void M500PcdConfigISOType ( uint8_t ucType )
 		WriteRawRC ( TModeReg, 0x8D );
 		WriteRawRC ( TPrescalerReg, 0x3E );
 		delayMicroseconds  ( 2 );
-		PcdAntennaOn ();//开天线
+		PcdAntennaOn ();//开天线 //Open antenna
 	}
 }
 
 /**
-  * @brief  通过RC522和ISO14443卡通讯
-  * @param  ucCommand，RC522命令字
-  * @param  pInData，通过RC522发送到卡片的数据
-  * @param  ucInLenByte，发送数据的字节长度
-  * @param  pOutData，接收到的卡片返回数据
-  * @param  pOutLenBit，返回数据的位长度
-  * @retval 状态值= MI_OK，成功
+  * @brief  通过RC522和ISO14443卡通讯 //Communication with RC522 and ISO14443 card
+  * @param  ucCommand，RC522命令字 //RC522 command word
+  * @param  pInData，通过RC522发送到卡片的数据 //Data sent to the card via RC522
+  * @param  ucInLenByte，发送数据的字节长度 //Length of data sent
+  * @param  pOutData，接收到的卡片返回数据 //Received card return data
+  * @param  pOutLenBit，返回数据的位长度 //Bit length of the returned data
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdComMF522 ( uint8_t ucCommand,
                    uint8_t* pInData,
@@ -177,60 +177,60 @@ char PcdComMF522 ( uint8_t ucCommand,
 	uint32_t ul;
 
 	switch ( ucCommand ) {
-		case PCD_AUTHENT:		  //Mifare认证
-			ucIrqEn   = 0x12;		//允许错误中断请求ErrIEn  允许空闲中断IdleIEn
-			ucWaitFor = 0x10;		//认证寻卡等待时候 查询空闲中断标志位
+		case PCD_AUTHENT:		  //Mifare certification
+			ucIrqEn   = 0x12;		//允许错误中断请求ErrIEn  允许空闲中断IdleIEn //Enable error interrupt request ErrIEn Enable idle interrupt IdleIEn
+			ucWaitFor = 0x10;		//认证寻卡等待时候 查询空闲中断标志位 //Wait for authentication card search Query idle interrupt flag
 			break;
 
-		case PCD_TRANSCEIVE:		//接收发送 发送接收
-			ucIrqEn   = 0x77;		//允许TxIEn RxIEn IdleIEn LoAlertIEn ErrIEn TimerIEn
-			ucWaitFor = 0x30;		//寻卡等待时候 查询接收中断标志位与 空闲中断标志位
+		case PCD_TRANSCEIVE:		//接收发送 发送接收 //Receive send send receive
+			ucIrqEn   = 0x77;		//允许TxIEn RxIEn IdleIEn LoAlertIEn ErrIEn TimerIEn //Allow TxIEn RxIEn IdleIEn LoAlertIEn ErrIEn TimerIEn
+			ucWaitFor = 0x30;		//寻卡等待时候 查询接收中断标志位与 空闲中断标志位 //While waiting for the card, check the receive interrupt flag and idle interrupt flag.
 			break;
 
 		default:
 			break;
 	}
-	//IRqInv置位管脚IRQ与Status1Reg的IRq位的值相反
+	//IRqInv置位管脚IRQ与Status1Reg的IRq位的值相反 //IRqInv set pin IRQ and IRq bit of Status1Reg have opposite value
 	WriteRawRC ( ComIEnReg, ucIrqEn | 0x80 );
-	//Set1该位清零时，CommIRqReg的屏蔽位清零
+	//Set1该位清零时，CommIRqReg的屏蔽位清零 //Set1该位清零时，CommIRqReg的屏蔽位清零
 	ClearBitMask ( ComIrqReg, 0x80 );
-	//写空闲命令
+	//写空闲命令 //写空闲命令
 	WriteRawRC ( CommandReg, PCD_IDLE );
-	//置位FlushBuffer清除内部FIFO的读和写指针以及ErrReg的BufferOvfl标志位被清除
+	//置位FlushBuffer清除内部FIFO的读和写指针以及ErrReg的BufferOvfl标志位被清除 //Setting FlushBuffer clears the internal FIFO read and write pointers and ErrReg's BufferOvfl flag is cleared
 	SetBitMask ( FIFOLevelReg, 0x80 );
 	for ( ul = 0; ul < ucInLenByte; ul ++ ) {
-		WriteRawRC ( FIFODataReg, pInData [ ul ] );     //写数据进FIFOdata
+		WriteRawRC ( FIFODataReg, pInData [ ul ] );     //写数据进FIFOdata //写数据进FIFOdata
 	}
-	WriteRawRC ( CommandReg, ucCommand );   //写命令
-	if ( ucCommand == PCD_TRANSCEIVE ) {    //StartSend置位启动数据发送 该位与收发命令使用时才有效
+	WriteRawRC ( CommandReg, ucCommand );   //写命令 //写命令
+	if ( ucCommand == PCD_TRANSCEIVE ) {    //StartSend置位启动数据发送 该位与收发命令使用时才有效 // StartSend is set to start data transmission. This bit is only valid when used with the send and receive commands.
 		SetBitMask(BitFramingReg, 0x80);
 	}
 
-	ul = 1000;                             //根据时钟频率调整，操作M1卡最大等待时间25ms
+	ul = 1000;                             //根据时钟频率调整，操作M1卡最大等待时间25ms //Adjust according to the clock frequency, the maximum waiting time for operating M1 card is 25ms
 
-	//认证 与寻卡等待时间
+	//认证 与寻卡等待时间 //Authentication and card waiting time
 	do {
-		ucN = ReadRawRC ( ComIrqReg );      //查询事件中断
+		ucN = ReadRawRC ( ComIrqReg );      //查询事件中断 //查询事件中断
 		ul --;
 	} while ( ( ul != 0 ) && ( ! ( ucN & 0x01 ) ) && ( ! ( ucN & ucWaitFor ) ) );
-	ClearBitMask ( BitFramingReg, 0x80 );	 //清理允许StartSend位
+	ClearBitMask ( BitFramingReg, 0x80 );	 //清理允许StartSend位 //清理允许StartSend位
 
 	if ( ul != 0 ) {
-		//读错误标志寄存器BufferOfI CollErr ParityErr ProtocolErr
+		//读错误标志寄存器BufferOfI CollErr ParityErr ProtocolErr //Read error flag register BufferOfI CollErr ParityErr ProtocolErr
 		if ( ! ( ReadRawRC ( ErrorReg ) & 0x1B ) ) {
 			cStatus = MI_OK;
-			if ( ucN & ucIrqEn & 0x01 ) {			//是否发生定时器中断
+			if ( ucN & ucIrqEn & 0x01 ) {			//是否发生定时器中断 //Whether a timer interrupt occurs
 				cStatus = MI_NOTAGERR;
 			}
 			if ( ucCommand == PCD_TRANSCEIVE ) {
-				//读FIFO中保存的字节数
+				//读FIFO中保存的字节数 //Read the number of bytes held in the FIFO
 				ucN = ReadRawRC ( FIFOLevelReg );
-				//最后接收到得字节的有效位数
+				//最后接收到得字节的有效位数 //Significant digits of last received byte
 				ucLastBits = ReadRawRC ( ControlReg ) & 0x07;
 				if ( ucLastBits ) {
-					* pOutLenBit = ( ucN - 1 ) * 8 + ucLastBits;    //N个字节数减去1（最后一个字节）+最后一位的位数 读取到的数据总位数
+					* pOutLenBit = ( ucN - 1 ) * 8 + ucLastBits;    //N个字节数减去1（最后一个字节）+最后一位的位数 读取到的数据总位数 //N bytes minus 1 (last byte) + number of digits in the last digit
 				} else {
-					* pOutLenBit = ucN * 8;    //最后接收到的字节整个字节有效
+					* pOutLenBit = ucN * 8;    //最后接收到的字节整个字节有效 //The last received byte is valid for the entire byte
 				}
 				if ( ucN == 0 ) {
 					ucN = 1;
@@ -252,16 +252,16 @@ char PcdComMF522 ( uint8_t ucCommand,
 }
 
 /**
-  * @brief 寻卡
-  * @param  ucReq_code，寻卡方式 = 0x52，寻感应区内所有符合14443A标准的卡；
-            寻卡方式= 0x26，寻未进入休眠状态的卡
-  * @param  pTagType，卡片类型代码
+  * @brief 寻卡 //Find card
+  * @param  ucReq_code，寻卡方式 = 0x52，寻感应区内所有符合14443A标准的卡； //ucReq_code, card search method = 0x52, find all cards that meet the 14443A standard in the sensing area;
+            寻卡方式= 0x26，寻未进入休眠状态的卡 //Card search mode = 0x26, search for cards that have not entered the sleep state
+  * @param  pTagType，卡片类型代码 //Card type code
              = 0x4400，Mifare_UltraLight
              = 0x0400，Mifare_One(S50)
              = 0x0200，Mifare_One(S70)
              = 0x0800，Mifare_Pro(X))
              = 0x4403，Mifare_DESFire
-  * @retval 状态值= MI_OK，成功
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdRequest ( uint8_t ucReq_code, uint8_t* pTagType )
 {
@@ -269,19 +269,19 @@ char PcdRequest ( uint8_t ucReq_code, uint8_t* pTagType )
 	uint8_t ucComMF522Buf [ MAXRLEN ];
 	uint32_t ulLen;
 
-	//清理指示MIFARECyptol单元接通以及所有卡的数据通信被加密的情况
+	//清理指示MIFARECyptol单元接通以及所有卡的数据通信被加密的情况 //Clearing the case where the MIFARECyptol unit is turned on and the data communication of all cards is encrypted
 	ClearBitMask ( Status2Reg, 0x08 );
-	//发送的最后一个字节的 七位
+	//发送的最后一个字节的 七位 // Seven bits of the last byte sent
 	WriteRawRC ( BitFramingReg, 0x07 );
-	//TX1,TX2管脚的输出信号传递经发送调制的13.56的能量载波信号
+	//TX1,TX2管脚的输出信号传递经发送调制的13.56的能量载波信号 // The output signals of the TX1 and TX2 pins pass the 13.56 energy carrier signal that is modulated by the transmission
 	SetBitMask ( TxControlReg, 0x03 );
-	ucComMF522Buf [ 0 ] = ucReq_code;		//存入 卡片命令字
+	ucComMF522Buf [ 0 ] = ucReq_code;		//存入 卡片命令字 // Save the card command word
 	cStatus = PcdComMF522 ( PCD_TRANSCEIVE,
 	                        ucComMF522Buf,
 	                        1,
 	                        ucComMF522Buf,
 	                        & ulLen );	//寻卡
-	if ( ( cStatus == MI_OK ) && ( ulLen == 0x10 ) ) {	//寻卡成功返回卡类型
+	if ( ( cStatus == MI_OK ) && ( ulLen == 0x10 ) ) {	//寻卡成功返回卡类型 //Card type returned successfully
 		* pTagType = ucComMF522Buf [ 0 ];
 		* ( pTagType + 1 ) = ucComMF522Buf [ 1 ];
 	} else {
@@ -291,9 +291,9 @@ char PcdRequest ( uint8_t ucReq_code, uint8_t* pTagType )
 }
 
 /**
-  * @brief  防冲撞
-  * @param  pSnr，卡片序列号，4字节
-  * @retval 状态值= MI_OK，成功
+  * @brief  防冲撞 //Anti-collision
+  * @param  pSnr，卡片序列号，4字节 //pSnr, card serial number, 4 bytes
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdAnticoll ( uint8_t* pSnr )
 {
@@ -302,22 +302,22 @@ char PcdAnticoll ( uint8_t* pSnr )
 	uint8_t ucComMF522Buf [ MAXRLEN ];
 	uint32_t ulLen;
 
-	//清MFCryptol On位 只有成功执行MFAuthent命令后，该位才能置位
+	//清MFCryptol On位 只有成功执行MFAuthent命令后，该位才能置位 // Clear the MFCryptol On bit. This bit can only be set after the MFAuthent command is successfully executed.
 	ClearBitMask ( Status2Reg, 0x08 );
-	//清理寄存器 停止收发
+	//清理寄存器 停止收发 //清理寄存器 停止收发
 	WriteRawRC ( BitFramingReg, 0x00);
-	//清ValuesAfterColl所有接收的位在冲突后被清除
+	//清ValuesAfterColl所有接收的位在冲突后被清除 //Clear ValuesAfterColl All received bits are cleared after collision
 	ClearBitMask ( CollReg, 0x80 );
-	ucComMF522Buf [ 0 ] = 0x93;	          //卡片防冲突命令
+	ucComMF522Buf [ 0 ] = 0x93;	          //卡片防冲突命令 //Card anti-collision order
 	ucComMF522Buf [ 1 ] = 0x20;
 	cStatus = PcdComMF522 ( PCD_TRANSCEIVE,
 	                        ucComMF522Buf,
 	                        2,
 	                        ucComMF522Buf,
-	                        & ulLen);      //与卡片通信
-	if ( cStatus == MI_OK) {	            //通信成功
+	                        & ulLen);      //与卡片通信 //Communicate with the card
+	if ( cStatus == MI_OK) {	            //通信成功 //Communication success
 		for ( uc = 0; uc < 4; uc ++ ) {
-			* ( pSnr + uc )  = ucComMF522Buf [ uc ]; //读出UID
+			* ( pSnr + uc )  = ucComMF522Buf [ uc ]; //Read UID
 			ucSnr_check ^= ucComMF522Buf [ uc ];
 		}
 		if ( ucSnr_check != ucComMF522Buf [ uc ] ) {
@@ -329,11 +329,11 @@ char PcdAnticoll ( uint8_t* pSnr )
 }
 
 /**
-  * @brief  用RC522计算CRC16
-  * @param  pIndata，计算CRC16的数组
-  * @param  ucLen，计算CRC16的数组字节长度
-  * @param  pOutData，存放计算结果存放的首地址
-  * @retval 无
+  * @brief  用RC522计算CRC16 //Calculate CRC16 with RC522
+  * @param  pIndata，计算CRC16的数组 //Calculate CRC16 array
+  * @param  ucLen，计算CRC16的数组字节长度 //Calculate CRC16 array byte length
+  * @param  pOutData，存放计算结果存放的首地址 //The first address where the calculation results are stored
+  * @retval 无 //nothing
   */
 void CalulateCRC ( uint8_t* pIndata,
                    uint8_t ucLen,
@@ -357,9 +357,9 @@ void CalulateCRC ( uint8_t* pIndata,
 }
 
 /**
-  * @brief  选定卡片
-  * @param  pSnr，卡片序列号，4字节
-  * @retval 状态值= MI_OK，成功
+  * @brief  选定卡片 //Selected card
+  * @param  pSnr，卡片序列号，4字节 //pSnr, card serial number, 4 bytes
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdSelect ( uint8_t* pSnr )
 {
@@ -390,13 +390,13 @@ char PcdSelect ( uint8_t* pSnr )
 }
 
 /**
-  * @brief  验证卡片密码
-  * @param  ucAuth_mode，密码验证模式= 0x60，验证A密钥，
-            密码验证模式= 0x61，验证B密钥
-  * @param  uint8_t ucAddr，块地址
-  * @param  pKey，密码
-  * @param  pSnr，卡片序列号，4字节
-  * @retval 状态值= MI_OK，成功
+  * @brief  验证卡片密码 //Verify card password
+  * @param  ucAuth_mode，密码验证模式= 0x60，验证A密钥， //ucAuth_mode, password authentication mode = 0x60, authentication A key,
+            密码验证模式= 0x61，验证B密钥 //Password verification mode = 0x61, verify B key
+  * @param  uint8_t ucAddr，块地址 //uint8_t ucAddr, block address
+  * @param  pKey，密码 //pKey, password
+  * @param  pSnr，卡片序列号，4字节 //pSnr, card serial number, 4 bytes
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdAuthState ( uint8_t ucAuth_mode,
                     uint8_t ucAddr,
@@ -427,10 +427,10 @@ char PcdAuthState ( uint8_t ucAuth_mode,
 }
 
 /**
-  * @brief  写数据到M1卡一块
-  * @param  uint8_t ucAddr，块地址
-  * @param  pData，写入的数据，16字节
-  * @retval 状态值= MI_OK，成功
+  * @brief  写数据到M1卡一块 //Write data to M1 card
+  * @param  uint8_t ucAddr，块地址 //uint8_t ucAddr, block address
+  * @param  pData，写入的数据，16字节 //pData, written data, 16 bytes
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdWrite ( uint8_t ucAddr, uint8_t* pData )
 {
@@ -470,10 +470,10 @@ char PcdWrite ( uint8_t ucAddr, uint8_t* pData )
 }
 
 /**
-  * @brief  读取M1卡一块数据
-  * @param  ucAddr，块地址
-  * @param  pData，读出的数据，16字节
-  * @retval 状态值= MI_OK，成功
+  * @brief  读取M1卡一块数据 //Read M1 card data
+  * @param  ucAddr，块地址 //ucAddr, block address
+  * @param  pData，读出的数据，16字节 //pData, read data, 16 bytes
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdRead ( uint8_t ucAddr, uint8_t* pData )
 {
@@ -501,9 +501,9 @@ char PcdRead ( uint8_t ucAddr, uint8_t* pData )
 }
 
 /**
-  * @brief  命令卡片进入休眠状态
-  * @param  无
-  * @retval 状态值= MI_OK，成功
+  * @brief  命令卡片进入休眠状态 //Command card to sleep
+  * @param  无 //none
+  * @retval 状态值= MI_OK，成功 //Status value = MI_OK, success
   */
 char PcdHalt( void )
 {
@@ -526,12 +526,12 @@ void IC_CMT ( uint8_t* UID,
               uint8_t RW,
               uint8_t* Dat )
 {
-	uint8_t ucArray_ID [ 4 ] = { 0 }; //先后存放IC卡的类型和UID(IC卡序列号)
-	PcdRequest ( 0x52, ucArray_ID ); //寻卡
-	PcdAnticoll ( ucArray_ID );      //防冲撞
-	PcdSelect ( UID );               //选定卡
-	PcdAuthState ( 0x60, 0x10, KEY, UID );//校验
-	if ( RW ) {                      //读写选择，1是读，0是写
+	uint8_t ucArray_ID [ 4 ] = { 0 }; //先后存放IC卡的类型和UID(IC卡序列号) //IC card type and UID (IC card serial number)
+	PcdRequest ( 0x52, ucArray_ID ); //寻卡 //Find card
+	PcdAnticoll ( ucArray_ID );      //防冲撞 //Anti-collision
+	PcdSelect ( UID );               //选定卡 //Selected card
+	PcdAuthState ( 0x60, 0x10, KEY, UID ); //校验 //check
+	if ( RW ) {                      //读写选择，1是读，0是写 //Read and write selection, 1 is read, 0 is write
 		PcdRead ( 0x10, Dat );
 	} else {
 		PcdWrite ( 0x10, Dat );

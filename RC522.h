@@ -7,39 +7,39 @@
 /////////////////////////////////////////////////////////////////////
 //MF522命令字
 /////////////////////////////////////////////////////////////////////
-#define PCD_IDLE              0x00               //取消当前命令
-#define PCD_AUTHENT           0x0E               //验证密钥
-#define PCD_RECEIVE           0x08               //接收数据
-#define PCD_TRANSMIT          0x04               //发送数据
-#define PCD_TRANSCEIVE        0x0C               //发送并接收数据
-#define PCD_RESETPHASE        0x0F               //复位
-#define PCD_CALCCRC           0x03               //CRC计算
+#define PCD_IDLE              0x00               //取消当前命令 //Cancel the current command
+#define PCD_AUTHENT           0x0E               //验证密钥 //Authentication key
+#define PCD_RECEIVE           0x08               //接收数据 //Receive data
+#define PCD_TRANSMIT          0x04               //发送数据 //send data
+#define PCD_TRANSCEIVE        0x0C               //发送并接收数据 //Send and receive data
+#define PCD_RESETPHASE        0x0F               //复位 //Reset
+#define PCD_CALCCRC           0x03               //CRC计算 //CRC calculation
 
 /////////////////////////////////////////////////////////////////////
 //Mifare_One卡片命令字
 /////////////////////////////////////////////////////////////////////
-#define PICC_REQIDL           0x26               //寻天线区内未进入休眠状态
-#define PICC_REQALL           0x52               //寻天线区内全部卡
-#define PICC_ANTICOLL1        0x93               //防冲撞
-#define PICC_ANTICOLL2        0x95               //防冲撞
-#define PICC_AUTHENT1A        0x60               //验证A密钥
-#define PICC_AUTHENT1B        0x61               //验证B密钥
-#define PICC_READ             0x30               //读块
-#define PICC_WRITE            0xA0               //写块
-#define PICC_DECREMENT        0xC0               //扣款
-#define PICC_INCREMENT        0xC1               //充值
-#define PICC_RESTORE          0xC2               //调块数据到缓冲区
-#define PICC_TRANSFER         0xB0               //保存缓冲区中数据
-#define PICC_HALT             0x50               //休眠
+#define PICC_REQIDL           0x26               //寻天线区内未进入休眠状态 //Do not enter dormant state in the antenna search area
+#define PICC_REQALL           0x52               //寻天线区内全部卡 //Find all cards in the antenna area
+#define PICC_ANTICOLL1        0x93               //防冲撞 //Anti-collision
+#define PICC_ANTICOLL2        0x95               //防冲撞 //Anti-collision
+#define PICC_AUTHENT1A        0x60               //验证A密钥 //Verify A key
+#define PICC_AUTHENT1B        0x61               //验证B密钥 //Verify B key
+#define PICC_READ             0x30               //读块 //Read block
+#define PICC_WRITE            0xA0               //写块 //Write Block
+#define PICC_DECREMENT        0xC0               //扣款 //Deduction
+#define PICC_INCREMENT        0xC1               //充值 //Recharge
+#define PICC_RESTORE          0xC2               //调块数据到缓冲区 //Block data into buffer
+#define PICC_TRANSFER         0xB0               //保存缓冲区中数据 //Save the data in the buffer
+#define PICC_HALT             0x50               //休眠 //Dormant
 
 /////////////////////////////////////////////////////////////////////
-//MF522 FIFO长度定义
+//MF522 FIFO长度定义 //FIFO length definition
 /////////////////////////////////////////////////////////////////////
 #define DEF_FIFO_LENGTH       64                 //FIFO size=64byte
 #define MAXRLEN  18
 
 /////////////////////////////////////////////////////////////////////
-//MF522寄存器定义
+//MF522寄存器定义 //MF522 register definition
 /////////////////////////////////////////////////////////////////////
 // PAGE 0
 #define     RFU00                 0x00
@@ -111,7 +111,7 @@
 #define     RFU3F		  		        0x3F
 
 /////////////////////////////////////////////////////////////////////
-//和MF522通讯时返回的错误代码
+//和MF522通讯时返回的错误代码 //Error code returned when communicating with MF522
 /////////////////////////////////////////////////////////////////////
 #define 	MI_OK                 0x26
 #define 	MI_NOTAGERR           0xcc

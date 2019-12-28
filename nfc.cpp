@@ -12,17 +12,17 @@
 void IC_test ( void )
 {
 	char cStr [ 30 ];
-	uint8_t ucArray_ID [ 4 ];    /*先后存放IC卡的类型和UID(IC卡序列号)*/
-	uint8_t ucStatusReturn;      /*返回状态*/
+	uint8_t ucArray_ID [ 4 ];    /*先后存放IC卡的类型和UID(IC卡序列号) // IC card type and UID (IC card serial number)*/
+	uint8_t ucStatusReturn;      /*返回状态 // Return status*/
 	static uint8_t ucLineCount = 0;
 	while ( 1 ) {
-		/*寻卡*/
-		if ( ( ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID ) ) != MI_OK ) { /*若失败再次寻卡*/
+		/*Find card*/
+		if ( ( ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID ) ) != MI_OK ) { /*若失败再次寻卡 //If you fail to find the card again*/
 			ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID );
 		}
 
 		if ( ucStatusReturn == MI_OK  ) {
-			/*防冲撞（当有多张卡进入读写器操作范围时，防冲突机制会从其中选择一张进行操作）*/
+			/*防冲撞（当有多张卡进入读写器操作范围时，防冲突机制会从其中选择一张进行操作） // Anti-collision (when multiple cards enter the reader's operating range, the anti-collision mechanism will select one of them to operate)*/
 			if ( PcdAnticoll ( ucArray_ID ) == MI_OK ) {
 				sprintf ( cStr, "The Card ID is: %02X%02X%02X%02X",
 				          ucArray_ID [ 0 ],
