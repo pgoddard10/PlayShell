@@ -10,21 +10,34 @@
 
 #include "RC522.c"
 
+void create_tts(std::string text, bool as_file = false, std::string filename = "null") {	
+	std::cout << "Creating some TTS" << std::endl;
+	std::string str = "flite -voice cmu_us_slt"; //change from default voice
+	if(as_file == true) {
+		str = str + " -o " + filename + ".wav"; //save as file (instead of reading aloud)
+	}
+	str = str + " -t '" + text + "' --setf duration_stretch=1.25"; //specify the text and slow the voice down
+	const char *command = str.c_str(); //convert the string into a char array
+	system(command); //run as a system command
+	delay(100); //pause to ensure speech has finished
+}
+
 static int callback(void* data, int argc, char** argv, char** azColName) {
 	int i;
 	//fprintf(stderr, "%s: ", (const char*)data);
-
+	std::string tagID = "";
 	for (i = 0;i < argc;i++) {
-		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-		printf("this: %s",argv[i]);
-		std::string str = "flite -voice cmu_us_slt -t '";
-		str = str + argv[i] + "'"; 
-		const char *command = str.c_str(); 
-		system(command);
-		delay(100);
+		//printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+		//printf("this: %s",argv[i]);
+		std::cout << "Column Name: " << azColName[i] << std::endl;
+		std::cout << "Contents: " << argv[i] <<std::endl;
+		if(strcmp(azColName[i],"id")==0) {
+			tagID = argv[i];
+		}
+		else {
+			create_tts(argv[i], true, tagID);
+		}
 	}
-
-	printf("\n");
 	return 0;
 }
 
@@ -63,8 +76,8 @@ std::string get_nfc_ID(){
 int main(int argc, char** argv) {
 	sqlite3* DB;
 	//char* messaggeError;
-	int exit = sqlite3_open("audio_culture.db", &DB);
-	std::string query = "SELECT * FROM tag;";
+	//int exit = sqlite3_open("audio_culture.db", &DB);
+	//std::string query = "SELECT * FROM tag;";
 
 	//std::cout << "STATE OF TABLE BEFORE INSERT" << std::endl;
 
@@ -73,20 +86,20 @@ int main(int argc, char** argv) {
 	RC522_setup(7);
 	PcdReset ();
 	M500PcdConfigISOType('A');
-	printf("Start NFC scan\r\n");
-	std::string str = "flite -voice cmu_us_slt -t ";
-	str = str + "'Please scan a tag.'"; 
-	const char *command = str.c_str(); 
-	system(command);
-	delay(100);
+	//delay(100); //to let the program wake up properly before trying to trigger TTS
+	std::string welcome_msg = "Please scan a tag.";
+	create_tts(welcome_msg, false);
+	std::cout << welcome_msg << std::endl;
 	while(1) {
 		std::string nfcID = "";
 		nfcID = get_nfc_ID();
 		if(nfcID.length() > 0) {
 			std::cout << "Tag successfully scanned: " << nfcID << " ... searching for matching record..." << std::endl;
 
-			//insert tag ID into database:
-			std::string sql("SELECT desc FROM tag WHERE ID = '"+nfcID+"';");
+			int exit = sqlite3_open("audio_culture.db", &DB);
+
+			//select tag from database:
+			std::string sql("SELECT id, desc FROM tag WHERE ID = '"+nfcID+"';");
 			if (exit) {
 				std::cerr << "Error open DB " << sqlite3_errmsg(DB) << std::endl;
 				return (-1);
@@ -117,11 +130,14 @@ int main(int argc, char** argv) {
 			// std::cout << "STATE OF TABLE AFTER INSERT" << std::endl;
 
 			// sqlite3_exec(DB, query.c_str(), callback, NULL, NULL);
-			
+			sqlite3_close(DB);
+			std::string scan_another_msg = "Please scan another tag.";
+			create_tts(scan_another_msg, false);
+			std::cout << scan_another_msg << std::endl;
 		}
 		delay(100);
 	}
 
-	sqlite3_close(DB);
+	//sqlite3_close(DB);
 	return (0);
 }
