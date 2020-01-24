@@ -4,11 +4,12 @@
 #include <string.h>
 #include <iostream>
 
-#include <sqlite3.h>
+#include <sqlite3.h> //for the database interaction
 #include <wiringPi.h>
-#include <wiringPiSPI.h>
+#include <wiringPiSPI.h> 
+#include <SFML/Audio.hpp> //for music
 
-#include "RC522.c"
+#include "RC522.c" //for NFC scanning
 
 void create_tts(std::string text, bool as_file = false, std::string filename = "null") {
 	std::string str = "flite -voice cmu_us_slt"; //change from default voice
@@ -80,6 +81,17 @@ int get_desc_from_db(std::string nfcID) {
 	return 0;
 }
 
+int play_wav(std::string filename) {
+	sf::Music buffer;
+	if (!buffer.openFromFile(filename)) {
+			std::cout << "error loading file: '" << filename << "'" << std::endl;
+			return -1; // error
+	}
+	buffer.play();
+	delay(1000);
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	RC522_setup(7);
 	PcdReset ();
@@ -97,7 +109,12 @@ int main(int argc, char** argv) {
 	}
 	
 	std::string welcome_msg = "Please scan a tag.";
-	create_tts(welcome_msg, create_wav, "please_scan_a_tag");
+	if(create_wav) {
+		create_tts(welcome_msg, create_wav, "please_scan_a_tag");
+	}
+	else {
+		play_wav("sounds/please_scan_a_tag.wav");
+	}
 	std::cout << welcome_msg << std::endl;
 	while(1) {
 		std::string nfcID = "";
