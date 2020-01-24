@@ -1,0 +1,5 @@
+Sadly I cannot work out how to connect to the Flite library as an include.
+
+Essencially, I think, it comes down to the linking within the compiler.
+
+Check out the Makefile - if running as GCC it's fine. Using the exact same setup but switching to G++, it fails. WHY?!?

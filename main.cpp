@@ -11,15 +11,18 @@
 #include "RC522.c"
 
 void create_tts(std::string text, bool as_file = false, std::string filename = "null") {	
-	std::cout << "Creating some TTS" << std::endl;
+	std::cout << "\ta) Creating some TTS" << std::endl;
 	std::string str = "flite -voice cmu_us_slt"; //change from default voice
 	if(as_file == true) {
 		str = str + " -o " + filename + ".wav"; //save as file (instead of reading aloud)
 	}
 	str = str + " -t '" + text + "' --setf duration_stretch=1.25"; //specify the text and slow the voice down
+	std::cout << "\tb) Created string: " << str << std::endl;
 	const char *command = str.c_str(); //convert the string into a char array
+	std::cout << "\tc) string created" << std::endl;
 	system(command); //run as a system command
-	delay(100); //pause to ensure speech has finished
+	std::cout << "\td) TTS finished (processed). Pausing..." << std::endl;
+	delay(200); //pause to ensure speech has finished
 }
 
 static int callback(void* data, int argc, char** argv, char** azColName) {
@@ -36,6 +39,8 @@ static int callback(void* data, int argc, char** argv, char** azColName) {
 		}
 		else {
 			create_tts(argv[i], true, tagID);
+			std::cout << "Pausing again, just incase..." << std::endl;
+			delay(200); //pause to ensure speech has finished
 		}
 	}
 	return 0;
