@@ -77,18 +77,23 @@ int get_desc_from_db(std::string nfcID) {
 		std::cerr << "Error SELECT" << std::endl;
 		return (-1);
 	}
-	sqlite3_close(DB);	
+	sqlite3_close(DB);
 	return 0;
 }
 
 int play_wav(std::string filename) {
+	std::cout << "playing sound file " << filename << std::endl;
 	sf::Music buffer;
 	if (!buffer.openFromFile(filename)) {
 			std::cout << "error loading file: '" << filename << "'" << std::endl;
 			return -1; // error
 	}
 	buffer.play();
-	delay(1000);
+	float duration = buffer.getDuration().asSeconds();
+	//std::string str = to_string(duration);
+	duration = (duration * 1000)+1000;
+	std::cout << duration << std::endl;
+	delay(duration);
 	return 0;
 }
 
@@ -96,21 +101,31 @@ int main(int argc, char** argv) {
 	RC522_setup(7);
 	PcdReset ();
 	M500PcdConfigISOType('A');
-	
-	bool create_wav = true;
-	if(argc==2) {
-		if(strcmp(argv[1],"-otf")==0) {
-			create_wav = false;
+
+	bool tts = true;
+	bool save_as_wav = false;
+	if(argc > 1) {
+		if((strcmp(argv[1],"tts")==0) && (strcmp(argv[2],"play")==0)) {
+			tts = true;
+			save_as_wav = false;
+		}
+		else if((strcmp(argv[1],"tts")==0) && (strcmp(argv[2],"wav")==0)) {
+			tts = true;
+			save_as_wav = true;
+		}
+		else if((strcmp(argv[1],"wav")==0) && (strcmp(argv[2],"play")==0)) {
+			tts = false;
+			save_as_wav = false; //N/A
 		}
 		else {
-			fprintf(stderr,"usage: either no params or use the switch \n-otf \t\t Play the TTS on the fly instead of creating a .wav file.\n");
+			fprintf(stderr,"usage: tts play (default) OR tts wav OR wav play\n\n");
 			return 1;
 		}
 	}
 	
 	std::string welcome_msg = "Please scan a tag.";
-	if(create_wav) {
-		create_tts(welcome_msg, create_wav, "please_scan_a_tag");
+	if(tts) {
+		create_tts(welcome_msg, save_as_wav, "please_scan_a_tag");
 	}
 	else {
 		play_wav("sounds/please_scan_a_tag.wav");
@@ -121,9 +136,23 @@ int main(int argc, char** argv) {
 		nfcID = get_nfc_ID();
 		if(nfcID.length() > 0) {
 			std::cout << "Tag successfully scanned: " << nfcID << " ... searching for matching record..." << std::endl;
-			get_desc_from_db(nfcID);
+			
+			if(tts) {
+				get_desc_from_db(nfcID);
+			}
+			else {
+				std::string soundfile = "sounds/" + nfcID + ".wav";
+				std::cout << soundfile << std::endl;
+				play_wav(soundfile);
+			}
+			
 			std::string scan_another_msg = "Please scan another tag.";
-			create_tts(scan_another_msg, create_wav, "please_scan_another_tag");
+			if(tts) {
+				create_tts(scan_another_msg, save_as_wav, "please_scan_another_tag");
+			}
+			else {
+				play_wav("sounds/please_scan_another_tag.wav");
+			}
 			std::cout << scan_another_msg << std::endl;
 		}
 	}
