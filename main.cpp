@@ -4,12 +4,14 @@
 #include <string.h>
 #include <iostream>
 
-#include <sqlite3.h> //for the database interaction
-#include <wiringPi.h>
-#include <wiringPiSPI.h> 
-#include <SFML/Audio.hpp> //for music
+#include <wiringPi.h> //only needed if directly using the wires in this file...
+//#include <wiringPiSPI.h>  //only needed if directly using the wires over SPI in this file...
+#include <SFML/Audio.hpp> //for music/audio playback of .wav files
 
 #include "RC522.h" //for NFC scanning
+#include "database.h" //for database interaction
+
+Database db = Database();
 
 void create_tts(std::string text, bool as_file = false, std::string filename = "null") {
 	std::string str = "flite -voice cmu_us_slt"; //change from default voice
@@ -19,21 +21,6 @@ void create_tts(std::string text, bool as_file = false, std::string filename = "
 	str = str + " -t '" + text + "' --setf duration_stretch=1.25"; //specify the text and slow the voice down
 	const char *command = str.c_str(); //convert the string into a char array
 	system(command); //run as a system command
-}
-
-static int callback(void* data, int argc, char** argv, char** azColName) {
-	int i;
-	std::string tagID = "";
-	for (i = 0;i < argc;i++) {
-		if(strcmp(azColName[i],"id")==0) {
-			tagID = argv[i];
-		}
-		else {
-			std::cout << "Record found: \n" << argv[i] << std::endl; 
-			create_tts(argv[i], true, tagID);
-		}
-	}
-	return 0;
 }
 
 std::string get_nfc_ID(){
@@ -60,27 +47,6 @@ std::string get_nfc_ID(){
 	}
 }
 
-int get_desc_from_db(std::string nfcID) {
-	sqlite3* DB;
-	int exit = sqlite3_open("audio_culture.db", &DB);
-
-	//select tag from database:
-	std::string sql("SELECT id, desc FROM tag WHERE ID = '"+nfcID+"';");
-	if (exit) {
-		std::cerr << "Error open DB " << sqlite3_errmsg(DB) << std::endl;
-		return (-1);
-	}
-
-	int rc = sqlite3_exec(DB, sql.c_str(), callback, NULL, NULL);
-
-	if (rc != SQLITE_OK) {
-		std::cerr << "Error SELECT" << std::endl;
-		return (-1);
-	}
-	sqlite3_close(DB);
-	return 0;
-}
-
 int play_wav(std::string filename) {
 	std::cout << "playing sound file " << filename << std::endl;
 	sf::Music buffer;
@@ -90,10 +56,9 @@ int play_wav(std::string filename) {
 	}
 	buffer.play();
 	float duration = buffer.getDuration().asSeconds();
-	//std::string str = to_string(duration);
 	duration = (duration * 1000)+1000;
 	std::cout << duration << std::endl;
-	delay(duration);
+	delay(duration); //uses the WiringPi include
 	return 0;
 }
 
@@ -138,7 +103,7 @@ int main(int argc, char** argv) {
 			std::cout << "Tag successfully scanned: " << nfcID << " ... searching for matching record..." << std::endl;
 			
 			if(tts) {
-				get_desc_from_db(nfcID);
+				db.get_desc_from_db(nfcID);
 			}
 			else {
 				std::string soundfile = "sounds/" + nfcID + ".wav";
