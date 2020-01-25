@@ -3,65 +3,87 @@
  *  @Date: Winter/Spring 2019-2020
  *  @Description: 
  *
+ *
+ * Database functions built based on https://www.dreamincode.net/forums/topic/122300-sqlite-in-c/ [25/01/2020]
  */
  
 #include "database.h"
 
 /** constructor, as per default settings */
-Database::Database() {
-	db_name = "audio_culture.db";
+Database::Database(const char* db_name) {
+	this->db_name = db_name;
+	this->db = NULL;
 }
 
 /** deconstructor, as per default settings */
 Database::~Database() {
 }
 
-std::string Database::get_tag_desc(std::string nfcID) {
-	sqlite3* db;
-	int exit = sqlite3_open(this->db_name, &db);
-	if (exit) {
-		std::cerr << "Error opening db " << sqlite3_errmsg(db) << std::endl;
-		return "";
+bool Database::open() {
+	if(sqlite3_open(this->db_name, &db) == SQLITE_OK) {
+		return true;
 	}
-	
-	std::string str = "SELECT id, desc FROM tag WHERE ID = '"+nfcID+"';";
-	const char* search_str = str.c_str();
-	
-						std::string desc;
-	
-	sqlite3_stmt *statement;
+	return false;
+}
 
-	if(sqlite3_prepare_v2(db, search_str, -1, &statement, 0) == SQLITE_OK)
-	{
-		int cols = sqlite3_column_count(statement);
-		int result = 0;
-		while(true)
-		{
-			result = sqlite3_step(statement);
-			
-			if(result == SQLITE_ROW)
-			{
-				for(int col = 0; col < cols; col++)
-				{
-					std::string s = (char*)sqlite3_column_text(statement, col);
-					if(col==0) {
-						std::cout << "Tag ID found: " << s << std::endl;
+void Database::close() {
+	sqlite3_close(this->db);
+}
+
+int Database::query(std::string query) {
+	if(this->open()) {
+		const char* search_str = query.c_str();
+		
+		sqlite3_stmt *statement;
+		this->results.clear();
+
+		if(sqlite3_prepare_v2(this->db, search_str, -1, &statement, 0) == SQLITE_OK) {
+			int cols = sqlite3_column_count(statement);
+			int result = 0;
+			while(true) {
+				result = sqlite3_step(statement);
+				
+				if(result == SQLITE_ROW) {
+					std::vector<std::string> values;
+					for(int col = 0; col < cols; col++) {
+						values.push_back((char*)sqlite3_column_text(statement, col));
 					}
-					else if(col==1) {
-						desc = s;
-					}
+					this->results.push_back(values);
+				}
+				else {
+					break;   
 				}
 			}
-			else
-			{
-				break;   
-			}
+		   
+			sqlite3_finalize(statement);
 		}
-	   
-		sqlite3_finalize(statement);
+		
+		std::string error = sqlite3_errmsg(this->db);
+		this->close();
+		
+		if(error != "not an error") {
+			std::cout << query << " " << error << std::endl;
+			return -1;
+		}
+		return 0;
 	}
-	
-	sqlite3_close(db);
-	
-	return desc;
+	else {
+		return -1;
+	}
+}
+
+
+bool Database::does_tag_exist(std::string nfcID){
+	std::string str = "SELECT ID FROM tag WHERE ID = '"+nfcID+"';"; //build query
+	this->query(str); //run query in database
+	if(results.empty()) {
+		return false;
+	}
+	return true;
+}
+
+std::string Database::get_tag_desc(std::string nfcID) {
+	std::string str = "SELECT desc FROM tag WHERE ID = '"+nfcID+"';"; //build query
+	this->query(str); //run query in database
+	return this->results[0][0]; //return description
 }
