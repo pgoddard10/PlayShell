@@ -14,14 +14,14 @@
 
 class Database {
 
- public:
-	Database(); /** constructor, as per default settings */
-	~Database(); /** deconstructor, as per default settings */
-	int get_desc_from_db(std::string nfcID);
+	public:
+		Database(); /** constructor, as per default settings */
+		~Database(); /** deconstructor, as per default settings */
+		std::string get_tag_desc(std::string nfcID);
 
- private:
-	static int callback(void* data, int argc, char** argv, char** azColName);
- 
+	private:
+		const char* db_name; //name of the database
+		 
 };
 
 #endif // DATABASE_H

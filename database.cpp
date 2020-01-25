@@ -9,46 +9,59 @@
 
 /** constructor, as per default settings */
 Database::Database() {
+	db_name = "audio_culture.db";
 }
 
 /** deconstructor, as per default settings */
 Database::~Database() {
 }
 
-//was static int
-int Database::callback(void* data, int argc, char** argv, char** azColName) {
-	int i;
-	std::string tagID = "";
-	for (i = 0;i < argc;i++) {
-		if(strcmp(azColName[i],"id")==0) {
-			tagID = argv[i];
-		}
-		else {
-			std::cout << "Record found: \n" << argv[i] << std::endl; 
-			//create_tts(argv[i], true, tagID);
-		}
-	}
-	return 0;
-}
-
-
-int Database::get_desc_from_db(std::string nfcID) {
-	sqlite3* DB;
-	int exit = sqlite3_open("audio_culture.db", &DB);
-
-	//select tag from database:
-	std::string sql("SELECT id, desc FROM tag WHERE ID = '"+nfcID+"';");
+std::string Database::get_tag_desc(std::string nfcID) {
+	sqlite3* db;
+	int exit = sqlite3_open(this->db_name, &db);
 	if (exit) {
-		std::cerr << "Error open DB " << sqlite3_errmsg(DB) << std::endl;
-		return (-1);
+		std::cerr << "Error opening db " << sqlite3_errmsg(db) << std::endl;
+		return "";
 	}
+	
+	std::string str = "SELECT id, desc FROM tag WHERE ID = '"+nfcID+"';";
+	const char* search_str = str.c_str();
+	
+						std::string desc;
+	
+	sqlite3_stmt *statement;
 
-	int rc = sqlite3_exec(DB, sql.c_str(), callback, NULL, NULL);
-
-	if (rc != SQLITE_OK) {
-		std::cerr << "Error SELECT" << std::endl;
-		return (-1);
+	if(sqlite3_prepare_v2(db, search_str, -1, &statement, 0) == SQLITE_OK)
+	{
+		int cols = sqlite3_column_count(statement);
+		int result = 0;
+		while(true)
+		{
+			result = sqlite3_step(statement);
+			
+			if(result == SQLITE_ROW)
+			{
+				for(int col = 0; col < cols; col++)
+				{
+					std::string s = (char*)sqlite3_column_text(statement, col);
+					if(col==0) {
+						std::cout << "Tag ID found: " << s << std::endl;
+					}
+					else if(col==1) {
+						desc = s;
+					}
+				}
+			}
+			else
+			{
+				break;   
+			}
+		}
+	   
+		sqlite3_finalize(statement);
 	}
-	sqlite3_close(DB);
-	return 0;
+	
+	sqlite3_close(db);
+	
+	return desc;
 }
