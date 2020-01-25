@@ -9,7 +9,7 @@
 #include <wiringPiSPI.h> 
 #include <SFML/Audio.hpp> //for music
 
-#include "RC522.c" //for NFC scanning
+#include "RC522.h" //for NFC scanning
 
 void create_tts(std::string text, bool as_file = false, std::string filename = "null") {
 	std::string str = "flite -voice cmu_us_slt"; //change from default voice
