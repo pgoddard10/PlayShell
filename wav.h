@@ -20,6 +20,7 @@ class WAV {
 		WAV(); /** constructor, as per default settings */
 		~WAV(); /** deconstructor, as per default settings */
 		int play_wav(std::string filename);
+		int delete_file(std::string filename);
 
 	private:
 		//something

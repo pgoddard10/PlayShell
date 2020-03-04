@@ -20,6 +20,8 @@ class Database {
 		~Database(); /** deconstructor, as per default settings */
 		bool does_tag_exist(std::string nfcID);
 		std::string get_tag_desc(std::string);
+		int save_desc(std::string nfcID, std::string desc);
+		int delete_tag(std::string nfcID);
 
 	private:
 		const char* db_name; //name of the database

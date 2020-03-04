@@ -41,4 +41,3 @@ std::string NFC::get_nfc_ID(){
 		}
 	}
 }
-

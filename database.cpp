@@ -55,6 +55,7 @@ int Database::query(std::string query) {
 				}
 			}
 		   
+			//sqlite3_exec(this->db, "COMMIT;", NULL, NULL, NULL);
 			sqlite3_finalize(statement);
 		}
 		
@@ -76,7 +77,8 @@ int Database::query(std::string query) {
 bool Database::does_tag_exist(std::string nfcID){
 	std::string str = "SELECT ID FROM tag WHERE ID = '"+nfcID+"';"; //build query
 	this->query(str); //run query in database
-	if(results.empty()) {
+
+	if(this->results.empty()) {
 		return false;
 	}
 	return true;
@@ -86,4 +88,20 @@ std::string Database::get_tag_desc(std::string nfcID) {
 	std::string str = "SELECT desc FROM tag WHERE ID = '"+nfcID+"';"; //build query
 	this->query(str); //run query in database
 	return this->results[0][0]; //return description
+}
+
+int Database::save_desc(std::string nfcID, std::string desc) {
+	std::string str = "INSERT into tag VALUES('"+nfcID+"','"+desc+"');"; //build query
+	if(this->query(str)==0) { //run query in database
+		return 0;
+	}
+	return -1;
+}
+
+int Database::delete_tag(std::string nfcID) {
+	std::string str = "DELETE FROM tag WHERE ID = '"+nfcID+"';"; //build query
+	if(this->query(str)==0) { //run query in database
+		return 0;
+	}
+	return -1;
 }

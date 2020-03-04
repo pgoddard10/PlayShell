@@ -29,7 +29,6 @@ class Tag_management {
 		NFC nfc = NFC();
 		
 		int add_tag();
-		int edit_tag();
 		int delete_tag();
 };
 

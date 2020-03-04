@@ -9,6 +9,9 @@
 #include "wav.h" //for .wav file interaction
 #include "nfc.h" //for NFC tag interaction
 #include "tag_management.h" //for NFC tag interaction
+#include <MPU6050.h>
+
+MPU6050 device(0x68);
 
 int main(int argc, char** argv) {
 	TTS tts = TTS();
@@ -16,8 +19,17 @@ int main(int argc, char** argv) {
 	Database db = Database("audio_culture.db");
 	NFC nfc = NFC();
 	Tag_management tag_management = Tag_management();
+	
+	float ax, ay, az, gr, gp, gy; //Variables to store the accel, gyro and angle values
 
-	bool use_tts = true;
+	sleep(1); //Wait for the MPU6050 to stabilize
+	
+	device.calc_yaw = true;
+
+
+	
+
+	bool use_tts = false;
 	bool save_as_wav = false;
 	bool manage = false;
 	if(argc > 1) {
@@ -28,6 +40,7 @@ int main(int argc, char** argv) {
 		else if((strcmp(argv[1],"tts")==0) && (strcmp(argv[2],"wav")==0)) {
 			use_tts = true;
 			save_as_wav = true;
+			std::cout << "-- No sound will be played during this program run. --" << std::endl;
 		}
 		else if((strcmp(argv[1],"wav")==0) && (strcmp(argv[2],"play")==0)) {
 			use_tts = false;
@@ -37,13 +50,15 @@ int main(int argc, char** argv) {
 			manage = true;
 		}
 		else {
-			fprintf(stderr,"usage: tts play (default) OR tts wav OR wav play\n\n");
+			fprintf(stderr,"usage: wav play (default) OR tts wav OR tts play\n\n");
 			return 1;
 		}
 	}
 	if(manage) {
 		while(1) {
-			tag_management.manage();
+			if(tag_management.manage()!=0) {
+				break;
+			}
 		}
 	}
 	else {
@@ -74,6 +89,16 @@ int main(int argc, char** argv) {
 					std::string soundfile = "sounds/" + nfcID + ".wav";
 					std::cout << soundfile << std::endl;
 					wav.play_wav(soundfile);
+				}
+				
+				for (int i = 0; i < 5; i++) {
+					device.getAngle(0, &gr);
+					device.getAngle(1, &gp);
+					device.getAngle(2, &gy);
+					std::cout << "Current angle around the roll axis: " << gr << "\n";
+					std::cout << "Current angle around the pitch axis: " << gp << "\n";
+					std::cout << "Current angle around the yaw axis: " << gy << "\n";
+					usleep(250000); //0.25sec
 				}
 				
 				std::string scan_another_msg = "Please scan another tag.";
