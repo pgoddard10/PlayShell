@@ -21,7 +21,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     $user->set_session();
   }
   else {
-    //header('Location: login.php?invalid_login');
+    header('Location: login.php?invalid_login');
     exit;
   }
 }
@@ -269,13 +269,6 @@ $user->roles = $staff_db->select_active_roles($user->staff_id);
           <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
             <i class="fa fa-bars"></i>
           </button>
-
-          <?php if(isset($_GET['page'])) {
-            $name = str_replace("_"," ",$_GET['page']); //replace the underscore with a space
-            $name = ucwords($name); //capitalise the first char of each word
-            echo '<h1 class="h2 mb-2 text-gray-800">'.$name.'</h1>'; //print the page name as the title
-          }
-          ?>
           
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
@@ -478,11 +471,11 @@ $user->roles = $staff_db->select_active_roles($user->staff_id);
   </a>
 
   <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <h5 class="modal-title" id="logoutModalLabel">Ready to Leave?</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>

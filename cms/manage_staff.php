@@ -15,14 +15,21 @@ $all_staff = $staff_db->select_all_staff_details();
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <?php if(isset($_GET['action'])) {
-            $name = str_replace("_"," ",$_GET['action']); //replace the underscore with a space
+          <?php if(isset($_GET['page'])) {
+            $name = str_replace("_"," ",$_GET['page']); //replace the underscore with a space
             $name = ucwords($name); //capitalise the first char of each word
-            echo '<h1 class="h3 mb-2 text-gray-800">'.$name.'</h1>'; //print the page name as the title
+            echo '<h1 class="h2 mb-2 text-gray-800">'.$name.'</h1>'; //print the page name as the title
           }
-          else {
-            echo '<h1 class="h3 mb-2 text-gray-800">View Staff</h1>'; //print the page name as the title
-          }
+          ?>
+          <?php
+          // if(isset($_GET['action'])) {
+          //   $name = str_replace("_"," ",$_GET['action']); //replace the underscore with a space
+          //   $name = ucwords($name); //capitalise the first char of each word
+          //   echo '<h1 class="h3 mb-2 text-gray-800">'.$name.'</h1>'; //print the page name as the title
+          // }
+          // else {
+          //   echo '<h1 class="h3 mb-2 text-gray-800">View Staff</h1>'; //print the page name as the title
+          // }
           ?>
 
           <!-- DataTales Example -->
@@ -55,7 +62,10 @@ $all_staff = $staff_db->select_all_staff_details();
                                 }
                             }
                         echo '</td>';
-                        echo '<td><a href="?page=manage_staff&action=edit&staff_id='.$staff['staff_id'].'"><i class=".btn-circle .btn-sm fas fa-edit"></i></a> | <a href="?page=manage_staff&action=delete&staff_id='.$staff['staff_id'].'"><i class=".btn-circle .btn-sm fas fa-trash"></i></a></td>';
+                        echo '<td>
+                                <a href="#" data-toggle="modal" data-target="#editModal-'.$staff['staff_id'].'"><i class=".btn-circle .btn-sm fas fa-edit"></i></a> | 
+                                <a href="#" data-toggle="modal" data-target="#deleteModalCenter-'.$staff['staff_id'].'"><i class=".btn-circle .btn-sm fas fa-trash"></i></a>
+                              </td>';
                         echo '</tr>';
                     }
                     ?>
@@ -72,4 +82,55 @@ $all_staff = $staff_db->select_all_staff_details();
       <!-- End of Main Content -->
 
 
-      
+      <?php
+      foreach($all_staff as $staff) {
+        ?>
+
+      <!-- Delete Modal -->
+      <div class="modal fade" id="deleteModalCenter-<?php echo $staff['staff_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="deleteModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLongTitle">Confirm Deletion</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Are you sure you wish to delete <?php echo $staff['first_name'].' '.$staff['last_name']; ?>?<br />
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Edit Modal -->
+      <div class="modal fade" id="editModal-<?php echo $staff['staff_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editModalLabel">Edit <?php echo $staff['first_name'].' '.$staff['last_name']; ?></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+            <?php echo $staff['first_name'].' '.$staff['last_name']; ?>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <?php
+      }
+      ?>
+
+            
