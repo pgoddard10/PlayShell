@@ -4,9 +4,21 @@ if(isset($_GET['logout'])) {
   session_destroy();
 }
 
-if(isset($_SESSION['username'])) {
-  header('Location: index.php');
-  exit;
+
+define("DATABASE",'audio_culture.db');
+
+//check if a login session is already active and the user is still valid
+if(isset($_SESSION['username'])){
+  require_once('Staff.php');
+  require_once('StaffDatabase.php');
+  $user = new Staff();
+  $staff_db = new StaffDatabase(DATABASE);
+  $staff = $staff_db->select_staff_details($_SESSION['username']);
+  $user->staff_id = $staff['staff_id'];
+  if(isset($user->active) && $user->active==1) {
+    header('Location: index.php');
+    exit;
+  }
 }
 ?>
 
@@ -62,7 +74,7 @@ if(isset($_SESSION['username'])) {
                       }
                     ?>
                   </div>
-                  <form class="user" method="POST" action="index.php">
+                  <form class="user" method="POST" action="index.php?login">
                     <div class="form-group">
                       <input type="username" class="form-control form-control-user" id="username" name="username" placeholder="Enter Username" required minlength=2>
                     </div>

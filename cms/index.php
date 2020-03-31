@@ -1,22 +1,29 @@
 <?php
 session_start();
 
-require_once('User.php');
+require_once('Staff.php');
 require_once('StaffDatabase.php');
 require_once('ContentDatabase.php');
 
 define("DATABASE",'audio_culture.db');
+define("STAFF_DB_MANAGER",1);
+define("CONTENT_MANAGER",2);
+define("REPORT_MANAGER",3);
+define("VISITOR_MANAGER",4);
+define("DEVICE_MANAGER",5);
+if(isset($_GET['page'])) define("PAGE",strtolower($_GET['page']));
+else define("PAGE","dashboard");
 
 $staff_db = new StaffDatabase(DATABASE);
 $content_db = new ContentDatabase(DATABASE);
-$user = new User;
+$user = new Staff;
 
 //login function
-if(isset($_POST['username']) && isset($_POST['password'])) {
+if(isset($_GET['login']) && isset($_POST['username']) && isset($_POST['password'])) {
   $username = $_POST['username'];
   $password = $_POST['password'];
-  $user_details = $staff_db->select_staff_details($username);
-  if($username==$user_details['username'] && password_verify($password,$user_details['password'])) {
+  $staff = $staff_db->select_staff_details($username);
+  if($username==$staff['username'] && password_verify($password,$staff['password']) && $staff['active']==1) {
     $user->username = $username;
     $user->set_session();
   }
@@ -26,17 +33,21 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
   }
 }
 
-//check if a login session is already active
-if(!isset($_SESSION['username'])){
+$staff = $staff_db->select_staff_details($_SESSION['username']);
+$user->staff_id = $staff['staff_id'];
+$user->first_name = $staff['first_name'];
+$user->last_name = $staff['last_name'];
+$user->username = $staff['username'];
+$user->display_name = $staff['first_name'].' '.$staff['last_name'];
+$user->email = $staff['email'];
+$user->roles = $staff_db->select_active_roles($staff['staff_id']);
+$user->active = $staff['active'];
+
+//check if a login session is already active and the user is still valid
+if(!isset($_SESSION['username']) || $user->active==0){
   header('Location: login.php');
   exit;
 }
-
-$user_details = $staff_db->select_staff_details($_SESSION['username']);
-$user->display_name = $user_details['first_name'].' '.$user_details['last_name'];
-$user->staff_id = $user_details['staff_id'];
-$user->roles = $staff_db->select_active_roles($user->staff_id);
-
 ?>
 
 <!DOCTYPE html>
@@ -92,159 +103,70 @@ $user->roles = $staff_db->select_active_roles($user->staff_id);
       <!-- Divider -->
       <hr class="sidebar-divider">
       
-    <?php if(in_array(1,$user->roles)) { ?>
-      <!-- Nav Item - Staff Collapse Menu -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+    <?php if(in_array(STAFF_DB_MANAGER,$user->roles)) { ?>
+      <!-- Nav Item - Staff Management -->
+      <li class="nav-item active">
+        <a class="nav-link" href="?page=manage_staff">
           <i class="fas fa-fw fa-id-card"></i>
-          <span>Staff</span>
-        </a>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="?page=manage_staff">View & Edit</a>
-            <a class="collapse-item" href="cards.html">Add New</a>
-          </div>
-        </div>
+          <span>Manage Staff</span></a>
       </li>
     <?php  } ?>
       
       
-    <?php if(in_array(2,$user->roles)) { ?>
+    <?php if(in_array(CONTENT_MANAGER,$user->roles)) { ?>
       <!-- Nav Item - Content Collapse Menu -->
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
           <i class="fas fa-fw fa-file-audio"></i>
           <span>Content</span>
         </a>
         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="buttons.html">Search & View</a>
-            <a class="collapse-item" href="cards.html">Add New</a>
+            <a class="collapse-item" href="?page=manage_content">Check out</a>
+            <a class="collapse-item" href="?page=manage_content">Add New</a>
           </div>
         </div>
       </li>
     <?php  } ?>
 
 
-    <?php if(in_array(3,$user->roles)) { ?>
+    <?php if(in_array(REPORT_MANAGER,$user->roles)) { ?>
       <!-- Nav Item - Report Management -->
-      <li class="nav-item">
-        <a class="nav-link" href="report.php">
+      <li class="nav-item active">
+        <a class="nav-link" href="?page=manage_reports">
           <i class="fas fa-fw fa-chart-bar"></i>
           <span>Reports</span></a>
       </li>
     <?php  } ?>
       
-    <?php if(in_array(4,$user->roles)) { ?>
-      <!-- Nav Item - Visitor Collapse Menu -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+
+
+    <?php if(in_array(VISITOR_MANAGER,$user->roles)) { ?>
+      <!-- Nav Item - Visitor Management -->
+      <li class="nav-item active">
+        <a class="nav-link" href="?page=manage_visitors">
           <i class="fas fa-fw fa-users"></i>
-          <span>Staff</span>
-        </a>
-        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="buttons.html">Search & View</a>
-            <a class="collapse-item" href="cards.html">Add New</a>
-          </div>
-        </div>
+          <span>Manage Visitors</span></a>
       </li>
     <?php  } ?>
+
       
-    <?php if(in_array(5,$user->roles)) { ?>
+    <?php if(in_array(DEVICE_MANAGER,$user->roles)) { ?>
       <!-- Nav Item - Device Collapse Menu -->
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
           <i class="fas fa-fw fa-hdd"></i>
           <span>Device</span>
         </a>
         <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="buttons.html">Check out</a>
-            <a class="collapse-item" href="cards.html">Add New</a>
+            <a class="collapse-item" href="?page=manage_device">Check out</a>
+            <a class="collapse-item" href="?page=manage_device">Add New</a>
           </div>
         </div>
       </li>
     <?php  } ?>
-
-      <?php
-
-      // <!-- Nav Item - Pages Collapse Menu -->
-      // <li class="nav-item">
-      //   <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-      //     <i class="fas fa-fw fa-cog"></i>
-      //     <span>Components</span>
-      //   </a>
-      //   <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-      //     <div class="bg-white py-2 collapse-inner rounded">
-      //       <h6 class="collapse-header">Custom Components:</h6>
-      //       <a class="collapse-item" href="buttons.html">Buttons</a>
-      //       <a class="collapse-item" href="cards.html">Cards</a>
-      //     </div>
-      //   </div>
-      // </li>
-
-      // <!-- Nav Item - Utilities Collapse Menu -->
-      // <li class="nav-item">
-      //   <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
-      //     <i class="fas fa-fw fa-wrench"></i>
-      //     <span>Utilities</span>
-      //   </a>
-      //   <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-      //     <div class="bg-white py-2 collapse-inner rounded">
-      //       <h6 class="collapse-header">Custom Utilities:</h6>
-      //       <a class="collapse-item" href="utilities-color.html">Colors</a>
-      //       <a class="collapse-item" href="utilities-border.html">Borders</a>
-      //       <a class="collapse-item" href="utilities-animation.html">Animations</a>
-      //       <a class="collapse-item" href="utilities-other.html">Other</a>
-      //     </div>
-      //   </div>
-      // </li>
-
-      // <!-- Divider -->
-      // <hr class="sidebar-divider">
-
-      // <!-- Heading -->
-      // <div class="sidebar-heading">
-      //   Addons
-      // </div>
-
-      // <!-- Nav Item - Pages Collapse Menu -->
-      // <li class="nav-item">
-      //   <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
-      //     <i class="fas fa-fw fa-folder"></i>
-      //     <span>Pages</span>
-      //   </a>
-      //   <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-      //     <div class="bg-white py-2 collapse-inner rounded">
-      //       <h6 class="collapse-header">Login Screens:</h6>
-      //       <a class="collapse-item" href="login.html">Login</a>
-      //       <a class="collapse-item" href="register.html">Register</a>
-      //       <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-      //       <div class="collapse-divider"></div>
-      //       <h6 class="collapse-header">Other Pages:</h6>
-      //       <a class="collapse-item" href="404.html">404 Page</a>
-      //       <a class="collapse-item" href="blank.html">Blank Page</a>
-      //     </div>
-      //   </div>
-      // </li>
-
-      // <!-- Nav Item - Charts -->
-      // <li class="nav-item">
-      //   <a class="nav-link" href="charts.html">
-      //     <i class="fas fa-fw fa-chart-area"></i>
-      //     <span>Charts</span></a>
-      // </li>
-
-      // <!-- Nav Item - Tables -->
-      // <li class="nav-item">
-      //   <a class="nav-link" href="tables.html">
-      //     <i class="fas fa-fw fa-table"></i>
-      //     <span>Tables</span></a>
-      // </li>
-
-      ?>
-
+    
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
 
@@ -431,18 +353,14 @@ $user->roles = $staff_db->select_active_roles($user->staff_id);
 
       <!-- Begin Page Content -->
       <?php
-      if(isset($_GET['page'])) {
-        switch($_GET['page']){
+        switch(PAGE){
           case 'manage_staff':
             require_once('manage_staff.php');
             break;
-          default:
+          case 'dashboard':
             require_once('dashboard.php');
+            break;
         }
-      }
-      else {
-        require_once('dashboard.php');
-      }
       ?>
       <!-- End of Main Content -->
       
@@ -500,21 +418,36 @@ $user->roles = $staff_db->select_active_roles($user->staff_id);
   <script src="js/sb-admin-2.min.js"></script>
 
 
-  <!-- Dashboard -->
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+
+  <?php
+      if(PAGE) {
+        switch(PAGE){
+          case 'manage_staff':?>
+              <!-- Manage Staff -->
+                <!-- Page level plugins -->
+                <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+                <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+                <!-- Page level custom scripts -->
+                <script src="js/demo/datatables-demo.js"></script>
+        <?php
+            break;
+            case 'dashboard':?>
+              <!-- Dashboard -->
+                <!-- Page level plugins -->
+                <script src="vendor/chart.js/Chart.min.js"></script>
+                <!-- Page level custom scripts -->
+                <script src="js/demo/chart-area-demo.js"></script>
+                <script src="js/demo/chart-pie-demo.js"></script>
+              <?php
+                  break;
+          default:
+        }
+      }
+      ?>
 
 
 
-  <!-- Manage Staff -->
-        <!-- Page level plugins -->
-        <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-        <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
-        <!-- Page level custom scripts -->
-        <script src="js/demo/datatables-demo.js"></script>
+
 
 </body>
 
