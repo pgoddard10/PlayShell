@@ -1,9 +1,8 @@
 <?php
 session_start();
 
-require_once('Staff.php');
-require_once('StaffDatabase.php');
-require_once('ContentDatabase.php');
+require_once('controllers/Staff.php');
+require_once('models/StaffDatabase.php');
 
 define("DATABASE",'audio_culture.db');
 define("STAFF_DB_MANAGER",1);
@@ -14,37 +13,17 @@ define("DEVICE_MANAGER",5);
 if(isset($_GET['page'])) define("PAGE",strtolower($_GET['page']));
 else define("PAGE","dashboard");
 
-$staff_db = new StaffDatabase(DATABASE);
-$content_db = new ContentDatabase(DATABASE);
-$user = new Staff;
+$staff_model = new StaffDatabase(DATABASE);
+$staff_controller = new Staff(new StaffDatabase(DATABASE));
 
-//login function
 if(isset($_GET['login']) && isset($_POST['username']) && isset($_POST['password'])) {
-  $username = $_POST['username'];
-  $password = $_POST['password'];
-  $staff = $staff_db->select_staff_details($username);
-  if($username==$staff['username'] && password_verify($password,$staff['password']) && $staff['active']==1) {
-    $user->username = $username;
-    $user->set_session();
-  }
-  else {
-    header('Location: login.php?invalid_login');
-    exit;
-  }
+  $staff_controller->login($_POST['username'],$_POST['password']);
 }
 
-$staff = $staff_db->select_staff_details($_SESSION['username']);
-$user->staff_id = $staff['staff_id'];
-$user->first_name = $staff['first_name'];
-$user->last_name = $staff['last_name'];
-$user->username = $staff['username'];
-$user->display_name = $staff['first_name'].' '.$staff['last_name'];
-$user->email = $staff['email'];
-$user->roles = $staff_db->select_active_roles($staff['staff_id']);
-$user->active = $staff['active'];
+$staff_controller->populate_details($_SESSION['username']);
 
 //check if a login session is already active and the user is still valid
-if(!isset($_SESSION['username']) || $user->active==0){
+if(!isset($_SESSION['username']) || $staff_controller->active==0){
   header('Location: login.php');
   exit;
 }
@@ -103,7 +82,7 @@ if(!isset($_SESSION['username']) || $user->active==0){
       <!-- Divider -->
       <hr class="sidebar-divider">
       
-    <?php if(in_array(STAFF_DB_MANAGER,$user->roles)) { ?>
+    <?php if(in_array(STAFF_DB_MANAGER,$staff_controller->roles)) { ?>
       <!-- Nav Item - Staff Management -->
       <li class="nav-item active">
         <a class="nav-link" href="?page=manage_staff">
@@ -113,7 +92,7 @@ if(!isset($_SESSION['username']) || $user->active==0){
     <?php  } ?>
       
       
-    <?php if(in_array(CONTENT_MANAGER,$user->roles)) { ?>
+    <?php if(in_array(CONTENT_MANAGER,$staff_controller->roles)) { ?>
       <!-- Nav Item - Content Collapse Menu -->
       <li class="nav-item active">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -130,7 +109,7 @@ if(!isset($_SESSION['username']) || $user->active==0){
     <?php  } ?>
 
 
-    <?php if(in_array(REPORT_MANAGER,$user->roles)) { ?>
+    <?php if(in_array(REPORT_MANAGER,$staff_controller->roles)) { ?>
       <!-- Nav Item - Report Management -->
       <li class="nav-item active">
         <a class="nav-link" href="?page=manage_reports">
@@ -141,7 +120,7 @@ if(!isset($_SESSION['username']) || $user->active==0){
       
 
 
-    <?php if(in_array(VISITOR_MANAGER,$user->roles)) { ?>
+    <?php if(in_array(VISITOR_MANAGER,$staff_controller->roles)) { ?>
       <!-- Nav Item - Visitor Management -->
       <li class="nav-item active">
         <a class="nav-link" href="?page=manage_visitors">
@@ -151,7 +130,7 @@ if(!isset($_SESSION['username']) || $user->active==0){
     <?php  } ?>
 
       
-    <?php if(in_array(DEVICE_MANAGER,$user->roles)) { ?>
+    <?php if(in_array(DEVICE_MANAGER,$staff_controller->roles)) { ?>
       <!-- Nav Item - Device Collapse Menu -->
       <li class="nav-item active">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
@@ -321,7 +300,7 @@ if(!isset($_SESSION['username']) || $user->active==0){
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;<?php echo $user->display_name; ?></span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;<?php echo $staff_controller->display_name; ?></span>
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -444,9 +423,6 @@ if(!isset($_SESSION['username']) || $user->active==0){
         }
       }
       ?>
-
-
-
 
 
 </body>

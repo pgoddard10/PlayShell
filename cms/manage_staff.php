@@ -1,87 +1,36 @@
 <?php
 
-if(!isset($user)) { //if trying to load the page directly, redirect
+if(!isset($staff_controller)) { //if trying to load the page directly, redirect
   header('Location: index.php');
   exit;
 }
-if(!in_array(STAFF_DB_MANAGER,$user->roles)){
+if(!in_array(STAFF_DB_MANAGER,$staff_controller->roles)){
   exit("You do not have permission to use this page.");
 }
 
-$all_staff = $staff_db->select_all_staff_details();
+//populate an array with all staff members
+$all_staff = $staff_model->select_all_staff_details();
 $staff_members = array();
-
-$all_roles = $staff_db->select_available_staff_roles();
 foreach($all_staff as $staff) {
-  $staff_member = new Staff();
-  $staff_member->staff_id = $staff['staff_id'];
-  $staff_member->first_name = $staff['first_name'];
-  $staff_member->last_name = $staff['last_name'];
-  $staff_member->username = $staff['username'];
-  $staff_member->display_name = $staff['first_name'].' '.$staff['last_name'];
-  $staff_member->email = $staff['email'];
-  $staff_member->roles = $staff_db->select_active_roles($staff['staff_id']);
-  $staff_member->active = $staff['active'];
+  $staff_member = new Staff($staff_model);
+  $staff_member->populate_details($staff['username']);
   array_push($staff_members,$staff_member);
 }
 
 
 //Controls for add/edit/deactivate staff member
-$action_message = "";
-$action_success = false;
+$msg=array("message"=>"");
 if(isset($_GET['action'])) {
-  if($_GET['action']=='new') {
-    if($staff_db->insert_new_staff($_POST['first_name'],$_POST['last_name'],$_POST['username'],$user->hash_password($_POST['password']),$_POST['email'],$_POST['role'])){
-      $action_message = "Successfully created ".$_POST['first_name'].' '.$_POST['last_name'];
-      $action_success = true;
-    }
-    else{
-      $action_message = "Unable to create ".$_POST['first_name'].' '.$_POST['last_name'];
-      $action_success = false;
-    }
-  }
-  else if(isset($_POST['staff_id'])) {
-    $staff_id = $_POST['staff_id'];
-    $staff_details = $staff_db->select_staff_details($staff_db->select_staff_username($staff_id));
-    if($_GET['action']=='edit') {
-      if(in_array(STAFF_DB_MANAGER,$staff_db->select_active_roles($staff_id)) && $staff_db->number_of_roles(1)<=1) { //if there is 1 or less Staff Database Managers left, do not delete
-        $action_message = "You cannot remove the Staff Database Manager role from the last Staff Database Manager";
-        $action_success = false;
-      }
-      else {
-        $replace_password=false;
-        if(strlen($_POST['password'])>8) $replace_password=true; //only replace password if one exists (i.e. is greated than 8 characters)
-        if($staff_db->update_staff($_POST['staff_id'],$_POST['first_name'],$_POST['last_name'],$_POST['username'],$replace_password,$user->hash_password($_POST['password']),$_POST['email'],$_POST['active'])){
-          $staff_db->delete_roles_for_staff($staff_id);
-          foreach($_POST['role'] as $role_id) {
-            $staff_db->insert_staff_role($staff_id,$role_id);
-          }
-          $action_message = "Saved changes for ".$staff_details['first_name'].' '.$staff_details['last_name'];
-          $action_success = true;
-        }
-        else{
-          $action_message = "Unable to edit ".$staff_details['first_name'].' '.$staff_details['last_name'];
-          $action_success = false;
-        }
-      }
-    }
-    elseif($_GET['action']=='deactivate') {
-      if(in_array(STAFF_DB_MANAGER,$staff_db->select_active_roles($staff_id)) && $staff_db->number_of_roles(1)<=1) { //if there is 1 or less Staff Database Managers left, do not deactivate
-        $action_message = "You cannot deactivate the last Staff Database Manager";
-        $action_success = false;
-      }
-      else {
-        if($staff_db->deactivate_staff($staff_id)){
-          $staff_db->delete_roles_for_staff($staff_id);
-          $action_message = "Successfully deactivated ".$staff_details['first_name'].' '.$staff_details['last_name'];
-          $action_success = true;
-        }
-        else{
-          $action_message = "Unable to deactivate ".$staff_details['first_name'].' '.$staff_details['last_name'];
-          $action_success = false;
-        }
-      }
-    }
+  switch($_GET['action']) {
+    case 'new':
+      $msg = $staff_controller->create_new($_POST['first_name'],$_POST['last_name'],$_POST['username'],$_POST['password'],$_POST['email'],$_POST['role']);
+      break;
+    case 'edit':
+      $msg = $staff_controller->edit($_POST['staff_id'],$_POST['first_name'],$_POST['last_name'],$_POST['username'],$_POST['password'],$_POST['email'],$_POST['active'],$_POST['role']);
+      break;
+    case 'deactivate':
+      $msg = $staff_controller->deactivate($_POST['staff_id']);
+      break;
   }
 }
 
@@ -98,10 +47,10 @@ if(isset($_GET['action'])) {
             <a href="#" data-toggle="modal" data-target="#addNewModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-user-plus"></i></span><span class="text">Add New</span></a>
           </div>
           <!-- Add/Edit/Deactivate Message Card -->
-          <?php if(strlen($action_message)>0) { ?>
-            <div class="card mb-4 py-3 border-left-<?php if($action_success) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
+          <?php if(strlen($msg['message'])>0) { ?>
+            <div class="card mb-4 py-3 border-left-<?php if($msg['success']) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
                 <div class="card-body">
-                <?php echo $action_message; //print success/fail message ?>
+                <?php echo $msg['message']; //print success/fail message ?>
                 </div>
               </div>
           <?php } ?>
@@ -130,7 +79,7 @@ if(isset($_GET['action'])) {
                         echo '<td>'.$details->email.'</td>';
                         echo '<td>';
                         foreach($details->roles as $role_id) {
-                          echo $staff_db->select_role_name($role_id).'<br />';
+                          echo $staff_model->select_role_name($role_id).'<br />';
                         }
                         echo '</td>';
                         if($details->active==1)
@@ -229,7 +178,7 @@ if(isset($_GET['action'])) {
                     <div class="form-group">
                       Roles:
                       <?php
-                      $all_roles = $staff_db->select_available_staff_roles();
+                      $all_roles = $staff_model->select_available_staff_roles();
                       foreach($all_roles as $role) { ?>
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="role-<?php echo $role['role_id']; ?>" name="role[]" value="<?php echo $role['role_id'].'"'; if(in_array($role['role_id'],$details->roles)) echo 'checked="checked"';  ?>>
@@ -306,7 +255,7 @@ if(isset($_GET['action'])) {
                     <div class="form-group">
                       Roles:
                       <?php
-                      $all_roles = $staff_db->select_available_staff_roles();
+                      $all_roles = $staff_model->select_available_staff_roles();
                       foreach($all_roles as $role) { ?>
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="role-<?php echo $role['role_id']; ?>" name="role[]" value="<?php echo $role['role_id']; ?>">
