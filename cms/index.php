@@ -349,6 +349,8 @@ else {
           case 'dashboard':
             require_once('dashboard.php');
             break;
+          default:
+            echo "Page not specified in the index.php file. Look around line 350";
         }
       ?>
       <!-- End of Main Content -->
