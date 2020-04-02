@@ -20,13 +20,15 @@ class Staff {
         return password_hash($password, PASSWORD_DEFAULT);
     }
     public function set_session(){
-        $_SESSION['username = $this->username'];
+        $_SESSION['username'] = $this->username;
     }
     public function login($username,$password) {
         $staff = $this->model->select_staff_details($username);
         if($username==$staff['username'] && password_verify($password,$staff['password']) && $staff['active']==1) {
             $this->username = $username;
             $this->set_session();
+            $this->populate_details($staff['username']);
+            return true;
         }
         else {
             header('Location: login.php?invalid_login');

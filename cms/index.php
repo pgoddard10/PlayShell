@@ -20,12 +20,19 @@ if(isset($_GET['login']) && isset($_POST['username']) && isset($_POST['password'
   $staff_controller->login($_POST['username'],$_POST['password']);
 }
 
-$staff_controller->populate_details($_SESSION['username']);
-
 //check if a login session is already active and the user is still valid
-if(!isset($_SESSION['username']) || $staff_controller->active==0){
+if(!isset($_SESSION['username'])) {
   header('Location: login.php');
   exit;
+}
+else {
+  $staff_controller->populate_details($_SESSION['username']);
+
+  //if the user account has been deactivated since a session was created then log them out
+  if($staff_controller->active==0){
+    header('Location: login.php');
+    exit;
+  }
 }
 ?>
 
@@ -336,6 +343,9 @@ if(!isset($_SESSION['username']) || $staff_controller->active==0){
           case 'manage_staff':
             require_once('manage_staff.php');
             break;
+            case 'manage_content':
+              require_once('manage_content.php');
+              break;
           case 'dashboard':
             require_once('dashboard.php');
             break;

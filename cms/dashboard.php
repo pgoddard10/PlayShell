@@ -1,6 +1,6 @@
 <?php
 
-if(!isset($user) && !in_array(1,$user->roles)) {
+if(!isset($staff_controller)) {
   header('Location: login.php');
   exit;
 }
