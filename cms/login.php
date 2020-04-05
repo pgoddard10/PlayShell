@@ -1,28 +1,3 @@
-<?php
-session_start();
-if(isset($_GET['logout'])) {
-  session_destroy();
-}
-
-
-define("DATABASE",'audio_culture.db');
-
-//check if a login session is already active and the user is still valid
-if(isset($_SESSION['username'])){
-  require_once('Staff.php');
-  require_once('StaffDatabase.php');
-  $user = new Staff();
-  $staff_db = new StaffDatabase(DATABASE);
-  $staff = $staff_db->select_staff_details($_SESSION['username']);
-  $user->staff_id = $staff['staff_id'];
-  if(isset($user->active) && $user->active==1) {
-    header('Location: index.php');
-    exit;
-  }
-}
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -63,23 +38,14 @@ if(isset($_SESSION['username'])){
                 <div class="p-5">
                   <div class="text-center">
                     <h1 class="h4 text-gray-900 mb-4">Welcome!</h1>
-                    <?php
-                      if(isset($_GET['invalid_login'])) {
-                        echo '
-                        <div class="card mb-4 py-3 border-bottom-danger">
-                          <div class="card-body">
-                            Invalid login details. Please try again.
-                          </div>
-                        </div>';
-                      }
-                    ?>
+                    <div id="login_messages"></div>
                   </div>
-                  <form class="user" method="POST" action="index.php?login">
+                  <form id="login_form" class="user">
                     <div class="form-group">
-                      <input type="username" class="form-control form-control-user" id="username" name="username" placeholder="Enter Username" required autofocus minlength=2>
+                      <input type="username" class="form-control form-control-user" id="username" name="username" placeholder="Enter Username" autocomplete="off" required autofocus minlength=2>
                     </div>
                     <div class="form-group">
-                      <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Password" required minlength=8>
+                      <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Password" autocomplete="off" required minlength=8>
                     </div>
                     <button type="submit" class="btn btn-primary btn-user btn-block">
                       Login
@@ -120,6 +86,23 @@ if(isset($_SESSION['username'])){
 
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $('#login_form').submit(function(event){
+          event.preventDefault(); //cancels the form submission
+
+          //build the URL to include GET request data from the form
+          var roles = [];
+          var direct_to_url = "ajax.auth.php?action=login&";
+          direct_to_url += $('#login_form').serialize();
+          //send the data as a GET request to the PHP page specified in direct_to_url
+          $.ajax({url: direct_to_url, success: function(result){
+              $("#login_messages").html(result);
+          }});
+      });
+    });
+  </script>
 
 </body>
 

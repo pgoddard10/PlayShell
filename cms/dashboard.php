@@ -1,9 +1,11 @@
 <?php
 
-if(!isset($staff_controller)) {
-  header('Location: login.php');
-  exit;
-}
+require_once('config.php');
+require_once('classes/views/Staff_View.php');
+require_once('classes/views/Authenticate_View.php');
+$staff_view = new Staff_View();
+$authenticate_view = new Authenticate_View();
+$authenticate_view->has_session();
 
 ?>
         <!-- Begin Page Content -->

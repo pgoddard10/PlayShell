@@ -15,6 +15,7 @@ class Staff_Model
     public $email = null;
     public $active = null;
     public $roles = array();
+    private $password = null;
     private $role_model = null;
 
     // --- OPERATIONS ---
@@ -27,25 +28,6 @@ class Staff_Model
         //$this->staff_model = new Staff_Model();
         $this->role_model = new Role_Model();
     }
-
-    // /**
-    //  * Short description of method get_all_usernames
-    //  * @param
-    //  * @return array(usernames : String)
-    //  */
-    // public function get_all_usernames()
-    // {
-    //     $returnValue = null;
-	// 	if($db = new SQLite3($this->db_file)){
-	// 		$stm = $db->prepare("SELECT username FROM staff");
-    //         $staff = $stm->execute();
-    //         while($row = $staff->fetchArray()) {
-    //             $returnValue[] = $row;
-    //         }
-    //     }
-    //     return $returnValue;
-    // }
-
     /**
      * Short description of method get_all_staff_ids
      * @param
@@ -79,6 +61,7 @@ class Staff_Model
             $results = $stm->execute();
             if($staff = $results->fetchArray()) {
                 $this->username = $staff['username'];
+                $this->password = $staff['password'];
                 $this->first_name = $staff['first_name'];
                 $this->last_name = $staff['last_name'];
                 $this->display_name = $staff['first_name'].' '.$staff['last_name'];
@@ -100,7 +83,6 @@ class Staff_Model
     public function has_role($role_id)
     {
         // print('hello 1: <pre>'.print_r($this->roles[0]['role_id'],true).'</pre>');
-        // print('hello 2: <pre>'.print_r($this->roles[1]['role_id'],true).'</pre>');
         foreach($this->roles as $role) {
             // echo ' | Matching '.$role_id.' with '.$role['role_id'];
             if($role['role_id']==$role_id) return true;
@@ -240,6 +222,34 @@ class Staff_Model
                 $returnValue = -2; //unable to execute query
         }
         return $returnValue;
+    }
+
+    /**
+     * Short description of method get_id_from_username
+     *
+     */
+    public function get_id_from_username($username)
+    {
+        $returnValue = -1; //unknown error
+		if($db = new SQLite3($this->db_file)){
+			$stm = $db->prepare("SELECT staff_id FROM staff WHERE username = :username");
+			$stm->bindParam(':username', $username);
+            $results = $stm->execute();
+            if($staff = $results->fetchArray()) {
+               $returnValue = $staff[0];
+            }
+            else
+                $returnValue = -2; //unable to execute query
+        }
+        return $returnValue;
+    }
+
+    /**
+     * Short description of method get_password
+     *
+     */
+    public function get_password() {
+        return $this->password;
     }
 
 } /* end of class Staff_Model */

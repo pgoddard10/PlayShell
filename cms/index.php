@@ -1,33 +1,20 @@
 <?php
 session_start();
-
-require_once('controllers/Staff.php');
-require_once('models/StaffDatabase.php');
 require_once('config.php');
+
+//specify page to display
 if(isset($_GET['page'])) define("PAGE",strtolower($_GET['page']));
 else define("PAGE","dashboard");
 
-$staff_model = new StaffDatabase(DATABASE_FILE);
-$staff_controller = new Staff(new StaffDatabase(DATABASE_FILE));
+require_once('classes/views/Authenticate_View.php');
+$authenticate_view = new Authenticate_View();
 
-if(isset($_GET['login']) && isset($_POST['username']) && isset($_POST['password'])) {
-  $staff_controller->login($_POST['username'],$_POST['password']);
-}
+// if(isset($_POST['username']) && isset($_POST['password'])) {
+//   $authenticate_view->login("pgoddard10","raspberry");
+// }
 
-//check if a login session is already active and the user is still valid
-if(!isset($_SESSION['username'])) {
-  header('Location: login.php');
-  exit;
-}
-else {
-  $staff_controller->populate_details($_SESSION['username']);
+$authenticate_view->has_session();
 
-  //if the user account has been deactivated since a session was created then log them out
-  if($staff_controller->active==0){
-    header('Location: login.php');
-    exit;
-  }
-}
 ?>
 
 <!DOCTYPE html>
@@ -119,69 +106,7 @@ else {
       <!-- Divider -->
       <hr class="sidebar-divider">
       
-    <?php if(in_array(STAFF_DB_MANAGER,$staff_controller->roles)) { ?>
-      <!-- Nav Item - Staff Management -->
-      <li class="nav-item active">
-        <a class="nav-link" href="?page=manage_staff">
-          <i class="fas fa-fw fa-id-card"></i>
-          <span>Manage Staff</span></a>
-      </li>
-    <?php  } ?>
-      
-      
-    <?php if(in_array(CONTENT_MANAGER,$staff_controller->roles)) { ?>
-      <!-- Nav Item - Content Collapse Menu -->
-      <li class="nav-item active">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          <i class="fas fa-fw fa-file-audio"></i>
-          <span>Content</span>
-        </a>
-        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="?page=manage_content">Check out</a>
-            <a class="collapse-item" href="?page=manage_content">Add New</a>
-          </div>
-        </div>
-      </li>
-    <?php  } ?>
-
-
-    <?php if(in_array(REPORT_MANAGER,$staff_controller->roles)) { ?>
-      <!-- Nav Item - Report Management -->
-      <li class="nav-item active">
-        <a class="nav-link" href="?page=manage_reports">
-          <i class="fas fa-fw fa-chart-bar"></i>
-          <span>Reports</span></a>
-      </li>
-    <?php  } ?>
-      
-
-
-    <?php if(in_array(VISITOR_MANAGER,$staff_controller->roles)) { ?>
-      <!-- Nav Item - Visitor Management -->
-      <li class="nav-item active">
-        <a class="nav-link" href="?page=manage_visitors">
-          <i class="fas fa-fw fa-users"></i>
-          <span>Manage Visitors</span></a>
-      </li>
-    <?php  } ?>
-
-      
-    <?php if(in_array(DEVICE_MANAGER,$staff_controller->roles)) { ?>
-      <!-- Nav Item - Device Collapse Menu -->
-      <li class="nav-item active">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
-          <i class="fas fa-fw fa-hdd"></i>
-          <span>Device</span>
-        </a>
-        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="?page=manage_device">Check out</a>
-            <a class="collapse-item" href="?page=manage_device">Add New</a>
-          </div>
-        </div>
-      </li>
-    <?php  } ?>
+      <?php $authenticate_view->display_menu(); ?>
     
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
@@ -337,7 +262,7 @@ else {
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;<?php echo $staff_controller->display_name; ?></span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;<?php $authenticate_view->display_name(); ?></span>
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

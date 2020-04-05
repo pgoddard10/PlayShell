@@ -1,15 +1,12 @@
 <?php
 
 require_once('config.php');
-
 require_once('classes/views/Staff_View.php');
-//require_once('classes/views/Login_View.php');
+require_once('classes/views/Authenticate_View.php');
 $staff_view = new Staff_View();
-//$login_view = new Login_View();
-
-/*
-  CHECK PERMISSIONS
-*/
+$authenticate_view = new Authenticate_View();
+$authenticate_view->has_session();
+$authenticate_view->page_permissions(STAFF_DB_MANAGER);
 
 ?>
 <!-- Custom styles for this page -->
@@ -22,17 +19,6 @@ $staff_view = new Staff_View();
           <a href="#" data-toggle="modal" data-target="#addNewModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-user-plus"></i></span><span class="text">Add New</span></a>
         </div>
 
-        <div>
-          <ol>
-            <li>Login & Permissions
-                <ol type="a">
-                  <li>Switch over to MVC methods</li>
-                  <li>Delete old classes</li>
-                </ol>
-            </li>
-          </ol>
-        </div>
-        <?php //echo $staff_view->JSONify_All_Staff(); ?>
         <div id="div1"></div>
         <!-- DataTable of Entire Staff -->
         <div class="card shadow mb-4">
