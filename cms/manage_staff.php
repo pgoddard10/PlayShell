@@ -24,15 +24,35 @@ $staff_view = new Staff_View();
 
         <div>
           <ol>
-            <li>Search bar, etc.
+            <li>Login & Permissions
                 <ol type="a">
-                  <li>Might be worth copying the HTML output (via the Inspector as it's dynamically produced) and playing with a static page to find the solution then copy over to PHP</li>
+                  <li>Switch over to MVC methods</li>
+                  <li>Delete old classes</li>
                 </ol>
             </li>
           </ol>
         </div>
+        <?php //echo $staff_view->JSONify_All_Staff(); ?>
         <div id="div1"></div>
-
+        <!-- DataTable of Entire Staff -->
+        <div class="card shadow mb-4">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="manage_staff_data_table" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role(s)</th>
+                    <th>Active?</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+          </div>
         </div>
 
       </div>
@@ -44,12 +64,9 @@ $staff_view = new Staff_View();
         $staff_view->edit_modal();
       ?>
 
-<script>
-  $(document).ready(function(){
-      $.ajax({url: "ajax.staff_table_data.php?action=display_table", success: function(result){
-          $("#div1").html(result);
-      }});
-  });
-</script>
 
+<script>
+
+
+</script>
 <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">

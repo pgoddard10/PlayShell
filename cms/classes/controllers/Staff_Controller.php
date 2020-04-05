@@ -61,7 +61,7 @@ class Staff_Controller
                     }
                 }
             }
-            if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1)) { //check how many staffDBmanagers exist in total
+            if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1) && (!in_array(STAFF_DB_MANAGER,$roles))) { //check how many staffDBmanagers exist in total
                 $returnValue = -3; //cannot remove the role for last DB manager
             }
             else {

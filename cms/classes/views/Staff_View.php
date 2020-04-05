@@ -47,8 +47,6 @@ class Staff_View
                     </div>
                   </div>
         <?php
-        $this->staff_controller->populate_all_staff();
-        $this->display_table_all_staff();
     }
 
     /**
@@ -96,8 +94,6 @@ class Staff_View
                     </div>
                     </div>
         <?php
-        $this->staff_controller->populate_all_staff();
-        $this->display_table_all_staff();
     }
 
     /**
@@ -119,70 +115,42 @@ class Staff_View
                     </div>
                   </div>
         <?php
-        $this->staff_controller->populate_all_staff();
-        $this->display_table_all_staff();
     }
 
     /**
-     * Short description of method display_table_all_staff
+     * Short description of method JSONify_All_Staff
      *
      * @return void
      */
-    public function display_table_all_staff()
+    public function JSONify_All_Staff()
     {
-        ?>
-        <!-- DataTable of Entire Staff -->
-        <div class="card shadow mb-4">
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-bordered" id="manage_staff_data_table" width="100%" cellspacing="0">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role(s)</th>
-                    <th>Active?</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  foreach($this->staff_controller->all_staff as $staff_member=>$details) {
-                      echo '<tr>';
-                      echo '<td>'.$details->display_name.'</td>';
-                      echo '<td>'.$details->username.'</td>';
-                      echo '<td>'.$details->email.'</td>';
-                      echo '<td>';
-                      if($details->roles) {
-                        foreach($details->roles as $role) {
-                            echo $role['name'].'<br />';
-                        }
-                      }
-                      else {
-                          echo "[No assigned roles]";
-                      }
-                      echo '</td>';
-                      if($details->active==1)
-                          echo '<td>Yes</td>';
-                      else
-                        echo '<td>No</td>';
-                        $staff_as_json = json_encode($details);
-                      echo "<td><a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-                      if($details->active==1) {
-                            $display_name = $details->display_name; //to workaround the escape charaters
-                            echo " | <a href='#' data-toggle='modal' data-id='{\"staff_id\":".$details->staff_id.", \"name\":\"$display_name\"}' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-                      }
-                      echo '</td>';
-                      echo '</tr>';
-                  }
-                  ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <?php
-          
+        $data = array();
+        foreach($this->staff_controller->all_staff as $staff_member=>$details) {
+            $mystaff = array();
+            $mystaff['name'] = $details->display_name;
+            $mystaff['username'] = $details->username;
+            $mystaff['email'] = $details->email;
+            $mystaff['roles'] = null;
+            if($details->roles) {
+                foreach($details->roles as $role) {
+                    $mystaff['roles'] = $mystaff['roles'].$role['name'].'<br />';
+                }
+            }
+            else {
+                $mystaff['roles'] = "[No assigned roles]";
+            }
+            if($details->active==1)
+                $mystaff['active'] = 'Yes';
+            else
+                $mystaff['active'] = 'No';
+            $staff_as_json = json_encode($details);
+            $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
+            if($details->active==1) {
+                $mystaff['buttons'] = $mystaff['buttons'] . " | <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
+            }
+            $data["data"][] = $mystaff;
+        }
+        return json_encode($data);
     }
 
     /**
@@ -298,7 +266,6 @@ class Staff_View
             });
         });
         </script>
-
         <?php
     }
 
@@ -376,53 +343,6 @@ class Staff_View
             </div>
             </div>
         </div>
-        <script>
-        var staff_id;
-        //Collect the form data and 'submit' the form via AJAX
-        $(document).ready(function(){
-            $("#btn_staff_edit").click(function(){
-                var roles = [];
-                var direct_to_url = "ajax.staff_actions.php?action=edit&staff_id="+staff_id+"&";
-                direct_to_url += $('#edit_form').serialize(); //grab all input boxes
-
-                //grab the role tickbox data
-                $('#edit_form input[type=checkbox]').each(function() {     
-                        if (this.checked) {
-                            roles.push(this.name.replace("role_",""));
-                        }
-                    });
-                $.each(roles, function(index, value) {
-                    direct_to_url += "&roles[]="+value;
-                });
-
-                //send the data as a GET request to the PHP page specified in direct_to_url
-                $.ajax({url: direct_to_url, success: function(result){
-                    $("#div1").html(result);
-                }});
-            });
-        });
-
-        //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
-        //data is passed in the form of a JSON string.
-        $(document).on("click", ".editModalBox", function () {
-            staff_id = $(this).data('id').staff_id;
-            $(".modal-body #edit_first_name").val($(this).data('id').first_name);
-            $(".modal-body #edit_last_name").val($(this).data('id').last_name);
-            $(".modal-body #edit_email").val($(this).data('id').email);
-            $(".edit_active_options select").val($(this).data('id').active);
-            var i;
-            for (i = 1; i <= 5; i++) {
-                    $("#ckbox_edit_role_"+i).prop("checked", false);
-            }
-
-            //tick the checkboxes that match the roles this staff member has
-            var roles = $(this).data('id').roles;
-            $.each(roles, function(index, value) {
-                    $("#ckbox_edit_role_"+value.role_id).prop("checked", true);
-                });
-        });
-        </script>
-
     <?php
     }
 
@@ -434,7 +354,6 @@ class Staff_View
     public function deactivate_modal()
     {
         ?>
-
         <!-- Deactivate Staff - Confirmation Modal -->
         <div class="modal fade" id="deactivateModalCenter" tabindex="-1" role="dialog" aria-labelledby="deactivateModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
@@ -455,25 +374,6 @@ class Staff_View
             </div>
           </div>
         </div>
-
-        <script>
-        var staff_id;
-        var name;
-        $(document).ready(function(){
-            $("#btn_staff_deactivate").click(function(){
-                $.ajax({url: "ajax.staff_actions.php?action=deactivate&staff_id="+staff_id, success: function(result){
-                    $("#div1").html(result);
-                }});
-            });
-        });
-        $(document).on("click", ".deactivateModalBox", function () {
-            name = $(this).data('id').name;
-            staff_id = $(this).data('id').staff_id;
-            $(".modal-body #txt_box_staff_id").val( staff_id );
-            $(".modal-body #span_name").text(name);
-        });
-
-        </script>
         <?php
     }
 
