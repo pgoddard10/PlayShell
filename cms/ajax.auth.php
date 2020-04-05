@@ -7,5 +7,8 @@ switch($_GET['action']) {
     case 'login':
         $authenticate_view->login($_GET['username'],$_GET['password']);
         break;
+    case 'logout':
+        $authenticate_view->logout();
+        break;
 }
 ?>

@@ -48,6 +48,13 @@ class Authenticate_View
         <?php
         }
     }
+    /**
+     * Short description of method logout
+     */
+    public function logout()
+    {
+        session_destroy();
+    }
 
     /**
      * Short description of method page_permissions
@@ -56,9 +63,18 @@ class Authenticate_View
      */
     public function page_permissions($page)
     {    
-       if(!$this->staff_controller->has_role($page)) {
-            echo "You do not have permissions to view this page";
-            exit;
+       if(!$this->staff_controller->has_role($page)) { ?>
+        <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h2 mb-0 text-gray-800">Permissions Error</h1>
+            </div>
+            <div class="card mb-4 py-3 border-left-danger">
+                <div class="card-body">You do not have permissions to view this page.</div>
+            </div>
+        </div>
+        <?php
+        exit;
        }
     }
 
@@ -69,6 +85,7 @@ class Authenticate_View
     {
         if(!$this->staff_controller->has_session()) {
             echo "You are not logged in!";
+            header('Location: login.php');
             exit;
         }
     }

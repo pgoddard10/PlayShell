@@ -347,13 +347,26 @@ $authenticate_view->has_session();
         <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" href="login.php?logout">Logout</a>
+          <a class="btn btn-primary" id="btn_logout" href="#">Logout</a>
         </div>
       </div>
     </div>
   </div>
 
 
+  <script>
+  $(document).ready(function() {
+    $("#btn_logout").click(function(){ 
+      $.when(logout()).done(function(a1){ //when the ajax request is complete
+        window.location.replace("login.php?logged_out"); //redirect to the login page
+      });
+      function logout(){ //call the ajax for saving the changes
+        return $.ajax({url: "ajax.auth.php?action=logout", success: function(result){
+        }});
+      }
+    });
+  });
+  </script>
 
 </body>
 
