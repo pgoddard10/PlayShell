@@ -4,7 +4,7 @@ require_once('config.php');
 
 //specify page to display
 if(isset($_GET['page'])) define("PAGE",strtolower($_GET['page']));
-else define("PAGE","dashboard");
+else define("PAGE","home");
 
 require_once('classes/views/Authenticate_View.php');
 $authenticate_view = new Authenticate_View();
@@ -48,11 +48,11 @@ $authenticate_view->has_session();
       <!-- Divider -->
       <hr class="sidebar-divider my-0">
 
-      <!-- Nav Item - Dashboard -->
+      <!-- Nav Item - Home -->
       <li class="nav-item active">
         <a class="nav-link" href="index.php">
-          <i class="fas fa-fw fa-tachometer-alt"></i>
-          <span>Dashboard</span></a>
+          <i class="fas fa-fw fa-home"></i>
+          <span>Home</span></a>
       </li>
 
       <!-- Divider -->
@@ -252,8 +252,8 @@ $authenticate_view->has_session();
             case 'manage_content':
               require_once('manage_content.php');
               break;
-          case 'dashboard':
-            require_once('dashboard.php');
+          case 'home':
+            require_once('home.php');
             break;
           default:
             echo "Page not specified in the index.php file. Look around line 350";
@@ -321,7 +321,6 @@ $authenticate_view->has_session();
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
 
-
   <?php
       if(PAGE) {
         switch(PAGE){
@@ -334,16 +333,6 @@ $authenticate_view->has_session();
                 <script src="js/demo/datatables-manage_staff.js"></script>
         <?php
             break;
-            case 'dashboard':?>
-              <!-- Dashboard -->
-                <!-- Page level plugins -->
-                <script src="vendor/chart.js/Chart.min.js"></script>
-                <!-- Page level custom scripts -->
-                <script src="js/demo/chart-area-demo.js"></script>
-                <script src="js/demo/chart-pie-demo.js"></script>
-              <?php
-                  break;
-          default:
         }
       }
       ?>
