@@ -10,7 +10,6 @@ require_once('classes/controllers/Staff_Controller.php');
  */
 class Staff_View
 {
-
     private $staff_controller = null;
 
     /**
@@ -217,55 +216,12 @@ class Staff_View
                         <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button type="submit" class="btn btn-primary" id="btn_staff_new" data-dismiss="modal">Create</button>
+                        <button type="submit" class="btn btn-primary" id="btn_staff_new">Create</button>
                         </div>
                     </form>
                 </div>
                 </div>
             </div>
-
-        <script>
-        //Script to validate that both passwords match on creating new, or editing a staff member.
-            var new_password = document.getElementById("new_password")
-            , new_repeat_password = document.getElementById("new_repeat_password");
-
-            function validatePassword(){
-            if(password.value != repeat_password.value) {
-                repeat_password.setCustomValidity("Passwords do not match");
-            } else {
-                repeat_password.setCustomValidity('');
-            }
-            }
-            new_password.onchange = validatePassword;
-            new_repeat_password.onkeyup = validatePassword;
-
-        </script>
-        <script>
-        $(document).ready(function(){
-            $("#btn_staff_new").click(function(){
-
-                for(var i=0; i < document.getElementById('form_new_staff').elements.length; i++){
-                    var e = form.elements[i];
-                    console.log(e.name+"="+e.value);
-                }
-
-                var roles = [];
-                var direct_to_url = "ajax.staff_actions.php?action=new&";
-                direct_to_url += $('#form_new_staff').serialize();
-                $('#form_new_staff input[type=checkbox]').each(function() {     
-                        if (this.checked) {
-                            roles.push(this.name.replace("role_",""));
-                        }
-                    });
-                $.each(roles, function(index, value) {
-                    direct_to_url += "&roles[]="+value;
-                });
-                $.ajax({url: direct_to_url, success: function(result){
-                    $("#div1").html(result);
-                }});
-            });
-        });
-        </script>
         <?php
     }
 
@@ -337,7 +293,7 @@ class Staff_View
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button id="btn_staff_edit" type="submit" class="btn btn-primary" data-dismiss="modal">Save</button>
+                        <button id="btn_staff_edit" type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
             </div>
