@@ -1,14 +1,12 @@
 <?php
 
-require_once "vendor/autoload.php"; //for the TTS system
+require_once('config.php');
+require_once('classes/views/Staff_View.php');
+require_once('classes/views/Authenticate_View.php');
+$staff_view = new Staff_View();
+$authenticate_view = new Authenticate_View();
+$authenticate_view->has_session();
 
-if(!isset($staff_controller)) { //if trying to load the page directly, redirect
-    header('Location: index.php');
-    exit;
-}
-if(!in_array(CONTENT_MANAGER,$staff_controller->roles)){
-    exit("You do not have permission to use this page.");
-}
 
 
 function write_blank_file($filename) {

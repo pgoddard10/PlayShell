@@ -155,12 +155,12 @@ class Authenticate_View
         <li class="nav-item active">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
             <i class="fas fa-fw fa-hdd"></i>
-            <span>Device</span>
+            <span>Devices</span>
           </a>
           <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item" href="?page=manage_device">Check out</a>
-              <a class="collapse-item" href="?page=manage_device">Add New</a>
+              <a class="collapse-item" href="?page=manage_devices">Check out</a>
+              <a class="collapse-item" href="?page=manage_devices">Add New</a>
             </div>
           </div>
         </li>
