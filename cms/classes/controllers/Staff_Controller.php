@@ -13,8 +13,8 @@ require_once('classes/models/Staff_Model.php');
 class Staff_Controller
 {
     private $staff_model = null;
-    public $all_staff = null;
     public $role_model = null;
+    public $all_staff = null;
 
     /**
      * Short description of method __construct
@@ -45,21 +45,33 @@ class Staff_Controller
      * @param  array<> staff_data
      * @return Integer
      */
-    public function edit($staff_id, $first_name, $last_name, $username, $password, $repeat_password, $email, $active, $roles)
+    public function edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active, $roles)
     {
-        $returnValue = -1;
+        $this->staff_model->populate_from_db($staff_id);
+        $returnValue = -1; //unknown error
         if($password != $repeat_password) $returnValue =-2; //password mis-match
-            else {
-            //if this person is staff DB manager in DB
-                //check how many staffDBmanagers exist in total
-                //if total==1
-                //$returnValue = -2; //cannot remove the role for last DB manager
-            if($this->staff_model->edit($staff_id, $first_name, $last_name, $username, $password, $repeat_password, $email, $active)==0) {
-            //if($this->staff_model->edit_roles($roles))
-                $returnValue = 0;
-            //else $returnValue = -4;
+        else {
+            //check to see if this person is staff DB manager in DB
+            $staff_db_mgr = false;
+            if($this->staff_model->roles) { //if this person has any roles
+                foreach($this->staff_model->roles as $role) { //loop through each of the existing roles
+                    if($role['role_id']==STAFF_DB_MANAGER) { //check if any are the staff DB manager
+                        $staff_db_mgr = true;
+                        break;
+                    }
+                }
             }
-            else $returnValue = -3;
+            if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1)) { //check how many staffDBmanagers exist in total
+                $returnValue = -3; //cannot remove the role for last DB manager
+            }
+            else {
+                if($this->staff_model->edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active)==0) {
+                    if($this->staff_model->edit_roles($roles)==0)
+                        $returnValue = 0;
+                    else $returnValue = -5; //unable to edit roles
+                }
+                else $returnValue = -4; //unable to edit staff details
+            }
         }
         return $returnValue;
     }
@@ -89,25 +101,14 @@ class Staff_Controller
     {
         $this->all_staff = null;
         $model = new Staff_Model();
-        $usernames = $model->get_all_usernames();
+        $staff_ids = $model->get_all_staff_ids();
         //print('<pre>'.print_r($usernames,true).'</pre>');
-        foreach($usernames as $username) {
+        foreach($staff_ids as $id) {
             $staff_member = new Staff_Model();
-            $staff_member->populate_from_db($username[0]);
+            $staff_member->populate_from_db($id[0]);
             $this->all_staff[] = $staff_member;
         }
         //print('hello: <pre>'.print_r($this->all_staff,true).'</pre>');
-    }
-
-    /**
-     * Short description of method get_all_roles
-     *
-     * @return array<Role_model>
-     */
-    public function get_all_roles()
-    {
-        $returnValue = null;
-        return $returnValue;
     }
 
 } /* end of class Staff_Controller */

@@ -13,7 +13,6 @@ $staff_view = new Staff_View();
 
 ?>
 <!-- Custom styles for this page -->
-<link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
       <!-- Begin Page Content -->
       <div class="container-fluid">
 
@@ -24,8 +23,13 @@ $staff_view = new Staff_View();
         </div>
 
         <div>
-          + Roles won't save when edited because the Model doesn't have the code to update the database...<br />
-          + Need to work out where the search bar went, too.
+          <ol>
+            <li>Search bar, etc.
+                <ol type="a">
+                  <li>Might be worth copying the HTML output (via the Inspector as it's dynamically produced) and playing with a static page to find the solution then copy over to PHP</li>
+                </ol>
+            </li>
+          </ol>
         </div>
         <div id="div1"></div>
 
@@ -37,6 +41,7 @@ $staff_view = new Staff_View();
       <?php
         $staff_view->deactivate_modal();
         $staff_view->new_modal();
+        $staff_view->edit_modal();
       ?>
 
 <script>
@@ -46,3 +51,5 @@ $staff_view = new Staff_View();
       }});
   });
 </script>
+
+<link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">

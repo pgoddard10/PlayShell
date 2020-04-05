@@ -3,18 +3,12 @@ session_start();
 
 require_once('controllers/Staff.php');
 require_once('models/StaffDatabase.php');
-
-define("DATABASE",'audio_culture.db');
-define("STAFF_DB_MANAGER",1);
-define("CONTENT_MANAGER",2);
-define("REPORT_MANAGER",3);
-define("VISITOR_MANAGER",4);
-define("DEVICE_MANAGER",5);
+require_once('config.php');
 if(isset($_GET['page'])) define("PAGE",strtolower($_GET['page']));
 else define("PAGE","dashboard");
 
-$staff_model = new StaffDatabase(DATABASE);
-$staff_controller = new Staff(new StaffDatabase(DATABASE));
+$staff_model = new StaffDatabase(DATABASE_FILE);
+$staff_controller = new Staff(new StaffDatabase(DATABASE_FILE));
 
 if(isset($_GET['login']) && isset($_POST['username']) && isset($_POST['password'])) {
   $staff_controller->login($_POST['username'],$_POST['password']);

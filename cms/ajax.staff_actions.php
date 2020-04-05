@@ -9,7 +9,7 @@ switch($_GET['action']) {
         $staff_view->create_new($_GET['first_name'],$_GET['last_name'],$_GET['username'],$_GET['password'],$_GET['repeat_password'],$_GET['email'],$_GET['roles']);
         break;
     case 'edit':
-        $staff_view->edit($_GET['staff_id'],$_GET['first_name'],$_GET['last_name'],$_GET['username'],$_GET['password'],$_GET['repeat_password'],$_GET['email'],$_GET['active'],$_GET['roles']);
+        $staff_view->edit($_GET['staff_id'],$_GET['first_name'],$_GET['last_name'],$_GET['password'],$_GET['repeat_password'],$_GET['email'],$_GET['active'],$_GET['roles']);
         break;
     case 'deactivate':
         $staff_view->deactivate($_GET['staff_id']);

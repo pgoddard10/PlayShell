@@ -76,7 +76,7 @@ if(isset($_SESSION['username'])){
                   </div>
                   <form class="user" method="POST" action="index.php?login">
                     <div class="form-group">
-                      <input type="username" class="form-control form-control-user" id="username" name="username" placeholder="Enter Username" required minlength=2>
+                      <input type="username" class="form-control form-control-user" id="username" name="username" placeholder="Enter Username" required autofocus minlength=2>
                     </div>
                     <div class="form-group">
                       <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Password" required minlength=8>

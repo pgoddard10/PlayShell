@@ -49,9 +49,6 @@ class Staff_View
         <?php
         $this->staff_controller->populate_all_staff();
         $this->display_table_all_staff();
-        // $this->new_modal();
-        // $this->deactivate_modal();
-        // $this->edit_modal();
     }
 
     /**
@@ -67,12 +64,30 @@ class Staff_View
      * @param  array<Integer> roles
      * @return void
      */
-    public function edit($staff_id, $first_name, $last_name, $username, $password, $repeat_password, $email, $active, $roles)
+    public function edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active, $roles)
     { 
-        $success = $this->staff_controller->edit($staff_id, $first_name, $last_name, $username, $password, $repeat_password, $email, $active, $roles);
-        if($success==0) $msg = "Successfully edited $first_name $last_name with roles ".print(print_r($roles));
-        if($success==-1) $msg = "An unknown error occurred.";
-        if($success==-2) $msg = "Password mis-match";
+        $success = $this->staff_controller->edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active, $roles);
+        switch($success) {
+            case 0:
+                $msg = "Successfully edited $first_name $last_name.";
+                break;
+            case -2:
+                $msg = "Changes for $first_name $last_name were not saved. The specified passwords do not match.";
+                break;
+            case -3:
+                $msg = "Changes for $first_name $last_name were not saved. You cannot remove the role for the last Staff Database Manager.";
+                break;
+            case -4:
+                $msg = "Changes for $first_name $last_name were not saved. There was a database error editing the staff details.";
+                break;
+            case -5:
+                $msg = "Changes for $first_name $last_name were not saved. There was a database error editing the roles.";
+                break;
+            case -1:
+            default:
+                $msg = "Changes for $first_name $last_name were not saved. An unknown error occurred.";
+                break;
+        }
         ?>
                 <!-- Edit Message Card -->
                 <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
@@ -152,10 +167,11 @@ class Staff_View
                           echo '<td>Yes</td>';
                       else
                         echo '<td>No</td>';
-                      echo '<td><a href="#" data-toggle="modal" data-id="'.$details->staff_id.'" data-target="#editModal_'.$details->staff_id.'"><i class=".btn-circle .btn-sm fas fa-edit"></i></a>'; 
+                        $staff_as_json = json_encode($details);
+                      echo "<td><a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
                       if($details->active==1) {
-                            $name = $details->display_name; //to workaround the escape charaters
-                            echo " | <a href='#' data-toggle='modal' data-id='{\"staff_id\":".$details->staff_id.", \"name\":\"$name\"}' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
+                            $display_name = $details->display_name; //to workaround the escape charaters
+                            echo " | <a href='#' data-toggle='modal' data-id='{\"staff_id\":".$details->staff_id.", \"name\":\"$display_name\"}' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
                       }
                       echo '</td>';
                       echo '</tr>';
@@ -167,7 +183,6 @@ class Staff_View
           </div>
           <?php
           
-        $this->edit_modal();
     }
 
     /**
@@ -207,10 +222,10 @@ class Staff_View
                             </div>
                             <div class="form-group row">
                             <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="password" class="form-control form-control-user" id="new_password" name="password" placeholder="Password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                                <input type="password" class="form-control form-control-user" id="new_password" name="password" placeholder="Password" autocomplete="off" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
                             </div>
                             <div class="col-sm-6">
-                                <input type="password" class="form-control form-control-user" id="new_repeat_password" name="repeat_password" placeholder="Repeat Password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                                <input type="password" class="form-control form-control-user" id="new_repeat_password" name="repeat_password" placeholder="Repeat Password" autocomplete="off" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
                             </div>
                             </div>
                             <div class="form-group">
@@ -234,7 +249,7 @@ class Staff_View
                         <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button type="button" class="btn btn-primary" id="btn_staff_new" data-dismiss="modal">Create</button>
+                        <button type="submit" class="btn btn-primary" id="btn_staff_new" data-dismiss="modal">Create</button>
                         </div>
                     </form>
                 </div>
@@ -253,7 +268,6 @@ class Staff_View
                 repeat_password.setCustomValidity('');
             }
             }
-
             new_password.onchange = validatePassword;
             new_repeat_password.onkeyup = validatePassword;
 
@@ -261,6 +275,12 @@ class Staff_View
         <script>
         $(document).ready(function(){
             $("#btn_staff_new").click(function(){
+
+                for(var i=0; i < document.getElementById('form_new_staff').elements.length; i++){
+                    var e = form.elements[i];
+                    console.log(e.name+"="+e.value);
+                }
+
                 var roles = [];
                 var direct_to_url = "ajax.staff_actions.php?action=new&";
                 direct_to_url += $('#form_new_staff').serialize();
@@ -289,86 +309,84 @@ class Staff_View
      */
     public function edit_modal()
     {
-        
-        foreach($this->staff_controller->all_staff as $staff_member=>$details) {
         ?>
         <!-- Edit Staff - Form Modal-->
-        <div class="modal fade" id="editModal_<?php echo $details->staff_id; ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editModalCenter" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit <?php echo $details->display_name; ?></h5>
+                <h5 class="modal-title" id="editModalLabel">Edit</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 </div>
-                <form class="user" id="edit_form_<?php echo $details->staff_id; ?>">
-                <div class="modal-body">
-                    <!-- form input -->
+                <form class="user" id="edit_form">
+                    <div class="modal-body">
+                        <!-- form input -->
                         <div class="form-group row">
-                        <div class="col-sm-6 mb-3 mb-sm-0">
-                            <input type="text" class="form-control form-control-user" id="edit_first_name_<?php echo $details->staff_id; ?>" name="first_name" placeholder="First Name" required value=<?php echo $details->first_name; ?>>
-                        </div>
-                        <div class="col-sm-6">
-                            <input type="text" class="form-control form-control-user" id="edit_last_name_<?php echo $details->staff_id; ?>" name="last_name" placeholder="Last Name" required value=<?php echo $details->last_name; ?>>
-                        </div>
-                        </div>
-                        <div class="form-group">
-                        <input type="email" class="form-control form-control-user" id="edit_email_<?php echo $details->staff_id; ?>" name="email" placeholder="Email Address" value=<?php echo $details->email; ?>>
-                        </div>
-                        <div class="form-group">
-                        <input type="text" class="form-control form-control-user" id="edit_username_<?php echo $details->staff_id; ?>" name="username" placeholder="Username" required value=<?php echo $details->username; ?>>
-                        </div>
-                        <div class="form-group row">
-                        <div class="col-sm-6 mb-3 mb-sm-0">
-                            <input type="password" class="form-control form-control-user" id="edit_password_<?php echo $details->staff_id; ?>" name="password" placeholder="Replace Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
-                        </div>
-                        <div class="col-sm-6">
-                            <input type="password" class="form-control form-control-user" id="edit_repeat_password_<?php echo $details->staff_id; ?>" name="repeat_password" placeholder="Repeat Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
-                        </div>
-                        </div>
-                        <div class="form-group">
-                        <small id="passwordHelpBlock" class="form-text text-muted">
-                            <p>Passwords must be at least 8 characters long, contain a number, lowercase and uppercase letters.</p>
-                        </small>
-                        </div>
-                        <div class="form-group">
-                        Roles:
-                        <?php
-                        foreach($this->staff_controller->role_model->available_roles as $role) { ?>
-                            <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ckbox_edit_role_<?php echo $role['role_id']; ?>_for_<?php echo $details->staff_id; ?>" name="role_<?php echo $role['role_id']; ?>" value=<?php echo '"'.$role['role_id'].'"'; if($details->has_role($role['role_id'])) echo 'checked="checked"';  ?>>
-                            <label class="form-check-label" for="ckbox_edit_role_<?php echo $role['role_id']; ?>_for_<?php echo $details->staff_id; ?>">
-                                <?php echo $role['name']; ?>
-                            </label>
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <input type="text" class="form-control form-control-user" id="edit_first_name" name="first_name" placeholder="First Name" required />
                             </div>
-                        <?php } ?>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" id="edit_last_name" name="last_name" placeholder="Last Name" required />
+                            </div>
                         </div>
                         <div class="form-group">
-                        Active? <?php echo 'active? 1/0 = '.$details->active.' | '; ?>
-                        <select id="edit_active_<?php echo $details->staff_id; ?>" name="active" class="form-control-sm form-control-user-sm">
-                            <option value="1">Yes</option>
-                            <option value="0"<?php if($details->active==0) echo " selected" ?>>No</option>
-                        </select>
+                            <input type="email" class="form-control form-control-user" id="edit_email" name="email" placeholder="Email Address" />
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <input type="password" class="form-control form-control-user" id="edit_password" name="password" autocomplete="off" placeholder="Replace Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="password" class="form-control form-control-user" id="edit_repeat_password" name="repeat_password" autocomplete="off" placeholder="Repeat Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <small id="passwordHelpBlock" class="form-text text-muted">
+                                <p>Passwords must be at least 8 characters long, contain a number, lowercase and uppercase letters.</p>
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            Roles:
+                            <?php
+                            foreach($this->staff_controller->role_model->available_roles as $role) { ?>
+                                <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ckbox_edit_role_<?php echo $role['role_id']; ?>" name="role_<?php echo $role['role_id']; ?>" value="<?php echo $role['role_id']; ?>">
+                                <label class="form-check-label" for="ckbox_edit_role_<?php echo $role['role_id']; ?>">
+                                    <?php echo $role['name']; ?>
+                                </label>
+                                </div>
+                            <?php } ?>
+                        </div>
+                        <div class="form-group edit_active_options">
+                            Active?
+                            <select id="edit_active" name="active" class="form-control-sm form-control-user-sm">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                    <input type="hidden" name="staff_id" value="<?php echo $details->staff_id; ?>" />
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="reset" class="btn btn-secondary">Reset</button>
-                    <button id="btn_staff_edit_<?php echo $details->staff_id; ?>" type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button id="btn_staff_edit" type="submit" class="btn btn-primary" data-dismiss="modal">Save</button>
                     </div>
                 </form>
             </div>
             </div>
         </div>
         <script>
+        var staff_id;
+        //Collect the form data and 'submit' the form via AJAX
         $(document).ready(function(){
-            $("#btn_staff_edit_<?php echo $details->staff_id; ?>").click(function(){
+            $("#btn_staff_edit").click(function(){
                 var roles = [];
-                var direct_to_url = "ajax.staff_actions.php?action=edit&";
-                direct_to_url += $('#edit_form_<?php echo $details->staff_id; ?>').serialize();
-                $('#edit_form_<?php echo $details->staff_id; ?> input[type=checkbox]').each(function() {     
+                var direct_to_url = "ajax.staff_actions.php?action=edit&staff_id="+staff_id+"&";
+                direct_to_url += $('#edit_form').serialize(); //grab all input boxes
+
+                //grab the role tickbox data
+                $('#edit_form input[type=checkbox]').each(function() {     
                         if (this.checked) {
                             roles.push(this.name.replace("role_",""));
                         }
@@ -376,15 +394,36 @@ class Staff_View
                 $.each(roles, function(index, value) {
                     direct_to_url += "&roles[]="+value;
                 });
+
+                //send the data as a GET request to the PHP page specified in direct_to_url
                 $.ajax({url: direct_to_url, success: function(result){
                     $("#div1").html(result);
                 }});
             });
         });
+
+        //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
+        //data is passed in the form of a JSON string.
+        $(document).on("click", ".editModalBox", function () {
+            staff_id = $(this).data('id').staff_id;
+            $(".modal-body #edit_first_name").val($(this).data('id').first_name);
+            $(".modal-body #edit_last_name").val($(this).data('id').last_name);
+            $(".modal-body #edit_email").val($(this).data('id').email);
+            $(".edit_active_options select").val($(this).data('id').active);
+            var i;
+            for (i = 1; i <= 5; i++) {
+                    $("#ckbox_edit_role_"+i).prop("checked", false);
+            }
+
+            //tick the checkboxes that match the roles this staff member has
+            var roles = $(this).data('id').roles;
+            $.each(roles, function(index, value) {
+                    $("#ckbox_edit_role_"+value.role_id).prop("checked", true);
+                });
+        });
         </script>
 
-            <?php
-        }
+    <?php
     }
 
     /**
