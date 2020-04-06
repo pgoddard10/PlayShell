@@ -1,67 +1,59 @@
+
 <?php
 
 require_once('config.php');
-require_once('classes/views/Staff_View.php');
+require_once('classes/views/Visitor_View.php');
 require_once('classes/views/Authenticate_View.php');
-$staff_view = new Staff_View();
+$visitor_view = new Visitor_View();
 $authenticate_view = new Authenticate_View();
 $authenticate_view->has_session();
+$authenticate_view->page_permissions(VISITOR_DB_MANAGER);
 
 ?>
+<!-- Custom styles for this page -->
+      <!-- Begin Page Content -->
+      <div class="container-fluid">
 
-
-        <!-- Begin Page Content -->
-        <div class="container-fluid">
-
-          <!-- Page Heading -->
+        <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-          <h1 class="h2 mb-0 text-gray-800">Manage Visitors</h1>
+          <h1 class="h2 mb-0 text-gray-800"><i class="fas fa-fw fa-users"></i> Manage Visitors</h1>
+          <a href="#" data-toggle="modal" data-target="#addNewModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-user-plus"></i></span><span class="text">Add New</span></a>
         </div>
+        <p class="mb-4">
+          Add, edit and remove access for visitors.
+        </p>
 
-          <div class="row">
-
-            <div class="col-lg-6">
-
-              <!-- Default Card Example -->
-              <div class="card mb-4">
-                <div class="card-header">
-                  Default Card Example
-                </div>
-                <div class="card-body">
-                  This card uses Bootstrap's default styling with no utility classes added. Global styles are the only things modifying the look and feel of this default card example.
-                </div>
-              </div>
-
+        <div id="div1"></div>
+        <!-- DataTable of Entire Visitor -->
+        <div class="card shadow mb-4">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="manage_visitor_data_table" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+              </table>
             </div>
-
-            <div class="col-lg-6">
-
-              <!-- Default Card Example -->
-              <div class="card mb-4">
-                <div class="card-header">
-                  Default Card Example
-                </div>
-                <div class="card-body">
-                  This card uses Bootstrap's default styling with no utility classes added. Global styles are the only things modifying the look and feel of this default card example.
-                </div>
-              </div>
-
-              <!-- Default Card Example -->
-              <div class="card mb-4">
-                <div class="card-header">
-                  Default Card Example
-                </div>
-                <div class="card-body">
-                  This card uses Bootstrap's default styling with no utility classes added. Global styles are the only things modifying the look and feel of this default card example.
-                </div>
-              </div>
-
-            </div>
-
           </div>
-
+          </div>
         </div>
-        <!-- /.container-fluid -->
 
       </div>
-      <!-- End of Main Content -->
+      <!-- /.container-fluid -->
+
+      <?php
+        $visitor_view->delete_modal();
+        $visitor_view->new_modal();
+        $visitor_view->edit_modal();
+      ?>
+
+<script>
+
+
+</script>
+<link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">

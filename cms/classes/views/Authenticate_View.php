@@ -118,7 +118,7 @@ class Authenticate_View
         <li class="nav-item active">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
             <i class="fas fa-fw fa-file-audio"></i>
-            <span>Content</span>
+            <span>Manage Content</span>
           </a>
           <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
@@ -135,11 +135,11 @@ class Authenticate_View
         <li class="nav-item active">
           <a class="nav-link" href="?page=manage_reports">
             <i class="fas fa-fw fa-chart-bar"></i>
-            <span>Reports</span></a>
+            <span>Manage Reports</span></a>
         </li>
         <?php
        }
-       if($this->staff_controller->has_role(VISITOR_MANAGER)) { 
+       if($this->staff_controller->has_role(VISITOR_DB_MANAGER)) { 
         ?>
         <!-- Nav Item - Visitor Management -->
         <li class="nav-item active">
@@ -155,7 +155,7 @@ class Authenticate_View
         <li class="nav-item active">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
             <i class="fas fa-fw fa-hdd"></i>
-            <span>Devices</span>
+            <span>Manage Devices</span>
           </a>
           <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">

@@ -7,7 +7,8 @@ $(document).ready(function() {
     "order": [[ 4, "desc" ],[ 0, "desc" ]],
     "ajax": {
       url: "ajax.staff_table_data.php?action=display_table",
-      "contentType": "application/json"
+      "contentType": "application/json",
+      "dataSrc": "data"
     },
     "columns": [
           { "data": "name" },

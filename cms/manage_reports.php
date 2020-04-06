@@ -15,8 +15,11 @@ $authenticate_view->has_session();
 
           <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-          <h1 class="h2 mb-0 text-gray-800">Manage Reports</h1>
+          <h1 class="h2 mb-0 text-gray-800"><i class="fas fa-fw fa-chart-bar"></i> Manage Reports</h1>
         </div>
+        <p class="mb-4">
+          [placeholder]
+        </p>
 
           <div class="row">
 

@@ -124,6 +124,7 @@ class Staff_View
     public function JSONify_All_Staff()
     {
         $data = array();
+        if(count($this->staff_controller->all_staff)<=0) return '{"data": []}'; //empty JSON for datatables to read correctly.
         foreach($this->staff_controller->all_staff as $staff_member=>$details) {
             $mystaff = array();
             $mystaff['name'] = $details->display_name;

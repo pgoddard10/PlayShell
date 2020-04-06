@@ -15,9 +15,12 @@ $authenticate_view->page_permissions(STAFF_DB_MANAGER);
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-          <h1 class="h2 mb-0 text-gray-800">Manage Staff</h1>
+          <h1 class="h2 mb-0 text-gray-800"><i class="fas fa-fw fa-id-card"></i> Manage Staff</h1>
           <a href="#" data-toggle="modal" data-target="#addNewModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-user-plus"></i></span><span class="text">Add New</span></a>
         </div>
+        <p class="mb-4">
+          Add, edit and remove access for staff through this page. You can also set access-level permissions.
+        </p>
 
         <div id="div1"></div>
         <!-- DataTable of Entire Staff -->
