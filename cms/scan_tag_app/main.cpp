@@ -27,8 +27,7 @@ int main(int argc, char** argv) {
 			ifs.close(); //close the file handler
 			std::cout << "File opened and read. The Content ID is: " << content_id << std::endl;
 
-			if(content_id.length()>0) {
-
+			if(content_id.length()>0) { //if the content_id actually exists
 				Json::Value root;
 				root["content_id"] = content_id;
 				root["nfc_tag"] = nfcID;
@@ -38,7 +37,7 @@ int main(int argc, char** argv) {
 
 				std::ofstream results_file("../json/tag_data.json"); //open the file to respond to the request
 				if (results_file.is_open()) {
-					results_file << json_file;
+					results_file << json_file; //push the contents of the json_file into the actual file
 					results_file.close(); //close the file handler
 					std::cout << "Saved the JSON formatted content: " << json_file << std::endl;
 				}

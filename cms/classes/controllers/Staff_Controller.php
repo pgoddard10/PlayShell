@@ -34,6 +34,7 @@ class Staff_Controller
     public function create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)
     {
         $returnValue = -1;
+        $username = strtolower($username);
         if($password != $repeat_password) $returnValue =-2; //password mis-match
         else {
             $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
@@ -134,6 +135,7 @@ class Staff_Controller
     public function login($username,$password)
     {
         $returnValue = -1;
+        $username = strtolower($username);
         $staff_id = $this->staff_model->get_id_from_username($username);
         if($staff_id > 0) {
             $staff = $this->staff_model->populate_from_db($staff_id);

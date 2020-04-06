@@ -1,4 +1,12 @@
 <?php
+/**
+ * Default landing page once logged in
+ * General info to be displayed on this page
+ *
+ * @author Paul Goddard, paul2.goddard@live.uwe.ac.uk
+ * @date Spring 2020 
+ * 
+ */
 
 require_once('config.php');
 require_once('classes/views/Staff_View.php');

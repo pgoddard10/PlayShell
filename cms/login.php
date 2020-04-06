@@ -1,3 +1,13 @@
+<?php
+/**
+ * The login form - you must have a staff user account to be able to log in
+ *
+ * @author Paul Goddard, paul2.goddard@live.uwe.ac.uk
+ * @date Spring 2020 
+ * 
+ */
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

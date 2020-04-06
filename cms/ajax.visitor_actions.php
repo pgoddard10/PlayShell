@@ -1,4 +1,12 @@
 <?php
+/**
+ * Ajax requests from the Manage Visitors page.
+ * Allows add/edit/delete functionality
+ *
+ * @author Paul Goddard, paul2.goddard@live.uwe.ac.uk
+ * @date Spring 2020 
+ * 
+ */
 
 require_once('config.php');
 

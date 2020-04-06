@@ -1,4 +1,13 @@
 <?php
+/**
+ * Ajax requests from the Manage Visitor page.
+ * Responsible for getting the contents of the table
+ * Table contains all staff details
+ *
+ * @author Paul Goddard, paul2.goddard@live.uwe.ac.uk
+ * @date Spring 2020 
+ * 
+ */
 
 header('Content-Type: application/json');
 require_once('config.php');

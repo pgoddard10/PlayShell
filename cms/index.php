@@ -1,5 +1,13 @@
 <?php
-session_start();
+/**
+ * Sets styles, header & footers etc. Responsible for displaying the menu and grabbing the correct page contents
+ *
+ * @author Paul Goddard, paul2.goddard@live.uwe.ac.uk
+ * @date Spring 2020 
+ * 
+ */
+
+session_start(); //required for PHP session (used to confirm user is logged in)
 require_once('config.php');
 
 //specify page to display
@@ -9,7 +17,7 @@ else define("PAGE","home");
 require_once('classes/views/Authenticate_View.php');
 $authenticate_view = new Authenticate_View();
 
-$authenticate_view->has_session();
+$authenticate_view->has_session(); //check that the user is logged in
 
 ?>
 

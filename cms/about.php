@@ -1,7 +1,3 @@
-<?php
-
-?>
-
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
@@ -28,13 +24,11 @@
                     <div class="card-footer">
                         <div class="row">
                             <div class="col">
-                                <img src="https://avatars0.githubusercontent.com/u/48760536?s=460&u=531caaf801649bd02eb3716ce7c2e008231a605b&v=4" class="rounded-circle float-left " width="100px" alt="Paul Goddard carrying a climbing rope on his shoulders.">
                                 <i class="fab fa-fw fa-linkedin"></i>  <a href="https://www.linkedin.com/in/pgoddard10/" target="_blank">pgoddard10</a><br />
                                 <i class="fab fa-fw fa-twitter-square"></i>  <a href="https://twitter.com/pgoddard10" target="_blank">@pgoddard10</a><br />
                                 <i class="fab fa-fw fa-github-square"></i> <a href="https://github.com/pgoddard10/" target="_blank">pgoddard10</a><br />
                             </div> 
                             <div class="col">
-                                <img src="https://news.images.itv.com/image/file/1865210/stream_img.jpg" class="float-left " width="100px" alt="UWE logo">
                                 <i class="fas fa-fw fa-link"></i>  <a href="https://www.uwe.ac.uk" target="_blank">uwe.ac.uk</a><br />
                                 <i class="fab fa-fw fa-twitter-square"></i>  <a href="https://twitter.com/uwebristol" target="_blank">@uwe</a><br />
                                 <i class="fab fa-fw fa-instagram-square"></i> <a href="https://www.instagram.com/uwebristol/" target="_blank">uwebristol</a><br />

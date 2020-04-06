@@ -1,5 +1,12 @@
-
 <?php
+/**
+ * The GUI for managing visitor details
+ * The PHP file is included within the index.php page - access the GUI by loading index.php
+ *
+ * @author Paul Goddard, paul2.goddard@live.uwe.ac.uk
+ * @date Spring 2020 
+ * 
+ */
 
 require_once('config.php');
 require_once('classes/views/Visitor_View.php');
