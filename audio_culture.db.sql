@@ -1,20 +1,39 @@
 BEGIN TRANSACTION;
-DROP TABLE IF EXISTS `user_history`;
-CREATE TABLE IF NOT EXISTS `user_history` (
+DROP TABLE IF EXISTS `visitor_history`;
+CREATE TABLE IF NOT EXISTS `visitor_history` (
 	`content_id`	INTEGER NOT NULL,
 	`time_scanned`	TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`user_id`	INTEGER NOT NULL,
-	FOREIGN KEY(`content_id`) REFERENCES `content`(`content_id`),
-	FOREIGN KEY(`user_id`) REFERENCES `user`(`user_id`),
-	PRIMARY KEY(`content_id`,`time_scanned`,`user_id`)
+	`visitor_id`	INTEGER NOT NULL,
+	PRIMARY KEY(`content_id`,`time_scanned`,`visitor_id`),
+	FOREIGN KEY(`content_id`) REFERENCES `content`(`content_id`)
 );
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE IF NOT EXISTS `user` (
-	`user_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+DROP TABLE IF EXISTS `visitor`;
+CREATE TABLE `visitor` (
+	`visitor_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`first_name`	TEXT,
 	`last_name`	TEXT,
-	`email`	TEXT
+	`email`	TEXT,
+	`address_1`	TEXT,
+	`address_2`	TEXT,
+	`address_3`	TEXT,
+	`address_4`	TEXT,
+	`address_postcode`	TEXT
 );
+DROP TABLE IF EXISTS `staff_role`;
+CREATE TABLE IF NOT EXISTS `staff_role` (
+	`staff_id`	INTEGER NOT NULL,
+	`role_id`	INTEGER NOT NULL,
+	PRIMARY KEY(`staff_id`,`role_id`),
+	FOREIGN KEY(`staff_id`) REFERENCES `staff`(`staff_id`),
+	FOREIGN KEY(`role_id`) REFERENCES `role`(`role_id`)
+);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (3,2);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,1);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,2);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,3);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,4);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,5);
+INSERT INTO `staff_role` (staff_id,role_id) VALUES (2,2);
 DROP TABLE IF EXISTS `staff`;
 CREATE TABLE IF NOT EXISTS `staff` (
 	`staff_id`	INTEGER NOT NULL,
@@ -27,7 +46,15 @@ CREATE TABLE IF NOT EXISTS `staff` (
 	PRIMARY KEY(`staff_id`)
 );
 INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (1,'pgoddard10','$2y$10$iPhtEghZVVe7lIqjusadB.divf7a4CGtR.LjaWYIafQSphymEV80a','Paul','Goddard','paul2.goddard@live.uwe.ac.uk',1);
-INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (2,'sholmes','$2y$10$CnBgnliJM54qDiMdEsW8i.1cY5VpsdwwawNEO.VDcbmPaZ5Hx5SMS','Sherlock','Holmes',NULL,1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (2,'sholmes','$2y$10$KL0fvV9vv2AYBF7lOlJLees/Yd7fz0dpdSOY.PvT0yc2d./tNoq/G','Sherlock','Holmes','',1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (3,'jsmith','$2y$10$UozzO6LiErGPUqj9Gb06CeHSASTbLLqxH.ohASZK09/NqlX8BnrDa','Jim','Smith','jsmith@gmail.com',1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (4,'wriker','$2y$10$8gvujP4TxftVZh8Rnr1AHuUtSvjfjjGN3q.1wNOR34IZf0JeOAGme','Will','Riker','wriker@gmail.com',0);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (5,'mappleby','$2y$10$8gvujP4TxftVZh8Rnr1AHuUtSvjfjjGN3q.1wNOR34IZf0JeOAGme','Mike','Appleby','',1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (6,'kparis','$2y$10$8gvujP4TxftVZh8Rnr1AHuUtSvjfjjGN3q.1wNOR34IZf0JeOAGme','Katherine','Paris','',0);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (7,'rparker','$2y$10$8gvujP4TxftVZh8Rnr1AHuUtSvjfjjGN3q.1wNOR34IZf0JeOAGme','Ruby','Parker','',1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (8,'jjefferies','$2y$10$8gvujP4TxftVZh8Rnr1AHuUtSvjfjjGN3q.1wNOR34IZf0JeOAGme','Julie','Jefferies','',1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (9,'jhoward','$2y$10$8gvujP4TxftVZh8Rnr1AHuUtSvjfjjGN3q.1wNOR34IZf0JeOAGme','Jackie','Howard','',1);
+INSERT INTO `staff` (staff_id,username,password,first_name,last_name,email,active) VALUES (10,'snewton','$2y$10$CtRdKvoApMCoshCGHY/lCenZO7nO7HwUn9K7LobwFJ6vquN1a6QYW','Sandra','Newton','',1);
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE IF NOT EXISTS `role` (
 	`role_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -38,20 +65,6 @@ INSERT INTO `role` (role_id,name) VALUES (2,'Content Manager');
 INSERT INTO `role` (role_id,name) VALUES (3,'Report Manager');
 INSERT INTO `role` (role_id,name) VALUES (4,'Visitor Manager');
 INSERT INTO `role` (role_id,name) VALUES (5,'Device Manager');
-DROP TABLE IF EXISTS `staff_role`;
-CREATE TABLE IF NOT EXISTS `staff_role` (
-	`staff_id`	INTEGER NOT NULL,
-	`role_id`	INTEGER NOT NULL,
-	PRIMARY KEY(`staff_id`,`role_id`),
-	FOREIGN KEY(`staff_id`) REFERENCES `staff`(`staff_id`),
-	FOREIGN KEY(`role_id`) REFERENCES `role`(`role_id`)
-);
-INSERT INTO `staff_role` (staff_id,role_id) VALUES (2,2);
-INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,1);
-INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,2);
-INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,3);
-INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,4);
-INSERT INTO `staff_role` (staff_id,role_id) VALUES (1,5);
 DROP TABLE IF EXISTS `item`;
 CREATE TABLE IF NOT EXISTS `item` (
 	`item_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
@@ -61,8 +74,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`last_modified`	TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`modified_by`	INTEGER,
 	`url`	TEXT,
-	`active`	INTEGER NOT NULL,
-	FOREIGN KEY(`modified_by`) REFERENCES `staff`(`staff_id`)
+	`active`	INTEGER NOT NULL
 );
 INSERT INTO `item` (item_id,heritage_id,name,location,last_modified,modified_by,url,active) VALUES (1,NULL,'talking head','reception','2020-03-20 16:51:04',1,NULL,1);
 DROP TABLE IF EXISTS `gesture`;
@@ -85,9 +97,8 @@ CREATE TABLE IF NOT EXISTS `content` (
 	`active`	INTEGER,
 	`gesture_id`	INTEGER,
 	`item_id`	INTEGER,
-	FOREIGN KEY(`modified_by`) REFERENCES `staff`(`staff_id`),
-	FOREIGN KEY(`gesture_id`) REFERENCES `gesture`(`gesture_id`),
-	FOREIGN KEY(`item_id`) REFERENCES `item`(`item_id`)
+	FOREIGN KEY(`item_id`) REFERENCES `item`(`item_id`),
+	FOREIGN KEY(`gesture_id`) REFERENCES `gesture`(`gesture_id`)
 );
 INSERT INTO `content` (content_id,name,tag_id,tts_enabled,soundfile_location,written_text,next_content,created,last_modified,modified_by,active,gesture_id,item_id) VALUES (1,'some content name','JBD874',1,NULL,'This is some sample content which is to be spoken aloud by the text-to-speech system.',NULL,'2020-03-20 16:48:50','2020-03-20 17:36:50',1,1,NULL,1);
 INSERT INTO `content` (content_id,name,tag_id,tts_enabled,soundfile_location,written_text,next_content,created,last_modified,modified_by,active,gesture_id,item_id) VALUES (2,'name2','UBIY87OI',1,NULL,'Some creative content is written here.',NULL,'2020-03-20 18:39:59','2020-03-20 18:39:59',1,1,NULL,1);

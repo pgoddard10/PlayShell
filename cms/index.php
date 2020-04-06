@@ -329,8 +329,9 @@ $authenticate_view->has_session();
                 <!-- Page level plugins -->
                 <script src="vendor/datatables/jquery.dataTables.min.js"></script>
                 <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
                 <!-- Page level custom scripts -->
-                <script src="js/demo/datatables-manage_staff.js"></script>
+                <script src="js/datatables/manage_staff.js"></script>
         <?php
             break;
         }
@@ -339,6 +340,7 @@ $authenticate_view->has_session();
 
 
   <script>
+  //ajax actions for the logout button
   $(document).ready(function() {
     $("#btn_logout").click(function(){ 
       $.when(logout()).done(function(a1){ //when the ajax request is complete
