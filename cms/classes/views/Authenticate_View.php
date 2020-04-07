@@ -116,16 +116,9 @@ class Authenticate_View
         ?>
         <!-- Nav Item - Content Collapse Menu -->
         <li class="nav-item active">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          <a class="nav-link" href="?page=manage_content">
             <i class="fas fa-fw fa-file-audio"></i>
-            <span>Manage Content</span>
-          </a>
-          <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item" href="?page=manage_content">Check out</a>
-              <a class="collapse-item" href="?page=manage_content">Add New</a>
-            </div>
-          </div>
+            <span>Manage Content</span></a>
         </li>
         <?php
        }

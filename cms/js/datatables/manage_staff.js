@@ -6,7 +6,7 @@ $(document).ready(function() {
   var staff_table = $('#manage_staff_data_table').DataTable( {
     "order": [[ 4, "desc" ],[ 0, "desc" ]],
     "ajax": {
-      url: "ajax.staff_table_data.php?action=display_table",
+      url: "ajax.get_table_data.php?page=staff",
       "contentType": "application/json",
       "dataSrc": "data"
     },

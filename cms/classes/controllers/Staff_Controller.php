@@ -55,7 +55,12 @@ class Staff_Controller
         $returnValue = -1; //unknown error
         if($password != $repeat_password) $returnValue =-2; //password mis-match
         else {
-            $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+			if(strlen($password)>8) { //only replace password if one was provided
+                $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+            }
+            else {
+                $password = null;
+            }
             //check to see if this person is staff DB manager in DB
             $staff_db_mgr = false;
             if($this->staff_model->roles) { //if this person has any roles
@@ -70,7 +75,7 @@ class Staff_Controller
                 $returnValue = -3; //cannot remove the role for last DB manager
             }
             else {
-                if($this->staff_model->edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active)==0) {
+                if($this->staff_model->edit($staff_id, $first_name, $last_name, $password, $email, $active)==0) {
                     if($this->staff_model->edit_roles($roles)==0)
                         $returnValue = 0;
                     else $returnValue = -5; //unable to edit roles
@@ -138,10 +143,9 @@ class Staff_Controller
         $username = strtolower($username);
         $staff_id = $this->staff_model->get_id_from_username($username);
         if($staff_id > 0) {
-            $staff = $this->staff_model->populate_from_db($staff_id);
+            $this->staff_model->populate_from_db($staff_id);
             if(password_verify($password,$this->staff_model->get_password()) && $this->staff_model->active==1) {
                 $returnValue = 0;
-                $this->staff_model->populate_from_db($staff_id);
                 $_SESSION["username"] = $username;
             }
         }

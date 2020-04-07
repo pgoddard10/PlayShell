@@ -146,7 +146,7 @@ class Staff_View
             $staff_as_json = json_encode($details);
             $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
             if($details->active==1) {
-                $mystaff['buttons'] = $mystaff['buttons'] . " | <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
+                $mystaff['buttons'] = $mystaff['buttons'] . " | <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-pause-circle'></i></a>";
             }
             $data["data"][] = $mystaff;
         }
@@ -183,23 +183,23 @@ class Staff_View
                             </div>
                             </div>
                             <div class="form-group">
-                            <input type="email" class="form-control form-control-user" id="new_email" name="email" placeholder="Email Address">
+                                <input type="email" class="form-control form-control-user" id="new_email" name="email" placeholder="Email Address">
                             </div>
                             <div class="form-group">
-                            <input type="text" class="form-control form-control-user" id="new_username" name="username" placeholder="Username" required>
+                                <input type="text" class="form-control form-control-user" id="new_username" name="username" placeholder="Username" required>
                             </div>
                             <div class="form-group row">
-                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="password" class="form-control form-control-user" id="new_password" name="password" placeholder="Password" autocomplete="off" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
-                            </div>
-                            <div class="col-sm-6">
-                                <input type="password" class="form-control form-control-user" id="new_repeat_password" name="repeat_password" placeholder="Repeat Password" autocomplete="off" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
-                            </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="password" class="form-control form-control-user" id="new_password" name="password" placeholder="Password" autocomplete="off" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="password" class="form-control form-control-user" id="new_repeat_password" name="repeat_password" placeholder="Repeat Password" autocomplete="off" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                                </div>
                             </div>
                             <div class="form-group">
-                            <small id="passwordHelpBlock" class="form-text text-muted">
-                                <p>Passwords must be at least 8 characters long, contain a number, lowercase and uppercase letters.</p>
-                            </small>
+                                <small id="passwordHelpBlock" class="form-text text-muted">
+                                    <p>Passwords must be at least 8 characters long, contain a number, lowercase and uppercase letters.</p>
+                                </small>
                             </div>
                             <div class="form-group">
                             Roles:

@@ -125,12 +125,11 @@ class Staff_Model
      * @param  array<> staff_data
      * @return Integer
      */
-    public function edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active)
+    public function edit($staff_id, $first_name, $last_name, $password, $email, $active)
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-            $replace_password=false;
-			if(strlen($password)>0) { //only replace password if one was provided
+			if(strlen($password)>8) { //only replace password if one was provided
 				$stm = $db->prepare("UPDATE staff SET `first_name`= :first_name,`last_name`=:last_name, `password`=:password, `email`=:email, `active`=:active WHERE staff_id = :staff_id");
 			}
 			else{ //if no new password, do not update

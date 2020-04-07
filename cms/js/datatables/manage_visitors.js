@@ -5,7 +5,7 @@ $(document).ready(function() {
     //Visitor Management Table
     var visitor_table = $('#manage_visitor_data_table').DataTable( {
       "ajax": {
-        url: "ajax.visitor_table_data.php?action=display_table",
+        url: "ajax.get_table_data.php?page=visitor",
         "contentType": "application/json",
         "dataSrc": "data"
       },
@@ -92,15 +92,17 @@ $(document).ready(function() {
   
     /**
      * 
-     * Deactivate visitor
+     * Delete visitor
      * 
      */
-    var display_name;
-    $(document).on("click", ".deleteModalBox", function () {//onclick of the Deactivate icon/button
-      //grab the data provided via JSON on the Deactivate icon/button
-      display_name = $(this).data('id').display_name;
+    var name;
+    $(document).on("click", ".deleteModalBox", function () {//onclick of the Delete icon/button
+      //grab the data provided via JSON on the Delete icon/button
+      name = $(this).data('id').first_name;
+      name += " ";
+      name += $(this).data('id').last_name;
       visitor_id = $(this).data('id').visitor_id;
-      $(".modal-body #span_name").text(display_name);
+      $(".modal-body #span_name").text(name);
     });
   
     $("#btn_visitor_delete").click(function(){ //on click of the confirmation delete button (AKA submit the form)

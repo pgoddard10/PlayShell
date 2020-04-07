@@ -137,14 +137,21 @@ class Visitor_View
                         <!-- form input -->
                             <div class="form-group row">
                             <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" id="new_first_name" name="first_name" placeholder="First Name" required>
+                                <input type="text" class="form-control form-control-user" id="new_first_name" name="first_name" placeholder="First Name" required pattern="[a-zA-Z]+">
                             </div>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" id="new_last_name" name="last_name" placeholder="Last Name" required>
+                                <input type="text" class="form-control form-control-user" id="new_last_name" name="last_name" placeholder="Last Name" required pattern="[a-zA-Z]+">
                             </div>
                             </div>
                             <div class="form-group">
                                 <input type="email" class="form-control form-control-user" id="new_email" name="email" placeholder="Email Address">
+                            </div>
+                            <div class="form-group">
+                            <small id="emailHelpBlock" class="form-text text-muted">
+                                <p>After the visitor has finished with the device, an email will automatically be sent to the specified email.<br />
+                                The email will contain details of the content that the visitor has interacted with.<br />
+                                Leave the email field blank to prevent the email being sent.</p>
+                            </small>
                             </div>
                             <div class="form-group">
                                 <input type="text" class="form-control form-control-user" id="new_address_1" name="address_1" placeholder="Address Line 1" required>
@@ -159,7 +166,7 @@ class Visitor_View
                                 <input type="text" class="form-control form-control-user" id="new_address_4" name="address_4" placeholder="Address Line 4" required>
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control form-control-user" id="new_address_postcode" name="address_postcode" placeholder="Postcode" required>
+                                <input type="text" class="form-control form-control-user" id="new_address_postcode" name="address_postcode" placeholder="Postcode" required pattern="[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? [0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -219,7 +226,7 @@ class Visitor_View
                                 <input type="text" class="form-control form-control-user" id="edit_address_4" name="address_4" placeholder="Address Line 4" required>
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control form-control-user" id="edit_address_postcode" name="address_postcode" placeholder="Postcode" required>
+                                <input type="text" class="form-control form-control-user" id="edit_address_postcode" name="address_postcode" placeholder="Postcode" required pattern="[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? [0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}">
                             </div>
                         </div>
                     <div class="modal-footer">
@@ -247,7 +254,7 @@ class Visitor_View
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLongTitle">Confirm Deactivation</h5>
+                <h5 class="modal-title" id="deleteModalLongTitle">Confirm Deletion</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
