@@ -66,9 +66,3 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
         $item_view->new_item_modal();
         $item_view->edit_item_modal();
       ?>
-
-
-<script>
-
-
-</script>

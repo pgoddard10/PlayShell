@@ -60,10 +60,3 @@ $authenticate_view->page_permissions(STAFF_DB_MANAGER);
         $staff_view->new_modal();
         $staff_view->edit_modal();
       ?>
-
-
-<script>
-
-
-</script>
-<link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">

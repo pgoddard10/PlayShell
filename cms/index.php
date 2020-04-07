@@ -226,25 +226,34 @@ $authenticate_view->has_session(); //check that the user is logged in
 
                 <!-- Page level custom scripts -->
                 <script src="js/datatables/manage_staff.js"></script>
+
+                <!-- Page level custom style -->
+                <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
         <?php
             break;
           case 'manage_visitors':?>
                 <!-- Manage Visitors -->
-                  <!-- Page level plugins -->
-                  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-                  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
-  
-                  <!-- Page level custom scripts -->
-                  <script src="js/datatables/manage_visitors.js"></script>
+                <!-- Page level plugins -->
+                <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+                <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+                <!-- Page level custom scripts -->
+                <script src="js/datatables/manage_visitors.js"></script>
+
+                <!-- Page level custom style -->
+                <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
         <?php
           case 'manage_content':?>
                 <!-- Manage Content -->
                   <!-- Page level plugins -->
-                  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-                  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
-  
-                  <!-- Page level custom scripts -->
-                  <script src="js/datatables/manage_content.js"></script>
+                <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+                <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+                <!-- Page level custom scripts -->
+                <script src="js/datatables/manage_content.js"></script>
+
+                <!-- Page level custom style -->
+                <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
           <?php
             break;
         }
