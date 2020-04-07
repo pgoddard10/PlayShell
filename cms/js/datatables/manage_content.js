@@ -4,7 +4,7 @@ function format ( d ) {
     // `d` is the original data object for the row
     var sub_table = "";
     sub_table += "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
-    sub_table += "<div><h1 class='h5 mb-0'>'"+ d.name +"' contains the following tags/content:</h1></div>";
+    sub_table += "<div><h1 class='h5 mb-0'>'"+ d.name_without_url +"' contains the following tags/content:</h1></div>";
     sub_table += '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
         '<thead>' +
             '<tr>' +
@@ -51,7 +51,7 @@ $(document).ready(function() {
                 },
                 width: "15px"
             },
-            { "data": "name" },
+            { "data": "name_with_url" },
             { "data": "heritage_id" },
             { "data": "location" },
             { "data": "active" },
@@ -103,7 +103,7 @@ $(document).ready(function() {
             $('#addNewItemModal').modal('toggle'); //closes the modal box
   
             //build the URL to include GET request data from the form
-            var direct_to_url = "ajax.content_actions.php?action=new&";
+            var direct_to_url = "ajax.content_actions.php?action=new_item&";
             direct_to_url += $('#form_new_item').serialize();
             //send the data as a GET request to the PHP page specified in direct_to_url
               $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
@@ -147,7 +147,7 @@ $(document).ready(function() {
         event.preventDefault(); //cancels the form submission
         $('#editModalCenter').modal('toggle'); //closes the modal box
         var roles = [];
-        var direct_to_url = "ajax.content_actions.php?action=edit&item_id="+item_id+"&";
+        var direct_to_url = "ajax.content_actions.php?action=edit_item&item_id="+item_id+"&";
         direct_to_url += $('#edit_form').serialize(); //grab all input boxes
   
         //send the data as a GET request to the PHP page specified in direct_to_url
@@ -173,7 +173,6 @@ $(document).ready(function() {
       //grab the data provided via JSON on the Delete icon/button
       name = "'" + $(this).data('id').name + "'";
       item_id = $(this).data('id').item_id;
-      console.log("ajax.content_actions.php?action=delete&item_id="+item_id);
       $(".modal-body #span_name").text(name);
     });
   
@@ -183,7 +182,7 @@ $(document).ready(function() {
           item_table.ajax.reload(); //reload the table with the new data
         });
         function save_to_database(){ //call the ajax for saving the changes
-          return $.ajax({url: "ajax.content_actions.php?action=delete&item_id="+item_id, success: function(result){
+          return $.ajax({url: "ajax.content_actions.php?action=delete_item&item_id="+item_id, success: function(result){
               console.log("successfully deleted");
               $("#div1").html(result);
           }});

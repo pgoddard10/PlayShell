@@ -1,6 +1,6 @@
 <?php
 
-require_once('classes/controllers/Staff_Controller.php');
+require_once('classes/controllers/Authenticate_Controller.php');
 
 /**
  * Short description of class Authenticate_View
@@ -10,14 +10,14 @@ require_once('classes/controllers/Staff_Controller.php');
  */
 class Authenticate_View
 {
-    private $staff_controller = null;
+    private $authenticate_controller = null;
 
     /**
      * Short description of method __construct
      * @param  String db_file
      */
     function __construct() {
-        $this->staff_controller = new Staff_Controller();
+        $this->authenticate_controller = new Authenticate_Controller();
     }
 
     /**
@@ -27,7 +27,7 @@ class Authenticate_View
      */
     public function login($username,$password)
     {
-        $success = $this->staff_controller->login($username,$password);
+        $success = $this->authenticate_controller->login($username,$password);
         if($success==0){
             ?>
               <div class="card mb-4 py-3 border-bottom-success">
@@ -63,7 +63,7 @@ class Authenticate_View
      */
     public function page_permissions($page)
     {    
-       if(!$this->staff_controller->has_role($page)) { ?>
+       if(!$this->authenticate_controller->has_role($page)) { ?>
         <div class="container-fluid">
             <!-- Page Heading -->
             <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -83,7 +83,7 @@ class Authenticate_View
      */
     public function has_session()
     {
-        if(!$this->staff_controller->has_session()) {
+        if(!$this->authenticate_controller->has_session()) {
             echo "You are not logged in!";
             header('Location: login.php');
             exit;
@@ -94,7 +94,15 @@ class Authenticate_View
      */
     public function display_name()
     {
-        echo $this->staff_controller->get_display_name();
+        echo $this->authenticate_controller->get_display_name();
+    }
+    
+    /**
+     * Short description of method display_name
+     */
+    public function get_staff_id()
+    {
+        return $this->authenticate_controller->get_staff_id();
     }
 
     /**
@@ -102,7 +110,7 @@ class Authenticate_View
      */
     public function display_menu()
     {
-     if($this->staff_controller->has_role(STAFF_DB_MANAGER)) {
+     if($this->authenticate_controller->has_role(STAFF_DB_MANAGER)) {
          ?>
         <!-- Nav Item - Staff Management -->
         <li class="nav-item active">
@@ -112,7 +120,7 @@ class Authenticate_View
         </li>
         <?php
        }
-      if($this->staff_controller->has_role(CONTENT_MANAGER)) {
+      if($this->authenticate_controller->has_role(CONTENT_MANAGER)) {
         ?>
         <!-- Nav Item - Content Collapse Menu -->
         <li class="nav-item active">
@@ -122,7 +130,7 @@ class Authenticate_View
         </li>
         <?php
        }
-      if($this->staff_controller->has_role(REPORT_MANAGER)) { 
+      if($this->authenticate_controller->has_role(REPORT_MANAGER)) { 
         ?>
         <!-- Nav Item - Report Management -->
         <li class="nav-item active">
@@ -132,7 +140,7 @@ class Authenticate_View
         </li>
         <?php
        }
-       if($this->staff_controller->has_role(VISITOR_DB_MANAGER)) { 
+       if($this->authenticate_controller->has_role(VISITOR_DB_MANAGER)) { 
         ?>
         <!-- Nav Item - Visitor Management -->
         <li class="nav-item active">
@@ -142,7 +150,7 @@ class Authenticate_View
         </li>
         <?php
        }
-      if($this->staff_controller->has_role(DEVICE_MANAGER)) { 
+      if($this->authenticate_controller->has_role(DEVICE_MANAGER)) { 
         ?>
         <!-- Nav Item - Device Collapse Menu -->
         <li class="nav-item active">

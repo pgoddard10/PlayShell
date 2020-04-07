@@ -100,22 +100,21 @@ class Item_View
     public function JSONify_All_Items()
     {
         $data = array();
-
-    	date_default_timezone_set("Europe/London");
-
         if(count($this->item_controller->all_items)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
         foreach($this->item_controller->all_items as $item=>$details) {
             $individual_item = array();
-            if(strlen($details->url) > 1) $individual_item['name'] = '<a href="'.$details->url.'" target="_blank">' . $details->name .'</a>';
-            else $individual_item['name'] = $details->name;
+            if(strlen($details->url) > 1) $individual_item['name_with_url'] = '<a href="'.$details->url.'" target="_blank">' . $details->name .'</a>';
+            else $individual_item['name_with_url'] = $details->name;
+
+            $individual_item['name_without_url'] = $details->name;
 
 
             $individual_item['heritage_id'] = $details->heritage_id;
             $individual_item['location'] = $details->location;
             
             $individual_item['content_array'] = array(array("V7SUI09", "This is some text to display", "Fiat" ),array("AS4GF65", "Something different, on another tag", "Toyota" ));
-            $individual_item['created'] = date("d/m/Y \a\\t H:m", strtotime($details->created));
-            $last_modified = date("d/m/Y \a\\t H:m", strtotime($details->last_modified));
+            $individual_item['created'] = date("d/m/Y \a\\t H:i", strtotime($details->created));
+            $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
             if(strlen($details->modified_by) > 1) $last_modified = $last_modified. ' by ' . $details->modified_by;
             else $last_modified = $last_modified. ' by [deleted staff member]';
             $individual_item['last_modified'] = $last_modified;

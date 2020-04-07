@@ -82,6 +82,8 @@ $(document).ready(function() {
     $(".modal-body #edit_first_name").val($(this).data('id').first_name);
     $(".modal-body #edit_last_name").val($(this).data('id').last_name);
     $(".modal-body #edit_email").val($(this).data('id').email);
+    $(".modal-body #edit_password").val("");
+    $(".modal-body #edit_repeat_password").val("");
     $(".edit_active_options select").val($(this).data('id').active);
     var i;
     //set all roles checkboxes to unticked/off

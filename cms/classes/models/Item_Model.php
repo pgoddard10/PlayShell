@@ -101,7 +101,7 @@ class Item_Model
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("UPDATE item SET `heritage_id`= :heritage_id,`name`=:name,`location`=:location, `url`=:url, `active`=:active, `modified_by`=:modified_by WHERE item_id = :item_id");
+			$stm = $db->prepare("UPDATE item SET `heritage_id`= :heritage_id,`name`=:name,`location`=:location, `url`=:url, `last_modified` = CURRENT_TIMESTAMP, `active`=:active, `modified_by`=:modified_by WHERE item_id = :item_id");
 			$stm->bindValue(':heritage_id', $heritage_id, SQLITE3_TEXT);
 			$stm->bindValue(':name', $name, SQLITE3_TEXT);
 			$stm->bindValue(':location', $location, SQLITE3_TEXT);
