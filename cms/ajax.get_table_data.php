@@ -28,13 +28,19 @@ switch($_GET['page']) {
         $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
         echo $visitor_view->JSONify_All_Visitors();
         break;
+    case 'staff':
+        $authenticate_view->page_permissions(STAFF_DB_MANAGER);
+        $staff_view->JSONify_All_Staff();
+        break;
     case 'item':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
         $item_view->JSONify_All_Items();
         break;
-    case 'staff':
-        $authenticate_view->page_permissions(STAFF_DB_MANAGER);
-        echo $staff_view->JSONify_All_Staff();
+    case 'content':
+        $authenticate_view->page_permissions(CONTENT_MANAGER);
+        $item_view->JSONify_All_Contents($_GET['item_id']);
+        // echo '{"data": [{"name": "new name 1", "tag": "tag 1"},{"name": "new n2", "tag": "t2"},{"name": "n3", "tag": "t3"}]}';
+        // echo '{"data": []}';
         break;
 }
 ?>

@@ -1,24 +1,26 @@
 <?php
 
-require_once('classes/controllers/Item_Controller.php');
+require_once('classes/controllers/Content_Controller.php');
 
 /**
- * Short description of class Item_View
+ * Short description of class Content_View
  *
  * @access public
  * @author firstname and lastname of author, <author@example.org>
  */
-class Item_View
+class Content_View
 {
-    private $item_controller = null;
+    private $content_controller = null;
+    private $item_id = null;
 
     /**
      * Short description of method __construct
      * @param  String db_file
      */
-    function __construct() {
-        $this->item_controller = new Item_Controller();
-        $this->item_controller->populate_all_items();
+    function __construct($item_id) {
+        $this->content_controller = new Content_Controller();
+        $this->content_controller->populate_all_contents($item_id);
+        $this->item_id = $item_id;
     }
 
     /**
@@ -28,7 +30,7 @@ class Item_View
      */
     public function create_new($heritage_id, $name, $location, $url, $active, $modified_by)
     {
-        $success = $this->item_controller->create_new($heritage_id, $name, $location, $url, $active, $modified_by);
+        $success = $this->content_controller->create_new($heritage_id, $name, $location, $url, $active, $modified_by);
         if($success==0) $msg = "Successfully created $name.";
         else $msg = "An unknown error occurred.";
         ?>
@@ -46,15 +48,15 @@ class Item_View
      *
      * @return void
      */
-    public function edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)
+    public function edit($content_id, $heritage_id, $name, $location, $url, $active, $modified_by)
     { 
-        $success = $this->item_controller->edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by);
+        $success = $this->content_controller->edit($content_id, $heritage_id, $name, $location, $url, $active, $modified_by);
         switch($success) {
             case 0:
                 $msg = "Successfully edited $name.";
                 break;
             case -2:
-                $msg = "Changes for $name were not saved. There was a database error editing the item details.";
+                $msg = "Changes for $name were not saved. There was a database error editing the content details.";
                 break;
             case -1:
             default:
@@ -74,13 +76,13 @@ class Item_View
     /**
      * Short description of method delete
      *
-     * @param  item_id
+     * @param  content_id
      * @return void
      */
-    public function delete($item_id)
+    public function delete($content_id)
     {
-        $success = $this->item_controller->delete($item_id);
-        if($success==0) $msg = "Successfully deleted the item.";
+        $success = $this->content_controller->delete($content_id);
+        if($success==0) $msg = "Successfully deleted the content.";
         else $msg = "An unknown error occurred.";
         ?>
               <!-- Delete Message Card -->
@@ -97,109 +99,58 @@ class Item_View
      *
      * @return void
      */
-    public function JSONify_All_Items()
+    public function JSONify_All_Contents($item_id)
     {
         $data = array();
-        if(count($this->item_controller->all_items)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
-        foreach($this->item_controller->all_items as $item=>$details) {
-            $individual_item = array();
-            
-            $individual_item['item_id'] = $details->item_id;
-            if(strlen($details->url) > 1) $individual_item['name_with_url'] = '<a href="'.$details->url.'" target="_blank">' . $details->name .'</a>';
-            else $individual_item['name_with_url'] = $details->name;
-            $individual_item['name_without_url'] = $details->name;
-            $individual_item['heritage_id'] = $details->heritage_id;
-            $individual_item['location'] = $details->location;
-            
-            
-            // foreach($details->content as $content){
-            //     $content_details_array = array();
-            //     $content_details_array[] = $content->name;
-            //     $content_details_array[] = $content->tag_id;
-            //     if($content->active==1)
-            //         $content_details_array[] = 'Yes';
-            //     else
-            //         $content_details_array[] = 'No';
-            //     $content_details_array[] = date("d/m/Y \a\\t H:i", strtotime($content->created));
-            //     $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
-            //     if(strlen($content->modified_by) > 1) $last_modified = $last_modified. ' by ' . $content->modified_by;
-            //     else $last_modified = $last_modified. ' by [deleted staff member]';
-            //     $content_details_array[] = $last_modified;
-            //     $content_details_array[] = $content->gesture_id;
-            //     $content_details_array[] = $content->next_content;
+        if(count($this->content_controller->all_contents)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
+        foreach($this->content_controller->all_contents as $content=>$details) {
+            $individual_content = array();
 
-
-            //     $individual_item['content_array'][] = $content_details_array;
-            // }
-
-            $individual_item['created'] = date("d/m/Y \a\\t H:i", strtotime($details->created));
-            $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
-            if(strlen($details->modified_by) > 1) $last_modified = $last_modified. ' by ' . $details->modified_by;
-            else $last_modified = $last_modified. ' by [deleted staff member]';
-            $individual_item['last_modified'] = $last_modified;
-            if($details->active==1)
-                $individual_item['active'] = 'Yes';
+            $individual_content['name'] = $content->name;
+            $individual_content['tag_id'] = $content->tag_id;
+            if($content->active==1)
+                $individual_content['active'] = 'Yes';
             else
-                $individual_item['active'] = 'No';
+                $individual_content['active'] = 'No';
+            $individual_content['created'] = date("d/m/Y \a\\t H:i", strtotime($content->created));
+            $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
+            if(strlen($content->modified_by) > 1) $last_modified = $last_modified. ' by ' . $content->modified_by;
+            else $last_modified = $last_modified. ' by [deleted staff member]';
+            $individual_content['last_modified'] = $last_modified;
+            $individual_content['gesture_id'] = $content->gesture_id;
+            $individual_content['next_content'] = $content->next_content;
 
-            $items_as_json = json_encode($details);
-            $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-            $individual_item['buttons'] = $individual_item['buttons'] . " | <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox' data-target='#deleteItemModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-            $data["data"][] = $individual_item;
+
+            $individual_content['content_array'][] = $content_details_array;
+
+
+            $contents_as_json = json_encode($details);
+            $individual_content['buttons'] = "<a href='#' data-toggle='modal' data-id='$contents_as_json' class='editContentModalBox' data-target='#editContentModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
+            $individual_content['buttons'] = $individual_content['buttons'] . " | <a href='#' data-toggle='modal' data-id='$contents_as_json' class='deleteContentModalBox' data-target='#deleteContentModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
+            $data["data"][] = $individual_content;
         }
         echo json_encode($data, JSON_PRETTY_PRINT );
     }
 
     /**
-     * Short description of method JSONify_All_Visitors
+     * Short description of method new_content_modal
      *
      * @return void
      */
-    public function JSONify_All_Contents($item_id) {
-        $array_of_contents = $this->item_controller->get_contents($item_id);
-        $individual_item = array();
-        foreach($array_of_contents[0]->content as $obj=>$contents) {
-            // print('<pre>'.print_r($contents->tag_id,true).'</pre>'); 
-
-            $content_details_array = array();
-            $content_details_array[] = $contents->name;
-            $content_details_array[] = $contents->tag_id;
-            if($contents->active==1)
-                $content_details_array[] = 'Yes';
-            else
-                $content_details_array[] = 'No';
-            $content_details_array[] = date("d/m/Y \a\\t H:i", strtotime($contents->created));
-            $last_modified = date("d/m/Y \a\\t H:i", strtotime($contents->last_modified));
-            if(strlen($contents->modified_by) > 1) $last_modified = $last_modified. ' by ' . $contents->modified_by;
-            else $last_modified = $last_modified. ' by [deleted staff member]';
-            $content_details_array[] = $last_modified;
-            $content_details_array[] = 'I_V->jsonify all contents -> ges_id'.$contents->gesture_id;
-            $content_details_array[] = 'I_V->jsonify all contents -> nxt_cntnt'.$contents->next_content;
-
-            $individual_item["data"][] = $content_details_array;
-        }
-        echo json_encode($individual_item, JSON_PRETTY_PRINT );
-    }
-
-    /**
-     * Short description of method new_item_modal
-     *
-     * @return void
-     */
-    public function new_item_modal()
+    public function new_content_modal()
     {
         ?>
-            <!-- Add New Item - Form Modal -->
-            <div class="modal fade" id="addNewItemModal" tabindex="-1" role="dialog" aria-labelledby="addNewItemModal" aria-hidden="true">
+            <!-- Add New Content - Form Modal -->
+            <div class="modal fade" id="addNewContentModal" tabindex="-1" role="dialog" aria-labelledby="addNewContentModal" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h5 class="modal-title" id="addNewItemModalLabel">Add New Item</h5>
+                    <h5 class="modal-title" id="addNewContentModalLabel">Add New Content</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     </div>
-                    <form class="user" id="form_new_item">
+                    <form class="user" id="form_new_content">
                         <div class="modal-body">
                         <!-- form input -->
                             <div class="form-group">
@@ -225,7 +176,7 @@ class Item_View
                         <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button type="submit" class="btn btn-primary" id="btn_item_new">Create</button>
+                        <button type="submit" class="btn btn-primary" id="btn_content_new">Create</button>
                         </div>
                     </form>
                 </div>
@@ -235,11 +186,11 @@ class Item_View
     }
 
     /**
-     * Short description of method edit_item_modal
+     * Short description of method edit_content_modal
      *
      * @return void
      */
-    public function edit_item_modal()
+    public function edit_content_modal()
     {
         ?>
         <!-- Edit Visitor - Form Modal-->
@@ -283,7 +234,7 @@ class Item_View
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button id="btn_item_edit" type="submit" class="btn btn-primary">Save</button>
+                        <button id="btn_content_edit" type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
             </div>
@@ -293,30 +244,30 @@ class Item_View
     }
 
     /**
-     * Short description of method delete_item_modal
+     * Short description of method delete_content_modal
      *
      * @return void
      */
-    public function delete_item_modal()
+    public function delete_content_modal()
     {
         ?>
         <!-- Delete Content - Confirmation Modal -->
-        <div class="modal fade" id="deleteItemModalCenter" tabindex="-1" role="dialog" aria-labelledby="deleteItemModalCenterTitle" aria-hidden="true">
+        <div class="modal fade" id="deleteContentModalCenter" tabindex="-1" role="dialog" aria-labelledby="deleteContentModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="deleteItemModalLongTitle">Confirm Deletion</h5>
+                <h5 class="modal-title" id="deleteContentModalLongTitle">Confirm Deletion</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
                 <div class="modal-body">
-                    Deleting <span id="span_name">this item</span> will also remove <strong>all</strong> associated content/tags.<br />
+                    Deleting <span id="span_name">this content</span> will also remove <strong>all</strong> associated content/tags.<br />
                     Are you sure you wish to continue?<br />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn_item_delete">Delete Item</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn_content_delete">Delete Content</button>
                 </div>
             </div>
           </div>
@@ -324,6 +275,6 @@ class Item_View
         <?php
     }
 
-} /* end of class Item_View */
+} /* end of class Content_View */
 
 ?>

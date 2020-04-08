@@ -3,6 +3,8 @@
  * Short description of class Item_Model
  * @author Paul Goddard, <paul2.goddard@live.uwe.ac.uk>
  */
+require_once('classes/models/Content_Model.php');
+
 class Item_Model
 {
     private $db_file = DATABASE_FILE;
@@ -14,7 +16,8 @@ class Item_Model
 	public $last_modified = null;
 	public $modified_by = null;
 	public $url = null;
-	public $active = null;
+    public $active = null;
+    public $content = array(); //an array of Content_Model objects
 
     // --- OPERATIONS ---
 
@@ -62,6 +65,13 @@ class Item_Model
                 $this->modified_by = $item['first_name'].' '.$item['last_name'];
                 $this->url = $item['url'];
                 $this->active = $item['active'];
+                $content_model = new Content_Model();
+                $all_contents_ids = $content_model->get_all_content_ids($item_id);
+                foreach($all_contents_ids as $content_id) {
+                    $cm = new Content_Model();
+                    $cm->populate_from_db($content_id);
+                    $this->content[] = $cm;
+                }
                 $returnValue = 0; //success
             }
             $returnValue = -2; //unable to execute query
@@ -132,6 +142,6 @@ class Item_Model
         return $returnValue;
     }
 
-} /* end of class Visitor_Model */
+} /* end of class Item_Model */
 
 ?>
