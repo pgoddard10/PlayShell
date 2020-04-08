@@ -100,54 +100,34 @@ class Item_View
     public function JSONify_All_Items()
     {
         $data = array();
-        if(count($this->item_controller->all_items)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
-        foreach($this->item_controller->all_items as $item=>$details) {
-            $individual_item = array();
-            
-            $individual_item['item_id'] = $details->item_id;
-            if(strlen($details->url) > 1) $individual_item['name_with_url'] = '<a href="'.$details->url.'" target="_blank">' . $details->name .'</a>';
-            else $individual_item['name_with_url'] = $details->name;
-            $individual_item['name_without_url'] = $details->name;
-            $individual_item['heritage_id'] = $details->heritage_id;
-            $individual_item['location'] = $details->location;
-            
-            
-            // foreach($details->content as $content){
-            //     $content_details_array = array();
-            //     $content_details_array[] = $content->name;
-            //     $content_details_array[] = $content->tag_id;
-            //     if($content->active==1)
-            //         $content_details_array[] = 'Yes';
-            //     else
-            //         $content_details_array[] = 'No';
-            //     $content_details_array[] = date("d/m/Y \a\\t H:i", strtotime($content->created));
-            //     $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
-            //     if(strlen($content->modified_by) > 1) $last_modified = $last_modified. ' by ' . $content->modified_by;
-            //     else $last_modified = $last_modified. ' by [deleted staff member]';
-            //     $content_details_array[] = $last_modified;
-            //     $content_details_array[] = $content->gesture_id;
-            //     $content_details_array[] = $content->next_content;
+        if(count($this->item_controller->all_items)<=0) echo '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
+        else {
+            foreach($this->item_controller->all_items as $item=>$details) {
+                $individual_item = array();
+                
+                $individual_item['item_id'] = $details->item_id;
+                if(strlen($details->url) > 1) $individual_item['name_with_url'] = '<a href="'.$details->url.'" target="_blank">' . $details->name .'</a>';
+                else $individual_item['name_with_url'] = $details->name;
+                $individual_item['name_without_url'] = $details->name;
+                $individual_item['heritage_id'] = $details->heritage_id;
+                $individual_item['location'] = $details->location;
+                $individual_item['created'] = date("d/m/Y \a\\t H:i", strtotime($details->created));
+                $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
+                if(strlen($details->modified_by) > 1) $last_modified = $last_modified. ' by ' . $details->modified_by;
+                else $last_modified = $last_modified. ' by [deleted staff member]';
+                $individual_item['last_modified'] = $last_modified;
+                if($details->active==1)
+                    $individual_item['active'] = 'Yes';
+                else
+                    $individual_item['active'] = 'No';
 
-
-            //     $individual_item['content_array'][] = $content_details_array;
-            // }
-
-            $individual_item['created'] = date("d/m/Y \a\\t H:i", strtotime($details->created));
-            $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
-            if(strlen($details->modified_by) > 1) $last_modified = $last_modified. ' by ' . $details->modified_by;
-            else $last_modified = $last_modified. ' by [deleted staff member]';
-            $individual_item['last_modified'] = $last_modified;
-            if($details->active==1)
-                $individual_item['active'] = 'Yes';
-            else
-                $individual_item['active'] = 'No';
-
-            $items_as_json = json_encode($details);
-            $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-            $individual_item['buttons'] = $individual_item['buttons'] . " | <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox' data-target='#deleteItemModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-            $data["data"][] = $individual_item;
+                $items_as_json = json_encode($details);
+                $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
+                $individual_item['buttons'] = $individual_item['buttons'] . " | <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox' data-target='#deleteItemModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
+                $data["data"][] = $individual_item;
+            }
+            echo json_encode($data, JSON_PRETTY_PRINT );
         }
-        echo json_encode($data, JSON_PRETTY_PRINT );
     }
 
     /**
@@ -157,28 +137,36 @@ class Item_View
      */
     public function JSONify_All_Contents($item_id) {
         $array_of_contents = $this->item_controller->get_contents($item_id);
-        $individual_item = array();
-        foreach($array_of_contents[0]->content as $obj=>$contents) {
-            // print('<pre>'.print_r($contents->tag_id,true).'</pre>'); 
+        $individual_content = array();
+        if(count($array_of_contents[0]->content)<=0) echo '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
+        else {
+            foreach($array_of_contents[0]->content as $obj=>$contents) {
 
-            $content_details_array = array();
-            $content_details_array[] = $contents->name;
-            $content_details_array[] = $contents->tag_id;
-            if($contents->active==1)
-                $content_details_array[] = 'Yes';
-            else
-                $content_details_array[] = 'No';
-            $content_details_array[] = date("d/m/Y \a\\t H:i", strtotime($contents->created));
-            $last_modified = date("d/m/Y \a\\t H:i", strtotime($contents->last_modified));
-            if(strlen($contents->modified_by) > 1) $last_modified = $last_modified. ' by ' . $contents->modified_by;
-            else $last_modified = $last_modified. ' by [deleted staff member]';
-            $content_details_array[] = $last_modified;
-            $content_details_array[] = 'I_V->jsonify all contents -> ges_id'.$contents->gesture_id;
-            $content_details_array[] = 'I_V->jsonify all contents -> nxt_cntnt'.$contents->next_content;
+                $content_details_array = array();
+                $content_details_array['name'] = $contents->name;
+                $content_details_array['tag_id'] = $contents->tag_id;
+                if($contents->active==1)
+                    $content_details_array['active'] = 'Yes';
+                else
+                    $content_details_array['active'] = 'No';
+                $content_details_array['created'] = date("d/m/Y \a\\t H:i", strtotime($contents->created));
+                $last_modified = date("d/m/Y \a\\t H:i", strtotime($contents->last_modified));
+                if(strlen($contents->modified_by) > 1) $last_modified = $last_modified. ' by ' . $contents->modified_by;
+                else $last_modified = $last_modified. ' by [deleted staff member]';
+                $content_details_array['last_modified'] = $last_modified;
+                $content_details_array['gesture'] = 'I_V->jsonify all contents -> ges_id'.$contents->gesture_id;
+                $content_details_array['next_content'] = 'I_V->jsonify all contents -> nxt_cntnt'.$contents->next_content;
 
-            $individual_item["data"][] = $content_details_array;
+
+                $content_as_json = json_encode($contents);
+                $content_details_array['buttons'] = "<a href='#' data-toggle='modal' data-id='$content_as_json' class='editContentModalBox' data-target='#editContentModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
+                $content_details_array['buttons'] = $content_details_array['buttons'] . " | <a href='#' data-toggle='modal' data-id='$content_as_json' class='deleteContentModalBox' data-target='#deleteContentModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
+
+
+                $individual_content["data"][] = $content_details_array;
+            }
+            echo json_encode($individual_content, JSON_PRETTY_PRINT );
         }
-        echo json_encode($individual_item, JSON_PRETTY_PRINT );
     }
 
     /**

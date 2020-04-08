@@ -41,7 +41,7 @@ $(document).ready(function() {
           }
       ]
   } );
-  
+
   // Add event listener for opening and closing the Item row
   // Displays the child content via ajax calls
   $('#manage_items_data_table tbody').on('click', 'td.details-control', function () {
@@ -49,7 +49,7 @@ $(document).ready(function() {
       var row = item_table.row( tr );
       var tdi = tr.find("i.fa");
 
-      if ( row.child.isShown() ) {
+      if (row.child.isShown() ) {
           // This row is already open - close it
           row.child.hide();
           tr.removeClass('shown');
@@ -60,56 +60,89 @@ $(document).ready(function() {
           // ajax calls to get child content and displays on screen
           var d = row.data();
           var child_table_name = 'child_details_'+d.item_id;
+
           var sub_table = "";
           sub_table += "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
-        
-          $.getJSON("ajax.get_table_data.php?page=content&item_id="+d.item_id, function(emp) {
-            if(emp.data != null) {
-              sub_table += "<p>'"+ d.name_without_url +"' contains the following tags/content:<p>";
-              sub_table += '<table id = "'+child_table_name+'">';
-              sub_table += '<thead>' +
-                  '<tr>' +
-                      '<th></th>' +
-                      '<th>Name</th>' +
-                      '<th>Tag ID</th>' +
-                      '<th>Active?</th>' +
-                      '<th>Created On</th>' +
-                      '<th>Last Modified</th>' +
-                      '<th>Gesture</th>' +
-                      '<th>Next Content</th>' +
-                      '<th>BUTTONS</th>' +
-                  '</tr>' +
-              '</thead>'+
-                  '<tbody>';
-                $.each(emp.data, function( index, value ) {
-                  sub_table += '<tr><td class="child-details-control"><i class="fa fa-plus-square" aria-hidden="true"></i></td><td>'+value[0]+'</td><td>'+value[1]+'</td><td>'+value[2]+'</td><td>'+value[3]+'</td><td>'+value[4]+'</td><td>'+value[5]+'</td><td>'+value[6]+'</td><td>'+value[7]+'</td></tr>';
-                });
-                sub_table += '</tbody></table>';
-              }
-              else {
-                sub_table += "<p>'"+ d.name_without_url +"' contains no child content.</p>";
-              }
-            
-              row.child(sub_table).show();
-              var content_table = $('#'+child_table_name).DataTable({
-                "order": [ 1, "asc" ],
-                destroy: true
-              });
+          sub_table += "<p>'"+ d.name_without_url +"' contains the following tags/content:<p>";
+          sub_table += '<table id = "'+child_table_name+'">';
+          sub_table += '<thead>' +
+              '<tr>' +
+                  '<th></th>' +
+                  '<th>Name</th>' +
+                  '<th>Tag ID</th>' +
+                  '<th>Active?</th>' +
+                  '<th>Created On</th>' +
+                  '<th>Last Modified</th>' +
+                  '<th>Gesture</th>' +
+                  '<th>Next Content</th>' +
+                  '<th></th>' +
+              '</tr>' +
+          '</thead>'+
+              '<tbody>';
+            sub_table += '</tbody></table>';
+          row.child(sub_table).show();
+          row.child().addClass( 'bg-info' );
 
-          });
-
-          
-          $('#'+child_table_name+' tbody').on('click', 'td.child-details-control', function () {
-              console.log("hello!");
+          var content_table = $('#'+child_table_name).DataTable({
+            "order": [ 1, "asc" ],
+            destroy: true,
+            "ajax": {
+              url: "ajax.get_table_data.php?page=content&item_id="+d.item_id,
+              "contentType": "application/json",
+              "dataSrc": "data"
+            },
+              "columns": [
+                {
+                    "className":      'child-details-control',
+                    "orderable":      false,
+                    "data":           null,
+                    "defaultContent": '',
+                    "render": function () {
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>'; //see comments : https://datatables.net/examples/api/row_details.html
+                    },
+                    width: "15px"
+                },
+                { "data": "name" },
+                { "data": "tag_id" },
+                { "data": "active" },
+                { "data": "created" },
+                { "data": "last_modified" },
+                { "data": "gesture" },
+                { "data": "next_content" },
+                { "data": "buttons" }
+              ]
           });
 
           tr.addClass('shown');
           tdi.first().removeClass('fa-plus-square');
           tdi.first().addClass('fa-minus-square');
+
+
+
+          $('#'+child_table_name+' tbody').on('click', 'td.child-details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = content_table.row( tr );
+            var tdi = tr.find("i.fa");
+      
+            if (row.child.isShown() ) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            }
+            else {
+              row.child("hello").show();
+              tr.addClass('shown');
+              tdi.first().removeClass('fa-plus-square');
+              tdi.first().addClass('fa-minus-square');
+            }
+          });
+
       }
   } );
 
-
+  
 
 
 
