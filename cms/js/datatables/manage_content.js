@@ -26,8 +26,10 @@ $(document).ready(function() {
           { "data": "location" },
           { "data": "active" },
           {
-              "data": "buttons",
-              "width": "100px"
+              "data":         "buttons",
+              "searchable":   false,
+              "orderable":    false,
+              "width":        "100px"
           },
           {
               "data": "created",
@@ -41,6 +43,19 @@ $(document).ready(function() {
           }
       ]
   } );
+
+
+  function format_childs_child(d) {
+    var to_display = "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
+    if(d.tts_enabled==1) {
+      to_display += d.written_text;
+    }
+    else {
+      to_display += "soundfile location";
+    }
+    return to_display;
+  }
+
 
   // Add event listener for opening and closing the Item row
   // Displays the child content via ajax calls
@@ -63,23 +78,21 @@ $(document).ready(function() {
 
           var sub_table = "";
           sub_table += "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
-          sub_table += "<p>'"+ d.name_without_url +"' contains the following tags/content:<p>";
-          sub_table += '<table id = "'+child_table_name+'">';
+          sub_table += "<div class='border'><p class='text-lg'>'"+ d.name_without_url +"' contains the following tags/content:<p>";
+          sub_table += '<table id = "'+child_table_name+'" width="100%">';
           sub_table += '<thead>' +
               '<tr>' +
                   '<th></th>' +
                   '<th>Name</th>' +
                   '<th>Tag ID</th>' +
                   '<th>Active?</th>' +
-                  '<th>Created On</th>' +
-                  '<th>Last Modified</th>' +
                   '<th>Gesture</th>' +
                   '<th>Next Content</th>' +
                   '<th></th>' +
               '</tr>' +
           '</thead>'+
               '<tbody>';
-            sub_table += '</tbody></table>';
+            sub_table += '</tbody></table></div>';
           row.child(sub_table).show();
           row.child().addClass( 'bg-info' );
 
@@ -102,14 +115,30 @@ $(document).ready(function() {
                     },
                     width: "15px"
                 },
-                { "data": "name" },
+                {
+                  "data":         "name",
+                  "width":        "20%"
+                },
                 { "data": "tag_id" },
                 { "data": "active" },
-                { "data": "created" },
-                { "data": "last_modified" },
                 { "data": "gesture" },
                 { "data": "next_content" },
-                { "data": "buttons" }
+                { 
+                  "data":         "buttons",
+                  "searchable":   false,
+                  "orderable":    false,
+                  "width":        "80px"
+                },
+                {
+                    "data": "created",
+                    "searchable": true,
+                    "visible": false 
+                },
+                {
+                    "data": "last_modified",
+                    "searchable": true,
+                    "visible": false 
+                }
               ]
           });
 
@@ -132,7 +161,8 @@ $(document).ready(function() {
                 tdi.first().addClass('fa-plus-square');
             }
             else {
-              row.child("hello").show();
+              row.child(format_childs_child(row.data())).show();
+              row.child().addClass( 'bg-gradient-success' );
               tr.addClass('shown');
               tdi.first().removeClass('fa-plus-square');
               tdi.first().addClass('fa-minus-square');

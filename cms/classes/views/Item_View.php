@@ -154,6 +154,9 @@ class Item_View
                 if(strlen($contents->modified_by) > 1) $last_modified = $last_modified. ' by ' . $contents->modified_by;
                 else $last_modified = $last_modified. ' by [deleted staff member]';
                 $content_details_array['last_modified'] = $last_modified;
+                $content_details_array['tts_enabled'] = $contents->tts_enabled;
+                $content_details_array['written_text'] = $contents->written_text;
+                $content_details_array['soundfile_location'] = $contents->soundfile_location;
                 $content_details_array['gesture'] = 'I_V->jsonify all contents -> ges_id'.$contents->gesture_id;
                 $content_details_array['next_content'] = 'I_V->jsonify all contents -> nxt_cntnt'.$contents->next_content;
 
