@@ -2,6 +2,15 @@
 
 $(document).ready(function() {
 
+  /**
+   * 
+   * =====================================================================
+   *  Start of Datatables display.
+   * 
+   *  This section gets all of the data and displays it into the placeholder <table>
+   * =====================================================================
+   * 
+   */  
   //Item Management Table
   var item_table = $('#manage_items_data_table').DataTable( {
     "order": [ 1, "asc" ],
@@ -44,7 +53,8 @@ $(document).ready(function() {
       ]
   } );
 
-
+  // This will display under Content row, when expanded
+  // i.e. drill down two levels to see it / displays under the second table
   function format_childs_child(d) {
     var to_display = "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
     if(d.tts_enabled==1) {
@@ -57,15 +67,15 @@ $(document).ready(function() {
   }
 
 
-  // Add event listener for opening and closing the Item row
+  // Add event listener for opening and closing the Item row (first table)
   // Displays the child content via ajax calls
-  $('#manage_items_data_table tbody').on('click', 'td.details-control', function () {
+  $('#manage_items_data_table tbody').on('click', 'td.details-control', function () { //when the plus/minus is clicked
       var tr = $(this).closest('tr');
       var row = item_table.row( tr );
       var tdi = tr.find("i.fa");
 
       if (row.child.isShown() ) {
-          // This row is already open - close it
+          // This row is already open - close it (remove the minus icon and display the plus icon instead)
           row.child.hide();
           tr.removeClass('shown');
           tdi.first().removeClass('fa-minus-square');
@@ -74,17 +84,18 @@ $(document).ready(function() {
       else {
           // ajax calls to get child content and displays on screen
           var d = row.data();
-          var child_table_name = 'child_details_'+d.item_id;
+          var child_table_name = 'child_details_'+d.item_id; //each child (second-level) table needs a unique ID for correct styling if more than one is open at a time
 
-          var sub_table = "";
-          sub_table += "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
-          sub_table += "<div class='border'><p class='text-lg'>'"+ d.name_without_url +"' contains the following tags/content:<p>";
-          sub_table += '<table id = "'+child_table_name+'" width="100%">';
-          sub_table += '<thead>' +
+          //start building the text to display under the opened row in the Item (first) table
+          var to_display = "";
+          to_display += "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
+          to_display += "<div class='border'><p class='text-lg'>'"+ d.name_without_url +"' contains the following tags/content:<p>";
+          to_display += '<table id = "'+child_table_name+'" width="100%">';
+          to_display += '<thead>' +
               '<tr>' +
                   '<th></th>' +
                   '<th>Name</th>' +
-                  '<th>Tag ID</th>' +
+                  '<th>NFC Tag ID</th>' +
                   '<th>Active?</th>' +
                   '<th>Gesture</th>' +
                   '<th>Next Content</th>' +
@@ -92,10 +103,12 @@ $(document).ready(function() {
               '</tr>' +
           '</thead>'+
               '<tbody>';
-            sub_table += '</tbody></table></div>';
-          row.child(sub_table).show();
-          row.child().addClass( 'bg-info' );
+          to_display += '</tbody></table></div>';
+          row.child(to_display).show(); //actually display the stuff that's been built just above on the screen
+          row.child().addClass( 'bg-info' ); //add a class to change the bg colour
 
+          //now start work on the second level table
+          //this table will display the Content data, i.e. about NFC tags.
           var content_table = $('#'+child_table_name).DataTable({
             "order": [ 1, "asc" ],
             destroy: true,
@@ -141,13 +154,13 @@ $(document).ready(function() {
                 }
               ]
           });
-
+          // This row is already closed so open it (remove the plus icon and display the minus icon instead)
           tr.addClass('shown');
           tdi.first().removeClass('fa-plus-square');
           tdi.first().addClass('fa-minus-square');
 
 
-
+          //within the second-level table (displaying the Content / NFC tag details), if the plus/minus is clicked
           $('#'+child_table_name+' tbody').on('click', 'td.child-details-control', function () {
             var tr = $(this).closest('tr');
             var row = content_table.row( tr );
@@ -161,8 +174,9 @@ $(document).ready(function() {
                 tdi.first().addClass('fa-plus-square');
             }
             else {
-              row.child(format_childs_child(row.data())).show();
-              row.child().addClass( 'bg-gradient-success' );
+              row.child(format_childs_child(row.data())).show();; //call the format_childs_child() function to display some additional data once the plus is clicked
+              row.child().addClass( 'bg-gradient-success' );//add a class to change the bg colour
+              // This row is already closed so open it (remove the plus icon and display the minus icon instead)
               tr.addClass('shown');
               tdi.first().removeClass('fa-plus-square');
               tdi.first().addClass('fa-minus-square');
@@ -179,7 +193,7 @@ $(document).ready(function() {
   /**
    * 
    * =====================================================================
-   *  End of Datatabls display.
+   *  End of Datatables display.
    * 
    *  Start of button functionality
    * =====================================================================
