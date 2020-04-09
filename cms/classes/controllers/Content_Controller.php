@@ -1,5 +1,6 @@
 <?php
 
+require_once "vendor/autoload.php";
 require_once('classes/models/Content_Model.php');
 
 /**
@@ -31,13 +32,15 @@ class Content_Controller
      */
     public function create_new($created_by)
     {
+        $returnValue = -1;//unknown error
         $written_text = null;
         $sound_file = null;
         $gesture = null;
         
         if($_POST['tts_enabled']==1) {
             $written_text = $_POST['written_text'];
-            $this->convert_text_to_speech($written_text);
+            $written_text_for_tts = $_POST['written_text'];
+            $written_text = filter_var($_POST['written_text'], FILTER_SANITIZE_MAGIC_QUOTES);
         }
         else {
             print('File to upload <pre>'.print_r($_FILES['sound_file'],true).'</pre>');
@@ -54,9 +57,13 @@ class Content_Controller
         $next_content = $_POST['next_content'];
         $active = $_POST['active'];
         $item_id = $_POST['item_id'];
-
-        $returnValue = -1;//unknown error
-        if($this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $sound_file)==0) $returnValue = 0;
+        if($this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $sound_file)==0) {
+            if($_POST['tts_enabled']==1) {
+                if($this->content_model->convert_text_to_speech($written_text_for_tts)==0) $returnValue = 0;
+                else $returnValue = -2; //created in database successfully but TTS failed
+            }
+            $returnValue = 0;
+        }
         return $returnValue;
     }
 
@@ -66,12 +73,42 @@ class Content_Controller
      * @param  
      * @return Integer
      */
-    public function edit($content_id, $heritage_id, $name, $location, $url, $active, $modified_by)
+    public function edit($modified_by)
     {
-        $returnValue = -1; //unknown error
+        $returnValue = -1;//unknown error
+        $content_id = $_POST['content_id'];
         $this->content_model->populate_from_db($content_id);
-        if($this->content_model->edit($content_id, $heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0; //successfully edited visitor
-        else $returnValue = -2; //error with query
+        $written_text = null;
+        $sound_file = null;
+        $gesture = null;
+        
+        if($_POST['edit_tts_enabled']==1) {
+            $written_text = $_POST['written_text'];
+            $written_text_for_tts = $_POST['written_text'];
+            $written_text = filter_var($_POST['written_text'], FILTER_SANITIZE_MAGIC_QUOTES);
+        }
+        else {
+            print('File to upload <pre>'.print_r($_FILES['edit_sound_file'],true).'</pre>');
+            $sound_file = $_FILES['edit_sound_file'];
+            // Configure The "php.ini" File
+            // In your "php.ini" file, search for the file_uploads directive, and set it to On:
+            // file_uploads = On
+            // see bottom of https://www.w3schools.com/php/php_file_upload.asp for complete script, including validation
+        }
+        if(isset($_POST['gesture'])) $gesture = $_POST['gesture'];
+
+        $name = $_POST['name'];
+        $tts_enabled = $_POST['edit_tts_enabled'];
+        $next_content = $_POST['next_content'];
+        $active = $_POST['active'];
+        $tag_id = $_POST['tag_id'];
+        if($this->content_model->edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $sound_file, $tag_id)==0) {
+            if($tts_enabled==1) {
+                if($this->content_model->convert_text_to_speech($written_text_for_tts)==0) $returnValue = 0;
+                else $returnValue = -2; //created in database successfully but TTS failed
+            }
+            $returnValue = 0;
+        }
         return $returnValue;
     }
 
@@ -81,11 +118,12 @@ class Content_Controller
      * @param  content_id
      * @return Integer
      */
-    public function delete($content_id)
+    public function delete()
     {
         $returnValue = -1; //unknown error
+        $content_id = $_GET['content_id'];
         $this->content_model->populate_from_db($content_id);
-        if($this->content_model->delete($content_id)==0) $returnValue = 0; //successfully deleted the content
+        if($this->content_model->delete()==0) $returnValue = 0; //successfully deleted the content & soundfile
         else $returnValue = -2; //error with query
         return $returnValue;
     }
@@ -105,8 +143,72 @@ class Content_Controller
             else
                 return -1;
         }
+    }
+
+    
+    /**
+     * Short description of method write_blank_file
+     *
+     * @return void
+     */
+    public function write_blank_file($filename) {
+        $fp = fopen($filename, 'w');
+        fwrite($fp, "");
+        fclose($fp);
+        chmod($filename,0666); //set permissions to allow both the C++ app and PHP system to write to the files
+    }
+
+
+    /**
+     * Short description of method scan_nfc_tag
+     *
+     * @return void
+     */
+    public function scan_nfc_tag() {
+        $content_id_file = "json/content.json"; //contains the outgoing content id (i.e. from the PHP script to the C++ app)
+        $nfc_details_file = "json/tag_data.json"; //contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
         
-        // print('populate_all_contents() <pre>'.print_r($this->all_contents,true).'</pre>');
+        //initialisation
+        if(!file_exists($content_id_file)) write_blank_file($content_id_file);
+        if(!file_exists($nfc_details_file)) write_blank_file($nfc_details_file);
+        
+        if(isset($_GET['content_id'])) { //onclick of [Add/Change NFC tag] button send ajax request to perform the below
+            //mimic a content ID being provided from the Database
+            //convert the content ID into a JSON object and save into a file
+            echo "Writing the content id to the .json file<br />";
+            $posts['content_id'] = $_GET['content_id'];
+            $fp = fopen($content_id_file, 'w');
+            fwrite($fp, json_encode($posts));
+            fclose($fp);
+        }
+    }
+
+    /**
+     * Short description of method get_nfc_id
+     *
+     * @return void
+     */
+    public function get_nfc_id() {
+        $returnValue = -1;
+        $content_id_file = "json/content.json"; //contains the outgoing content id (i.e. from the PHP script to the C++ app)
+        $nfc_details_file = "json/tag_data.json"; //contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
+        if($tag_data = file_get_contents($nfc_details_file)) { //onclick of [I've scanned the tag] button send ajax request to perform the below
+            //if the NFC details have been provided from the C++ app
+            //open the file, get the JSON
+            $tag_data_json = json_decode($tag_data, true);
+            // print('<pre>'.print_r($tag_data_json,true).'</pre>');
+            
+            //check that the content_id in the file matches the one provided in the PHP (to ensure no accidental cross-over)
+            if($tag_data_json['content_id']==$_GET['content_id']) {
+                $returnValue = $tag_data_json['nfc_tag'];
+            }
+        
+            //empty the files to prevent accidents on future reads
+            $this->write_blank_file($content_id_file);
+            $this->write_blank_file($nfc_details_file);
+            echo "All done";
+        }
+        return $returnValue;
     }
 
 } /* end of class Content_Controller */

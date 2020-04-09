@@ -73,6 +73,7 @@ class Content_Model
             $stm->bindParam(':content_id', $content_id);
             $results = $stm->execute();
             if($row = $results->fetchArray()) {
+                $this->content_id = $content_id;
                 $this->name = $row['name'];
                 $this->tag_id = $row['tag_id'];
                 $this->tts_enabled = $row['tts_enabled'];
@@ -112,7 +113,11 @@ class Content_Model
                 $stm->bindValue(':created_by', $created_by, SQLITE3_TEXT);
                 $stm->bindValue(':gesture_id', $gesture_id, SQLITE3_TEXT);
                 $stm->bindValue(':item_id', $item_id, SQLITE3_TEXT);
-			if($stm->execute()) $returnValue = 0;
+			if($stm->execute()) {
+                $content_id = $db->lastInsertRowID();
+                $this->populate_from_db($content_id);
+                $returnValue = 0;
+            }
             else $returnValue = -2;
         }
         return $returnValue;
@@ -123,24 +128,27 @@ class Content_Model
      * @param  
      * @return Integer
      */
-    public function edit($content_id, $tag_id, $tts_enabled, $soundfile_location, $written_text, $next_content, $active, $modified_by, $gesture_id, $item_id)
+    public function edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $soundfile_location, $tag_id)
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("UPDATE content SET `tag_id`= :tag_id,`tts_enabled`=:tts_enabled,`soundfile_location`=:soundfile_location, `written_text`=:written_text, 
+			$stm = $db->prepare("UPDATE content SET `name`= :name,`tts_enabled`=:tts_enabled,`soundfile_location`=:soundfile_location, `written_text`=:written_text, 
                                     `last_modified` = CURRENT_TIMESTAMP, `next_content`=:next_content, `active`=:active, `modified_by`=:modified_by, 
-                                    `gesture_id`=:gesture_id, `item_id`=:item_id WHERE content_id = :content_id");
-			$stm->bindValue(':tag_id', $heritage_id, SQLITE3_TEXT);
-			$stm->bindValue(':tts_enabled', $name, SQLITE3_TEXT);
+                                    `gesture_id`=:gesture_id, `tag_id`=:tag_id WHERE content_id = :content_id");
+			$stm->bindValue(':name', $name, SQLITE3_TEXT);
+			$stm->bindValue(':tts_enabled', $tts_enabled, SQLITE3_TEXT);
 			$stm->bindValue(':soundfile_location', $soundfile_location, SQLITE3_TEXT);
 			$stm->bindValue(':written_text', $written_text, SQLITE3_TEXT);
 			$stm->bindValue(':next_content', $next_content, SQLITE3_TEXT);
 			$stm->bindValue(':active', $active, SQLITE3_TEXT);
 			$stm->bindValue(':modified_by', $modified_by, SQLITE3_TEXT);
-			$stm->bindValue(':gesture_id', $modified_by, SQLITE3_TEXT);
-			$stm->bindValue(':item_id', $item_id, SQLITE3_TEXT);
-			$stm->bindParam(':content_id', $content_id);
-			if($stm->execute()) $returnValue = 0;
+			$stm->bindValue(':gesture_id', $gesture, SQLITE3_TEXT);
+			$stm->bindValue(':tag_id', $tag_id, SQLITE3_TEXT);
+			$stm->bindParam(':content_id', $this->content_id);
+			if($stm->execute()) {
+                $this->populate_from_db($this->content_id);
+                $returnValue = 0;
+            }
             else $returnValue = -2;
 		}
         return $returnValue;
@@ -156,12 +164,62 @@ class Content_Model
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
 			$stm = $db->prepare("DELETE FROM content WHERE content_id = ?");
-			$stm->bindParam(1, $content_id);
-			if($stm->execute()) $returnValue = 0;
-            else $returnValue = -2;
+			$stm->bindParam(1, $this->content_id);
+			if($stm->execute()) {
+                if($this->tts_enabled==1) {
+                    if($this->delete_soundfile()==0) $returnValue = 0;
+                    else $returnValue = -3; //deleted from db but unable to delete from filesystem
+                }
+                else $returnValue = 0;
+            }
+            else $returnValue = -2; //unable to delete from db
 		}
         return $returnValue;
     }
+
+    
+    /**
+     * Short description of method populate_all_contentss
+     *
+     */
+	public function convert_text_to_speech($written_text) {
+        $returnValue = -1;
+		$provider = new \duncan3dc\Speaker\Providers\PicottsProvider;
+        $tts = new \duncan3dc\Speaker\TextToSpeech($written_text, $provider);
+        $dir_name = 'audio/'.$this->item_id.'/';
+        if (!is_dir($dir_name)) {
+            //Create our directory if it does not exist
+            mkdir($dir_name);
+        }
+        $dir_name = $dir_name . $this->content_id.'/';
+        if (!is_dir($dir_name)) {
+            //Create our directory if it does not exist
+            mkdir($dir_name);
+        }
+
+		if(file_put_contents($dir_name.'sound.mp3', $tts->getAudioData())) {
+			$returnValue = 0;
+        }
+        return $returnValue;
+	}
+    
+    /**
+     * Short description of method delete_soundfile
+     *
+     * @param  content_id
+     * @return Integer
+     */
+    public function delete_soundfile()
+    {
+        $returnValue = -1; //unknown error
+        $file_name = 'audio/'.$this->item_id.'/'. $this->content_id.'/sound.mp3';
+        if (file_exists($file_name)) {
+            if(unlink($file_name)) $returnValue = 0;
+        }
+        else $returnValue = 0;
+        return $returnValue;
+    }
+
 
 } /* end of class Content_Model */
 

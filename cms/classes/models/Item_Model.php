@@ -136,7 +136,12 @@ class Item_Model
 		if($db = new SQLite3($this->db_file)){
 			$stm = $db->prepare("DELETE FROM item WHERE item_id = ?");
 			$stm->bindParam(1, $item_id);
-			if($stm->execute()) $returnValue = 0;
+			if($stm->execute()) {
+                $stm = $db->prepare("DELETE FROM content WHERE item_id = ?");
+                $stm->bindParam(1, $item_id);
+                if($stm->execute()) $returnValue = 0;
+                else $returnValue = -3;
+            }
             else $returnValue = -2;
 		}
         return $returnValue;

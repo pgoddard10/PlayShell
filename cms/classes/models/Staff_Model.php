@@ -82,9 +82,7 @@ class Staff_Model
      */
     public function has_role($role_id)
     {
-        // print('hello 1: <pre>'.print_r($this->roles[0]['role_id'],true).'</pre>');
         foreach($this->roles as $role) {
-            // echo ' | Matching '.$role_id.' with '.$role['role_id'];
             if($role['role_id']==$role_id) return true;
         }
         return false;

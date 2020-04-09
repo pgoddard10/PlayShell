@@ -93,7 +93,7 @@ class Item_View
     }
 
     /**
-     * Short description of method JSONify_All_Visitors
+     * Short description of method JSONify_All_Items
      *
      * @return void
      */
@@ -120,8 +120,8 @@ class Item_View
                     $individual_item['active'] = 'Yes';
                 else
                     $individual_item['active'] = 'No';
-
-                $items_as_json = json_encode($details);
+                    
+                $items_as_json = json_encode($details, JSON_HEX_APOS);
                 $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
                 $individual_item['buttons'] = $individual_item['buttons'] . " <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox btn-circle btn-sm btn-primary' data-target='#deleteItemModalCenter'><i class='fas fa-trash'></i></a>";
                 $data["data"][] = $individual_item;
@@ -191,7 +191,7 @@ class Item_View
     public function edit_item_modal()
     {
         ?>
-        <!-- Edit Visitor - Form Modal-->
+        <!-- Edit Item - Form Modal-->
         <div class="modal fade" id="editModalCenter" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
             <div class="modal-content">

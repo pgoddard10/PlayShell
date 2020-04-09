@@ -58,10 +58,10 @@ $(document).ready(function() {
   function format_childs_child(d) {
     var to_display = "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
     if(d.tts_enabled==1) {
-      to_display += '<p>This written text has been converted to speech:<br />'+d.written_text+'</p>';
+      to_display += '<p>This text, below, was converted to speech. <a download="'+d.name+'.mp3" href="audio/'+d.item_id+'/'+d.content_id+'/sound.mp3">Download a copy</a><br />'+d.written_text+'</p>';
     }
     else {
-      to_display += '<p><i>'+d.soundfile_location+'</i> was uploaded to play when the tag is scanned.</p>';
+      to_display += '<p><a download="'+d.soundfile_location+'" href="audio/'+d.soundfile_location+'">'+d.soundfile_location+'</a>  was uploaded to play when the tag is scanned.</p>';
     }
     return to_display;
   }
@@ -233,7 +233,6 @@ $(document).ready(function() {
       });
       function save_to_database(){ //call the ajax for saving the changes
       return $.ajax({url: direct_to_url, success: function(result){
-          console.log("successfully created");
           $("#div1").html(result);
       }});
     }
@@ -248,14 +247,12 @@ $(document).ready(function() {
 //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
 //data is passed in the form of a JSON string.
 $(document).on("click", ".editItemModalBox", function () { //onclick of the Edit icon/button
-
-//grab the JSON data provided on the Edit icon/button and fill in the form input boxes
-item_id = $(this).data('id').item_id;
-$(".modal-body #edit_name").val($(this).data('id').name);
-$(".modal-body #edit_url").val($(this).data('id').url);
-$(".modal-body #edit_heritage_id").val($(this).data('id').heritage_id);
-$(".modal-body #edit_location").val($(this).data('id').location);
-$(".edit_active_options select").val($(this).data('id').active);
+  item_id = $(this).data('id').item_id;
+  $(".modal-body #edit_name").val($(this).data('id').name);
+  $(".modal-body #edit_url").val($(this).data('id').url);
+  $(".modal-body #edit_heritage_id").val($(this).data('id').heritage_id);
+  $(".modal-body #edit_location").val($(this).data('id').location);
+  $(".edit_active_options select").val($(this).data('id').active);
 });
 
 /**
@@ -268,7 +265,6 @@ var item_id;
 $('#edit_form').submit(function(event){
   event.preventDefault(); //cancels the form submission
   $('#editModalCenter').modal('toggle'); //closes the modal box
-  var roles = [];
   var direct_to_url = "ajax.content_actions.php?action=edit_item&item_id="+item_id+"&";
   direct_to_url += $('#edit_form').serialize(); //grab all input boxes
 
@@ -312,14 +308,13 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
 
 
 
-/**
+  /**
  * 
  * =====================================================================
  *  
  * 
- *  End of ITEM Level functionality
- * 
- *  Start of CONTENT Level functionality
+ *  END of ITEM Level functionality
+ *  START of CONTENT Level functionality
  * 
  * =====================================================================
  * 
@@ -365,16 +360,13 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     }
     
     //Custom data
-    data.append('key', 'value');
-
-    console.log(form_data);
-
+    // data.append('key', 'value');
     
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
         item_table.ajax.reload(); //reload the table with the new data
       });
       function save_to_database(){ //call the ajax for saving the changes
-      return $.ajax({
+        return $.ajax({
           url: direct_to_url,
           method: "post",
           processData: false,
@@ -387,80 +379,154 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
           error: function (e) {
             console.log("create failed with error " + e);
           }
+        });
+      }
+  });
+
+  /**
+  * 
+  * Edit Content 
+  *    Populate the Modal Box with content's details
+  */
+  var content_id = null;
+  //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
+  //data is passed in the form of a JSON string.
+  $(document).on("click", ".editContentModalBox", function () { //onclick of the Edit icon/button
+
+    //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
+    content_id = $(this).data('id').content_id;
+    $(".modal-body #edit_name").val($(this).data('id').name);
+    $(".modal-body #edit_content_id").val($(this).data('id').content_id);
+    if($(this).data('id').tag_id!=null) {
+        $(".modal-body #nfc_tag_id_label").text(": '"+$(this).data('id').tag_id+"'");
+        $(".modal-body #tag_id").val($(this).data('id').tag_id);
+    }
+    if($(this).data('id').tts_enabled==1) {
+        $("#edit_tts_enabled_yes").prop("checked", true);
+        $(".modal-body #edit_written_text").val($(this).data('id').written_text);
+        $(".modal-body #edit_collapseOne").addClass("show");
+        $(".modal-body #edit_collapseTwo").removeClass("show");
+    }
+    else {
+      $("#edit_tts_enabled_no").prop("checked", true);
+      var soundfile_location = $(this).data('id').soundfile_location;
+      if(soundfile_location!=null)    $(".modal-body #edit_sound_file_label").html('<a download="'+soundfile_location+'" href="audio/'+soundfile_location+'">'+soundfile_location+'</a> already exists. Replace it: ');
+      $(".modal-body #edit_collapseTwo").addClass("show");
+      $(".modal-body #edit_collapseOne").removeClass("show");
+    }
+    
+    $(".edit_gesture_options select").val($(this).data('id').gesture_id);
+    $(".edit_active_options select").val($(this).data('id').active);
+  });
+
+  /**
+  * 
+  * Edit Content 
+  *    Submission of the data in the Edit content Modal Box
+  */
+  var item_id;
+  //Collect the form data and 'submit' the form via AJAX
+  $('#edit_content_form').submit(function(event){
+    event.preventDefault(); //cancels the form submission
+    $('#editContentModalCenter').modal('toggle'); //closes the modal box
+    // var roles = [];
+    // var direct_to_url = "ajax.content_actions.php?action=edit_content&content_id="+content_id+"&";
+    // direct_to_url += $('#edit_content_form').serialize(); //grab all input boxes
+
+    var data = new FormData();
+
+    //Form data
+    var form_data = $('#edit_content_form').serializeArray();
+    $.each(form_data, function (key, input) {
+        data.append(input.name, input.value);
+    });
+    
+    //File data
+    var file_data = $('input[name="edit_sound_file"]')[0].files;
+    for (var i = 0; i < file_data.length; i++) {
+        data.append("sound_file[]", file_data[i]);
+    }
+    
+    //Custom data
+    data.append('key', 'value');
+
+
+    //send the data as a GET request to the PHP page specified in direct_to_url
+    $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
+      item_table.ajax.reload(); //reload the table with the new data
+    });
+    function save_to_database(){ //call the ajax for saving the changes
+      return $.ajax({
+        url: 'ajax.content_actions.php?action=edit_content',
+        method: "post",
+        processData: false,
+        contentType: false,
+        data: data,
+        success: function (result) {
+          console.log("successfully created");
+          $("#div1").html(result);
+        },
+        error: function (e) {
+          console.log("create failed with error " + e);
+        }
       });
     }
-});
-
-/**
-* 
-* Edit item 
-*    Populate the Modal Box with item's details
-*/
-
-//Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
-//data is passed in the form of a JSON string.
-$(document).on("click", ".editContentModalBox", function () { //onclick of the Edit icon/button
-
-  //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
-  content_id = $(this).data('id').content_id;
-  $(".modal-body #edit_name").val($(this).data('id').name);
-  // $(".modal-body #edit_url").val($(this).data('id').url);
-  // $(".modal-body #edit_heritage_id").val($(this).data('id').heritage_id);
-  // $(".modal-body #edit_location").val($(this).data('id').location);
-  $(".edit_active_options select").val($(this).data('id').active);
-});
-
-/**
-* 
-* Edit item 
-*    Submission of the data in the Edit Modal Box
-*/
-var item_id;
-//Collect the form data and 'submit' the form via AJAX
-$('#edit_content_form').submit(function(event){
-  event.preventDefault(); //cancels the form submission
-  $('#editContentModalCenter').modal('toggle'); //closes the modal box
-  var roles = [];
-  var direct_to_url = "ajax.content_actions.php?action=edit_content&content_id="+content_id+"&";
-  direct_to_url += $('#edit_content_form').serialize(); //grab all input boxes
-
-  //send the data as a GET request to the PHP page specified in direct_to_url
-  $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
-    item_table.ajax.reload(); //reload the table with the new data
   });
-  function save_to_database(){ //call the ajax for saving the changes
-    return $.ajax({url: direct_to_url, success: function(result){
-        $("#div1").html(result);
-    }});
-  }
-});
 
+
+  /**
+  * 
+  * Delete Content
+  * 
+  */
+  var name;
+  $(document).on("click", ".deleteContentModalBox", function () {//onclick of the Delete icon/button
+    //grab the data provided via JSON on the Delete icon/button
+    name = "'" + $(this).data('id').name + "'";
+    content_id = $(this).data('id').content_id;
+    console.log("You are attempting to delete " + name + " with the content ID of " + content_id);
+    $(".modal-body #span_name").text(name);
+  });
+
+  $("#btn_content_delete").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+    //send the data as a GET request to the PHP page specified in direct_to_url
+    $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
+      item_table.ajax.reload(); //reload the table with the new data
+    });
+    function save_to_database(){ //call the ajax for saving the changes
+      return $.ajax({url: "ajax.content_actions.php?action=delete_content&content_id="+content_id, success: function(result){
+          $("#div1").html(result);
+      }});
+    }
+  });
+
+
+  /**
+  * 
+  * Scan NFC Tag -> Request to scan tag
+  * 
+  */
+
+ $("#btn_newNFCTag").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+  //send the data as a GET request to the PHP page specified in direct_to_url
+  $.ajax({url: "ajax.content_actions.php?action=scan_nfc_tag&content_id="+content_id, success: function(result){
+    console.log(result);
+       $(".modal-body #NFCTagModal_bodytext").text("Please scan the NFC tag on the server device.");
+       $(".modal-content #NFCTagModalFooter").removeClass("d-none");
+    }});
+});
 
 /**
 * 
-* Delete Item
+* Scan NFC Tag -> Scanning of tag confirmed by user
 * 
 */
-var name;
-$(document).on("click", ".deleteContentModalBox", function () {//onclick of the Delete icon/button
-//grab the data provided via JSON on the Delete icon/button
-name = "'" + $(this).data('id').name + "'";
-content_id = $(this).data('id').content_id;
-$(".modal-body #span_name").text(name);
-});
 
-$("#btn_item_delete").click(function(){ //on click of the confirmation delete button (AKA submit the form)
-  //send the data as a GET request to the PHP page specified in direct_to_url
-  $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
-    item_table.ajax.reload(); //reload the table with the new data
-  });
-  function save_to_database(){ //call the ajax for saving the changes
-    return $.ajax({url: "ajax.content_actions.php?action=delete_content&content_id="+content_id, success: function(result){
-        console.log("successfully deleted");
-        $("#div1").html(result);
-    }});
-  }
+$("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+ //send the data as a GET request to the PHP page specified in direct_to_url
+ $.ajax({url: "ajax.content_actions.php?action=get_nfc_id&content_id="+content_id, success: function(result){
+      console.log("finished!"+result);
+   }});
 });
-
   
-} );
+});

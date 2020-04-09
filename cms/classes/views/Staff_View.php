@@ -143,7 +143,7 @@ class Staff_View
                 $mystaff['active'] = 'Yes';
             else
                 $mystaff['active'] = 'No';
-            $staff_as_json = json_encode($details);
+            $staff_as_json = json_encode($details, JSON_HEX_APOS);
             $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
             if($details->active==1) {
                 $mystaff['buttons'] = $mystaff['buttons'] . " | <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-pause-circle'></i></a>";

@@ -106,7 +106,7 @@ class Visitor_View
             $myvisitor['name'] = $details->first_name.' '.$details->last_name;
             $myvisitor['email'] = $details->email;
             $myvisitor['address'] = $details->address;
-            $visitor_as_json = json_encode($details);
+            $visitor_as_json = json_encode($details, JSON_HEX_APOS);
             $myvisitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$visitor_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
             $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='deleteModalBox' data-target='#deleteModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
             $data["data"][] = $myvisitor;

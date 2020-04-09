@@ -33,5 +33,18 @@ switch($_GET['action']) {
     case 'new_content':
         $content_view->create_new($logged_in_staff_id);
         break;
+    case 'delete_content':
+        $content_view->delete();
+        break;
+    case 'edit_content':
+        // print('<pre>'.print_r($_POST,true).'</pre>');
+        $content_view->edit($logged_in_staff_id);
+        break;
+    case 'scan_nfc_tag':
+        $content_view->scan_nfc_tag();
+        break;
+    case 'get_nfc_id':
+        $content_view->get_nfc_id();
+        break;
 }
 ?>
