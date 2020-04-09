@@ -81,23 +81,6 @@ class Item_Controller
         }
     }
 
-    /**
-     * Short description of method JSONify_All_Visitors
-     *
-     * @return void
-     */
-    public function get_contents($item_id)
-    {
-        $contents = array();
-        foreach($this->all_items as $item) {
-            if($item->item_id == $item_id) {
-                $contents[] = $item;
-                break;
-            }
-        }
-        return $contents;
-    }
-        
 
 } /* end of class Item_Controller */
 

@@ -12,14 +12,15 @@ class Content_Controller
 {
     private $content_model = null;
     public $all_contents = array();
+    public $item_id = null; 
 
     /**
      * Short description of method __construct
      * @param  String db_file
      */
-    function __construct() {
-        $this->content_model = new Content_Model();
-        $this->populate_all_contents();
+    function __construct($item_id) {
+        $this->item_id = $item_id;
+        $this->content_model = new Content_Model($this->item_id);
     }
 
     /**
@@ -28,10 +29,34 @@ class Content_Controller
      * @param 
      * @return Integer
      */
-    public function create_new($heritage_id, $name, $location, $url, $active, $modified_by)
+    public function create_new($created_by)
     {
+        $written_text = null;
+        $sound_file = null;
+        $gesture = null;
+        
+        if($_POST['tts_enabled']==1) {
+            $written_text = $_POST['written_text'];
+            $this->convert_text_to_speech($written_text);
+        }
+        else {
+            print('File to upload <pre>'.print_r($_FILES['sound_file'],true).'</pre>');
+            $sound_file = $_FILES['sound_file'];
+            // Configure The "php.ini" File
+            // In your "php.ini" file, search for the file_uploads directive, and set it to On:
+            // file_uploads = On
+            // see bottom of https://www.w3schools.com/php/php_file_upload.asp for complete script, including validation
+        }
+        if(isset($_POST['gesture'])) $gesture = $_POST['gesture'];
+
+        $name = $_POST['name'];
+        $tts_enabled = $_POST['tts_enabled'];
+        $next_content = $_POST['next_content'];
+        $active = $_POST['active'];
+        $item_id = $_POST['item_id'];
+
         $returnValue = -1;//unknown error
-        if($this->content_model->create_new($heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0;
+        if($this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $sound_file)==0) $returnValue = 0;
         return $returnValue;
     }
 
@@ -71,25 +96,17 @@ class Content_Controller
      */
     public function populate_all_contents()
     {
-        $model = new Content_Model();
         $this->all_contents = array();
-        $content_ids = $model->get_all_content_ids();
-        foreach($content_ids as $id) {
+        $content_ids = $this->content_model->get_all_content_ids();
+        foreach($content_ids as $c_id) {
             $content = new Content_Model();
-            $content->populate_from_db($id[0]);
-            $this->all_contents[] = $content;
+            if($content->populate_from_db($c_id)==0)
+                $this->all_contents[] = $content;
+            else
+                return -1;
         }
-    }
-
-    
-    /**
-     * Short description of method JSONify_All_Visitors
-     *
-     * @return void
-     */
-    public function JSONify_All_Contents($item_id)
-    {
-        // $this->content_model->
+        
+        // print('populate_all_contents() <pre>'.print_r($this->all_contents,true).'</pre>');
     }
 
 } /* end of class Content_Controller */

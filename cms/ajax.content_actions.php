@@ -15,8 +15,11 @@ $authenticate_view->has_session();
 $authenticate_view->page_permissions(CONTENT_MANAGER);
 $logged_in_staff_id = $authenticate_view->get_staff_id();
 
+require_once('classes/views/Content_View.php');
 require_once('classes/views/Item_View.php');
 $item_view = new Item_View();
+if(isset($_GET['item_id'])) $content_view = new Content_View($_GET['item_id']);
+else $content_view = new Content_View();
 switch($_GET['action']) {
     case 'new_item':
         $item_view->create_new($_GET['heritage_id'],$_GET['name'],$_GET['location'],$_GET['url'],$_GET['active'],$logged_in_staff_id);
@@ -26,6 +29,9 @@ switch($_GET['action']) {
         break;
     case 'delete_item':
         $item_view->delete($_GET['item_id']);
+        break;
+    case 'new_content':
+        $content_view->create_new($logged_in_staff_id);
         break;
 }
 ?>

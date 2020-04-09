@@ -17,10 +17,11 @@ class Content_View
      * Short description of method __construct
      * @param  String db_file
      */
-    function __construct($item_id) {
-        $this->content_controller = new Content_Controller();
-        $this->content_controller->populate_all_contents($item_id);
+    function __construct($item_id=null) {
         $this->item_id = $item_id;
+        $this->content_controller = new Content_Controller($this->item_id);
+        $success = $this->content_controller->populate_all_contents(); 
+        if($success!=0) echo "Error populating contents array: ".$success;
     }
 
     /**
@@ -28,10 +29,10 @@ class Content_View
      * 
      * @return void
      */
-    public function create_new($heritage_id, $name, $location, $url, $active, $modified_by)
+    public function create_new($created_by)
     {
-        $success = $this->content_controller->create_new($heritage_id, $name, $location, $url, $active, $modified_by);
-        if($success==0) $msg = "Successfully created $name.";
+        $success = $this->content_controller->create_new($created_by);
+        if($success==0) $msg = "Successfully created '".$_POST['name']."'";
         else $msg = "An unknown error occurred.";
         ?>
               <!-- Add Message Card -->
@@ -94,42 +95,48 @@ class Content_View
         <?php
     }
 
+
     /**
      * Short description of method JSONify_All_Visitors
      *
      * @return void
      */
-    public function JSONify_All_Contents($item_id)
-    {
-        $data = array();
-        if(count($this->content_controller->all_contents)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
-        foreach($this->content_controller->all_contents as $content=>$details) {
-            $individual_content = array();
+    public function JSONify_All_Contents() {
+        $array_of_contents = $this->content_controller->all_contents;
+        // print('array_of_contents: <pre>'.print_r($array_of_contents,true).'</pre>');
+        $individual_content = array();
+        if(count($array_of_contents)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
+        else {
+            foreach($array_of_contents as $obj=>$contents) {
 
-            $individual_content['name'] = $content->name;
-            $individual_content['tag_id'] = $content->tag_id;
-            if($content->active==1)
-                $individual_content['active'] = 'Yes';
-            else
-                $individual_content['active'] = 'No';
-            $individual_content['created'] = date("d/m/Y \a\\t H:i", strtotime($content->created));
-            $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
-            if(strlen($content->modified_by) > 1) $last_modified = $last_modified. ' by ' . $content->modified_by;
-            else $last_modified = $last_modified. ' by [deleted staff member]';
-            $individual_content['last_modified'] = $last_modified;
-            $individual_content['gesture_id'] = $content->gesture_id;
-            $individual_content['next_content'] = $content->next_content;
+                $content_details_array = array();
+                $content_details_array['name'] = $contents->name;
+                $content_details_array['tag_id'] = $contents->tag_id;
+                if($contents->active==1)
+                    $content_details_array['active'] = 'Yes';
+                else
+                    $content_details_array['active'] = 'No';
+                $content_details_array['created'] = date("d/m/Y \a\\t H:i", strtotime($contents->created));
+                $last_modified = date("d/m/Y \a\\t H:i", strtotime($contents->last_modified));
+                if(strlen($contents->modified_by) > 1) $last_modified = $last_modified. ' by ' . $contents->modified_by;
+                else $last_modified = $last_modified. ' by [deleted staff member]';
+                $content_details_array['last_modified'] = $last_modified;
+                $content_details_array['tts_enabled'] = $contents->tts_enabled;
+                $content_details_array['written_text'] = $contents->written_text;
+                $content_details_array['soundfile_location'] = $contents->soundfile_location;
+                $content_details_array['gesture'] = 'I_V->jsonify all contents -> ges_id'.$contents->gesture_id;
+                $content_details_array['next_content'] = 'I_V->jsonify all contents -> nxt_cntnt'.$contents->next_content;
 
 
-            $individual_content['content_array'][] = $content_details_array;
+                $content_as_json = json_encode($contents);
+                $content_details_array['buttons'] = "<a href='#' data-toggle='modal' data-id='$content_as_json' class='editContentModalBox btn-success btn-circle btn-sm' data-target='#editContentModalCenter'><i class='fas fa-edit bg-success'></i></a>";
+                $content_details_array['buttons'] = $content_details_array['buttons'] . " <a href='#' data-toggle='modal' data-id='$content_as_json' class='deleteContentModalBox btn-success btn-circle btn-sm' data-target='#deleteContentModalCenter'><i class='fas fa-trash'></i></a>";
 
 
-            $contents_as_json = json_encode($details);
-            $individual_content['buttons'] = "<a href='#' data-toggle='modal' data-id='$contents_as_json' class='editContentModalBox' data-target='#editContentModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-            $individual_content['buttons'] = $individual_content['buttons'] . " | <a href='#' data-toggle='modal' data-id='$contents_as_json' class='deleteContentModalBox' data-target='#deleteContentModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-            $data["data"][] = $individual_content;
+                $individual_content["data"][] = $content_details_array;
+            }
+            return json_encode($individual_content, JSON_PRETTY_PRINT );
         }
-        echo json_encode($data, JSON_PRETTY_PRINT );
     }
 
     /**
@@ -150,33 +157,58 @@ class Content_View
                         <span aria-hidden="true">&times;</span>
                     </button>
                     </div>
-                    <form class="user" id="form_new_content">
+                    <form class="user" id="form_new_content" enctype="multipart/form-data" onsubmit="return false">
                         <div class="modal-body">
                         <!-- form input -->
                             <div class="form-group">
                                 <input type="text" class="form-control form-control-user" id="new_name" name="name" placeholder="Name" required>
                             </div>
                             <div class="form-group">
-                                <input type="url" class="form-control form-control-user" id="new_url" name="url" placeholder="URL">
+                                Use Text-To-Speech to create the audio file?<br />
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="tts_enabled" id="new_tts_enabled_yes" value="1" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" required>
+                                    <label class="form-check-label" for="new_tts_enabled_yes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="tts_enabled" id="new_tts_enabled_no" value="0" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    <label class="form-check-label" for="new_tts_enabled_no">No</label>
+                                </div>
+
+                                <div id="accordion">
+                                    <div id="collapseOne" class="collapse" aria-labelledby="Yes" data-parent="#accordion">
+                                        Enter the text to convert into speech
+                                        <textarea class="form-control" rows="10" id="new_written_text" name="written_text"></textarea>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" aria-labelledby="No" data-parent="#accordion">
+                                        <label for="new_sound_file">Upload your own audio file</label>
+                                        <input type="file" class="form-control-file" id="new_sound_file" name="new_sound_file" accept="audio/*">
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control form-control-user" id="new_heritage_id" name="heritage_id" placeholder="Your ID">
+                                <input type="text" class="form-control form-control-user" id="new_next_content" name="next_content" placeholder="Next content link: TO DO">
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control form-control-user" id="new_location" name="location" placeholder="Location">
+                            <div class="form-group new_gesture_options">
+                                Once the audio has finished, which physical gesture needs to be performed?<br />
+                                <select id="new_gesture" name="gesture" class="form-control-sm form-control-user-sm">
+                                    <option value selected>None</option>
+                                    <option value="0">Gesture 1</option>
+                                    <option value="1">Gesture 2</option>
+                                </select>
                             </div>
                             <div class="form-group new_active_options">
-                                Active?
+                                Active?<br />
                                 <select id="new_active" name="active" class="form-control-sm form-control-user-sm">
                                     <option value="1">Yes</option>
                                     <option value="0">No</option>
                                 </select>
                             </div>
+                            <input type="hidden" id="item_id" name="item_id" />
                         </div>
                         <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button type="submit" class="btn btn-primary" id="btn_content_new">Create</button>
+                        <button type="submit" class="btn btn-primary" id="btn_content_new_content">Create</button>
                         </div>
                     </form>
                 </div>
@@ -193,12 +225,12 @@ class Content_View
     public function edit_content_modal()
     {
         ?>
-        <!-- Edit Visitor - Form Modal-->
-        <div class="modal fade" id="editModalCenter" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <!-- Edit Content - Form Modal-->
+        <div class="modal fade" id="editContentModalCenter" tabindex="-1" role="dialog" aria-labelledby="editContentModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit</h5>
+                <h5 class="modal-title" id="editContentModalLabel">Edit</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -262,8 +294,7 @@ class Content_View
                 </button>
               </div>
                 <div class="modal-body">
-                    Deleting <span id="span_name">this content</span> will also remove <strong>all</strong> associated content/tags.<br />
-                    Are you sure you wish to continue?<br />
+                    Are you sure you wish to delete <span id="span_name">this content</span>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

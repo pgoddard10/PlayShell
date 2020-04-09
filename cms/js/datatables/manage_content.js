@@ -58,10 +58,10 @@ $(document).ready(function() {
   function format_childs_child(d) {
     var to_display = "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
     if(d.tts_enabled==1) {
-      to_display += d.written_text;
+      to_display += '<p>This written text has been converted to speech:<br />'+d.written_text+'</p>';
     }
     else {
-      to_display += "soundfile location";
+      to_display += '<p><i>'+d.soundfile_location+'</i> was uploaded to play when the tag is scanned.</p>';
     }
     return to_display;
   }
@@ -89,7 +89,14 @@ $(document).ready(function() {
           //start building the text to display under the opened row in the Item (first) table
           var to_display = "";
           to_display += "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
-          to_display += "<div class='border'><p class='text-lg'>'"+ d.name_without_url +"' contains the following tags/content:<p>";
+
+
+          to_display += "<div class='d-sm-flex align-items-center justify-content-between mb-4'>";
+          to_display +=   '<p class="text-lg mb-0">'+ d.name_without_url +' contains the following tags/content:</p>';
+          var item_id_json = '{"item_id" : "'+d.item_id+'"}';
+          to_display +=   "<a href='#' data-toggle='modal' data-target='#addNewContentModal' class='newContentModalBox btn btn-success btn-icon-split' data-id='"+item_id_json+"'><span class='icon text-white-50'><i class='fas fa-plus-circle'></i></span><span class='text'>Add New</span></a>";
+          to_display += '</div>';
+
           to_display += '<table id = "'+child_table_name+'" width="100%">';
           to_display += '<thead>' +
               '<tr>' +
@@ -105,7 +112,7 @@ $(document).ready(function() {
               '<tbody>';
           to_display += '</tbody></table></div>';
           row.child(to_display).show(); //actually display the stuff that's been built just above on the screen
-          row.child().addClass( 'bg-info' ); //add a class to change the bg colour
+          row.child().addClass( 'bg-gray-800 text-gray-100' ); //add a class to change the bg colour
 
           //now start work on the second level table
           //this table will display the Content data, i.e. about NFC tags.
@@ -132,7 +139,10 @@ $(document).ready(function() {
                   "data":         "name",
                   "width":        "20%"
                 },
-                { "data": "tag_id" },
+                {
+                  "data":         "tag_id",
+                  "width":        "100px"
+                },
                 { "data": "active" },
                 { "data": "gesture" },
                 { "data": "next_content" },
@@ -175,7 +185,7 @@ $(document).ready(function() {
             }
             else {
               row.child(format_childs_child(row.data())).show();; //call the format_childs_child() function to display some additional data once the plus is clicked
-              row.child().addClass( 'bg-gradient-success' );//add a class to change the bg colour
+              row.child().addClass( 'bg-gray-100 text-gray-900' );//add a class to change the bg colour
               // This row is already closed so open it (remove the plus icon and display the minus icon instead)
               tr.addClass('shown');
               tdi.first().removeClass('fa-plus-square');
@@ -190,45 +200,44 @@ $(document).ready(function() {
 
 
 
-  /**
-   * 
-   * =====================================================================
-   *  End of Datatables display.
-   * 
-   *  Start of button functionality
-   * =====================================================================
-   * 
-   */  
-
-
-
-
+/**
+ * 
+ * =====================================================================
+ *  End of Datatables display.
+ * 
+ *  Start of button functionality
+ * 
+ *     ITEM - Level
+ * 
+ * =====================================================================
+ * 
+ */  
 
 
   
-    /**
-     * 
-     * Add new item
-     * 
-     */      
-    $('#form_new_item').submit(function(event){
-      event.preventDefault(); //cancels the form submission
-      $('#addNewItemModal').modal('toggle'); //closes the modal box
+  /**
+   * 
+   * Add new item
+   * 
+   */      
+  $('#form_new_item').submit(function(event){
+    event.preventDefault(); //cancels the form submission
+    $('#addNewItemModal').modal('toggle'); //closes the modal box
 
-      //build the URL to include GET request data from the form
-      var direct_to_url = "ajax.content_actions.php?action=new_item&";
-      direct_to_url += $('#form_new_item').serialize();
-      //send the data as a GET request to the PHP page specified in direct_to_url
-        $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
-          item_table.ajax.reload(); //reload the table with the new data
-        });
-        function save_to_database(){ //call the ajax for saving the changes
-        return $.ajax({url: direct_to_url, success: function(result){
-            console.log("successfully created");
-            $("#div1").html(result);
-        }});
-      }
-  });
+    //build the URL to include GET request data from the form
+    var direct_to_url = "ajax.content_actions.php?action=new_item&";
+    direct_to_url += $('#form_new_item').serialize();
+    //send the data as a GET request to the PHP page specified in direct_to_url
+      $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
+        item_table.ajax.reload(); //reload the table with the new data
+      });
+      function save_to_database(){ //call the ajax for saving the changes
+      return $.ajax({url: direct_to_url, success: function(result){
+          console.log("successfully created");
+          $("#div1").html(result);
+      }});
+    }
+});
 
 /**
 * 
@@ -275,7 +284,6 @@ $('#edit_form').submit(function(event){
 });
 
 
-
 /**
 * 
 * Delete Item
@@ -296,6 +304,158 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   });
   function save_to_database(){ //call the ajax for saving the changes
     return $.ajax({url: "ajax.content_actions.php?action=delete_item&item_id="+item_id, success: function(result){
+        console.log("successfully deleted");
+        $("#div1").html(result);
+    }});
+  }
+});
+
+
+
+/**
+ * 
+ * =====================================================================
+ *  
+ * 
+ *  End of ITEM Level functionality
+ * 
+ *  Start of CONTENT Level functionality
+ * 
+ * =====================================================================
+ * 
+ */  
+
+
+  
+  /**
+   * 
+   * Add new content
+   * 
+   */
+  
+  //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
+  //data is passed in the form of a JSON string.
+  $(document).on("click", ".newContentModalBox", function () { //onclick of the Edit icon/button
+    //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
+    item_id = $(this).data('id').item_id;
+    console.log(item_id);
+    $(".modal-body #item_id").val($(this).data('id').item_id);
+  });
+
+  $('#form_new_content').submit(function(event){
+    event.preventDefault(); //cancels the form submission
+    $('#addNewContentModal').modal('toggle'); //closes the modal box
+
+    //build the URL to include GET request data from the form
+    var direct_to_url = "ajax.content_actions.php?action=new_content&";
+    direct_to_url += $('#form_new_content').serialize();
+
+    var data = new FormData();
+
+    //Form data
+    var form_data = $('#form_new_content').serializeArray();
+    $.each(form_data, function (key, input) {
+        data.append(input.name, input.value);
+    });
+    
+    //File data
+    var file_data = $('input[name="new_sound_file"]')[0].files;
+    for (var i = 0; i < file_data.length; i++) {
+        data.append("sound_file[]", file_data[i]);
+    }
+    
+    //Custom data
+    data.append('key', 'value');
+
+    console.log(form_data);
+
+    
+      $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
+        item_table.ajax.reload(); //reload the table with the new data
+      });
+      function save_to_database(){ //call the ajax for saving the changes
+      return $.ajax({
+          url: direct_to_url,
+          method: "post",
+          processData: false,
+          contentType: false,
+          data: data,
+          success: function (result) {
+            console.log("successfully created");
+            $("#div1").html(result);
+          },
+          error: function (e) {
+            console.log("create failed with error " + e);
+          }
+      });
+    }
+});
+
+/**
+* 
+* Edit item 
+*    Populate the Modal Box with item's details
+*/
+
+//Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
+//data is passed in the form of a JSON string.
+$(document).on("click", ".editContentModalBox", function () { //onclick of the Edit icon/button
+
+  //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
+  content_id = $(this).data('id').content_id;
+  $(".modal-body #edit_name").val($(this).data('id').name);
+  // $(".modal-body #edit_url").val($(this).data('id').url);
+  // $(".modal-body #edit_heritage_id").val($(this).data('id').heritage_id);
+  // $(".modal-body #edit_location").val($(this).data('id').location);
+  $(".edit_active_options select").val($(this).data('id').active);
+});
+
+/**
+* 
+* Edit item 
+*    Submission of the data in the Edit Modal Box
+*/
+var item_id;
+//Collect the form data and 'submit' the form via AJAX
+$('#edit_content_form').submit(function(event){
+  event.preventDefault(); //cancels the form submission
+  $('#editContentModalCenter').modal('toggle'); //closes the modal box
+  var roles = [];
+  var direct_to_url = "ajax.content_actions.php?action=edit_content&content_id="+content_id+"&";
+  direct_to_url += $('#edit_content_form').serialize(); //grab all input boxes
+
+  //send the data as a GET request to the PHP page specified in direct_to_url
+  $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
+    item_table.ajax.reload(); //reload the table with the new data
+  });
+  function save_to_database(){ //call the ajax for saving the changes
+    return $.ajax({url: direct_to_url, success: function(result){
+        $("#div1").html(result);
+    }});
+  }
+});
+
+
+/**
+* 
+* Delete Item
+* 
+*/
+var name;
+$(document).on("click", ".deleteContentModalBox", function () {//onclick of the Delete icon/button
+//grab the data provided via JSON on the Delete icon/button
+name = "'" + $(this).data('id').name + "'";
+content_id = $(this).data('id').content_id;
+$(".modal-body #span_name").text(name);
+});
+
+$("#btn_item_delete").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+  //send the data as a GET request to the PHP page specified in direct_to_url
+  $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
+    item_table.ajax.reload(); //reload the table with the new data
+  });
+  function save_to_database(){ //call the ajax for saving the changes
+    return $.ajax({url: "ajax.content_actions.php?action=delete_content&content_id="+content_id, success: function(result){
         console.log("successfully deleted");
         $("#div1").html(result);
     }});

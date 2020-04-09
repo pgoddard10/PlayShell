@@ -86,7 +86,7 @@ DROP TABLE IF EXISTS `content`;
 CREATE TABLE IF NOT EXISTS `content` (
 	`content_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`name`	TEXT NOT NULL,
-	`tag_id`	TEXT NOT NULL,
+	`tag_id`	TEXT,
 	`tts_enabled`	INTEGER NOT NULL,
 	`soundfile_location`	TEXT,
 	`written_text`	TEXT,

@@ -9,10 +9,10 @@
  */
 
 require_once('config.php');
-//require_once('classes/views/Content_View.php');
+require_once('classes/views/Content_View.php');
 require_once('classes/views/Item_View.php');
 require_once('classes/views/Authenticate_View.php');
-//$content_view = new Content_View();
+$content_view = new Content_View();
 $item_view = new Item_View();
 $authenticate_view = new Authenticate_View();
 $authenticate_view->has_session();
@@ -65,4 +65,8 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
         $item_view->delete_item_modal();
         $item_view->new_item_modal();
         $item_view->edit_item_modal();
+
+        $content_view->delete_content_modal();
+        $content_view->new_content_modal();
+        $content_view->edit_content_modal();
       ?>

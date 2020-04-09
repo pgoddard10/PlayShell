@@ -19,28 +19,28 @@ header('Content-Type: application/json');
 require_once('config.php');
 require_once('classes/views/Visitor_View.php');
 require_once('classes/views/Item_View.php');
+require_once('classes/views/Content_View.php');
 require_once('classes/views/Staff_View.php');
-$staff_view = new Staff_View();
-$visitor_view = new Visitor_View();
-$item_view = new Item_View();
 switch($_GET['page']) {
     case 'visitor':
         $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
+        $visitor_view = new Visitor_View();
         echo $visitor_view->JSONify_All_Visitors();
         break;
     case 'staff':
         $authenticate_view->page_permissions(STAFF_DB_MANAGER);
+        $staff_view = new Staff_View();
         $staff_view->JSONify_All_Staff();
         break;
     case 'item':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
+        $item_view = new Item_View();
         $item_view->JSONify_All_Items();
         break;
     case 'content':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
-        $item_view->JSONify_All_Contents($_GET['item_id']);
-        // echo '{"data": [{"name": "new name 1", "tag": "tag 1"},{"name": "new n2", "tag": "t2"},{"name": "n3", "tag": "t3"}]}';
-        // echo '{"data": []}';
+        $content_view = new Content_View($_GET['item_id']);
+        echo $content_view->JSONify_All_Contents();
         break;
 }
 ?>
