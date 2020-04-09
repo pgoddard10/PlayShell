@@ -175,7 +175,6 @@ class Content_Controller
         if(isset($_GET['content_id'])) { //onclick of [Add/Change NFC tag] button send ajax request to perform the below
             //mimic a content ID being provided from the Database
             //convert the content ID into a JSON object and save into a file
-            echo "Writing the content id to the .json file<br />";
             $posts['content_id'] = $_GET['content_id'];
             $fp = fopen($content_id_file, 'w');
             fwrite($fp, json_encode($posts));
@@ -206,7 +205,6 @@ class Content_Controller
             //empty the files to prevent accidents on future reads
             $this->write_blank_file($content_id_file);
             $this->write_blank_file($nfc_details_file);
-            echo "All done";
         }
         return $returnValue;
     }

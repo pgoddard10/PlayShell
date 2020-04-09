@@ -397,10 +397,12 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     content_id = $(this).data('id').content_id;
     $(".modal-body #edit_name").val($(this).data('id').name);
     $(".modal-body #edit_content_id").val($(this).data('id').content_id);
-    if($(this).data('id').tag_id!=null) {
-        $(".modal-body #nfc_tag_id_label").text(": '"+$(this).data('id').tag_id+"'");
-        $(".modal-body #tag_id").val($(this).data('id').tag_id);
-    }
+    var tag_id = "";
+    if($(this).data('id').tag_id!=null) var tag_id = $(this).data('id').tag_id;
+        $(".modal-body #nfc_tag_id_label").text(": '"+tag_id+"'");
+        $(".modal-body #tag_id").val(tag_id);
+    // }
+    $(".modal-body #nfc_tag_id_label_error").html("");
     if($(this).data('id').tts_enabled==1) {
         $("#edit_tts_enabled_yes").prop("checked", true);
         $(".modal-body #edit_written_text").val($(this).data('id').written_text);
@@ -463,7 +465,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
         contentType: false,
         data: data,
         success: function (result) {
-          console.log("successfully created");
           $("#div1").html(result);
         },
         error: function (e) {
@@ -521,11 +522,18 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
 * Scan NFC Tag -> Scanning of tag confirmed by user
 * 
 */
-
 $("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation delete button (AKA submit the form)
  //send the data as a GET request to the PHP page specified in direct_to_url
  $.ajax({url: "ajax.content_actions.php?action=get_nfc_id&content_id="+content_id, success: function(result){
-      console.log("finished!"+result);
+      var tag_id = result.tag_id;
+      console.log(result)
+      if(tag_id==-1) {
+        $(".modal-body #nfc_tag_id_label_error").html("Something went wrong. Please try again.<br />");
+      }
+      else {
+        $(".modal-body #tag_id").val(tag_id);
+        $(".modal-body #nfc_tag_id_label").text(": '"+tag_id+"'");
+      }
    }});
 });
   

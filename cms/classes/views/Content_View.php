@@ -298,11 +298,11 @@ class Content_View
                                 </select>
                             </div>
                             <div class="form-group">
-                                NFC Tag <span id="nfc_tag_id_label"></span><br />
+                                NFC Tag <span id="nfc_tag_id_label"></span><br /><span id="nfc_tag_id_label_error"></span>
                                 <input type="hidden" id="tag_id" name="tag_id" />
                                 <a href='#' id='btn_newNFCTag' class='btn_newNFCTag btn-sm btn-success btn-icon-split' data-toggle="modal" data-target="#NFCTagModal"><span class='icon text-white-50'><i class='fas fa-tag'></i></span><span class='text'>Add/Change NFC Tag</span></a>
                             </div>
-                            <input type="text" id="edit_content_id" name="content_id" />
+                            <input type="hidden" id="edit_content_id" name="content_id" />
                         </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -397,11 +397,8 @@ class Content_View
      */
     public function get_nfc_id() {
         $tag_id = $this->content_controller->get_nfc_id();
-        if($tag_id!=-1) {
-            echo $tag_id;
-        }
-        else
-            echo -1;
+        echo header('Content-Type: application/json');
+        echo '{"tag_id": '.$tag_id.'}';
     }
 } /* end of class Content_View */
 
