@@ -48,10 +48,10 @@ class Content_Controller
         $next_content = $_POST['next_content'];
         $active = $_POST['active'];
         $item_id = $_POST['item_id'];
-        if($this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture)==0) {
+        $returnValue = $this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture);
+        if($returnValue==0) {
             if($_POST['tts_enabled']==1) {
-                if($this->content_model->convert_text_to_speech($written_text_for_tts)==0) $returnValue = 0;
-                else $returnValue = -2; //created in database successfully but TTS failed
+                $result = $this->content_model->convert_text_to_speech($written_text_for_tts);
             }
             $returnValue = 0;
         }

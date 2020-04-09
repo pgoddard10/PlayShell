@@ -106,22 +106,56 @@ class Content_Model
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("INSERT INTO `content` (`name`,`tts_enabled`,`written_text`,`next_content`,`active`,`modified_by`,`gesture_id`,`item_id`)
-                                                VALUES (:name,:tts_enabled,:written_text,:next_content,:active,:created_by,:gesture_id,:item_id)");
-                $stm->bindValue(':name', $name, SQLITE3_TEXT);
-                $stm->bindValue(':tts_enabled', $tts_enabled, SQLITE3_TEXT);
-                $stm->bindValue(':written_text', $written_text, SQLITE3_TEXT);
-                $stm->bindValue(':next_content', $next_content, SQLITE3_TEXT);
-                $stm->bindValue(':active', $active, SQLITE3_TEXT);
-                $stm->bindValue(':created_by', $created_by, SQLITE3_TEXT);
-                $stm->bindValue(':gesture_id', $gesture_id, SQLITE3_TEXT);
-                $stm->bindValue(':item_id', $item_id, SQLITE3_TEXT);
-			if($stm->execute()) {
-                $content_id = $db->lastInsertRowID();
-                $this->populate_from_db($content_id);
-                $returnValue = 0;
+            
+            if(($tts_enabled==0) && (!isset($_FILES['sound_file']))) {
+                $returnValue = -6; //Soundfile not specified for non-TTS system
             }
-            else $returnValue = -2;
+            else {
+                $stm = $db->prepare("INSERT INTO `content` (`name`,`tts_enabled`,`written_text`,`next_content`,`active`,`modified_by`,`gesture_id`,`item_id`)
+                                                    VALUES (:name,:tts_enabled,:written_text,:next_content,:active,:created_by,:gesture_id,:item_id)");
+                    $stm->bindValue(':name', $name, SQLITE3_TEXT);
+                    $stm->bindValue(':tts_enabled', $tts_enabled, SQLITE3_TEXT);
+                    $stm->bindValue(':written_text', $written_text, SQLITE3_TEXT);
+                    $stm->bindValue(':next_content', $next_content, SQLITE3_TEXT);
+                    $stm->bindValue(':active', $active, SQLITE3_TEXT);
+                    $stm->bindValue(':created_by', $created_by, SQLITE3_TEXT);
+                    $stm->bindValue(':gesture_id', $gesture_id, SQLITE3_TEXT);
+                    $stm->bindValue(':item_id', $item_id, SQLITE3_TEXT);
+                if($stm->execute()) {
+                    $this->content_id = $db->lastInsertRowID();
+                    $this->populate_from_db($this->content_id);
+                    $returnValue = -3; //saved to db but unable to upload soundfile
+
+                    if($tts_enabled==0){
+                        $sound_file = $_FILES['sound_file'];
+                        $dir_name = AUDIO_FOLDER.$this->item_id.'/';
+                        if (!is_dir($dir_name)) {
+                            //Create our directory if it does not exist
+                            mkdir($dir_name);
+                        }
+                        $dir_name = $dir_name . $this->content_id.'/';
+                        if (!is_dir($dir_name)) {
+                            //Create our directory if it does not exist
+                            mkdir($dir_name);
+                        }
+                        $complete_file_path = $dir_name."sound.mp3";
+                        $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
+                        // Allow certain file formats
+                        if($file_type != "mp3") {
+                            $returnValue = -4; //file is of non-accepted filetype
+                        }
+                        else if (move_uploaded_file($_FILES["sound_file"]["tmp_name"][0], $complete_file_path)) {
+                            $returnValue = 0; //everything successful
+                        }
+                        else {
+                            $returnValue = -5; //could save file
+                        }
+                    }
+                    else $returnValue = 0; //saved to db and no requirement for soundfile
+
+                }
+                else $returnValue = -2; //unable to execute query
+            }
         }
         return $returnValue;
     }

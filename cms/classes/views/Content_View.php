@@ -35,18 +35,37 @@ class Content_View
         switch($success) {
             case 0:
                 $msg = "Successfully created '".$_POST['name']."'";
-                break;
+                $msg_type = "success";
+            break;
             case -2:
                 $msg = "Successfully created '".$_POST['name']."' in the database successfully but could not convert text to speech";
-                break;
+                $msg_type = "warning";
+            break;
+            case -3:
+                $msg = "Successfully created '".$_POST['name']."' but unable to upload the soundfile. Please try using text-to-speech instead.";
+                $msg_type = "warning";
+            break;
+            case -4://file is of non-accepted filetype
+                $msg = "Successfully created '".$_POST['name']."' but unable to upload the soundfile. However, the filetype of your upload is not allowed. Please use the edit feature to try again.";
+                $msg_type = "warning";
+            break;
+            case -5://could save file
+                $msg = "Successfully created '".$_POST['name']."' but unable to upload the soundfile.";
+                $msg_type = "warning";
+            break;
+            case -6://Soundfile not specified for non-TTS system
+                $msg = "Unable to create '".$_POST['name']."'. You have not specified any audio content.";
+                $msg_type = "danger";
+            break;
             case -1:
             default:
-                $msg = "Unable to create '".$_POST['name']."' were not saved. An unknown error occurred.";
-                break;
+                $msg = "Unable to create '".$_POST['name']."'. An unknown error occurred.";
+                $msg_type = "danger";
+            break;
         }
         ?>
               <!-- Add Message Card -->
-                <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
+                <div class="card mb-4 py-3 border-left-<?php echo $msg_type; //change colour depending on whether success or not ?>"> 
                     <div class="card-body">
                     <?php echo $msg; //print success/fail message ?>
                     </div>
