@@ -120,6 +120,8 @@ class Item_View
                     $individual_item['active'] = 'Yes';
                 else
                     $individual_item['active'] = 'No';
+
+                $individual_item['content'] = $details->content;
                     
                 $items_as_json = json_encode($details, JSON_HEX_APOS);
                 $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";

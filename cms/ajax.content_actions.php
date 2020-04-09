@@ -37,7 +37,6 @@ switch($_GET['action']) {
         $content_view->delete();
         break;
     case 'edit_content':
-        // print('<pre>'.print_r($_POST,true).'</pre>');
         $content_view->edit($logged_in_staff_id);
         break;
     case 'scan_nfc_tag':

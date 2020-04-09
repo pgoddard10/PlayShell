@@ -2,6 +2,14 @@
 
 $(document).ready(function() {
 
+  //store all the ITems in the local storage
+  function set_localstorage() {
+    $.ajax({url: "ajax.get_table_data.php?page=item", success: function(result){
+      localStorage.removeItem("db");
+      localStorage.setItem("db",JSON.stringify(result));
+    }});
+  }
+
   /**
    * 
    * =====================================================================
@@ -61,7 +69,7 @@ $(document).ready(function() {
       to_display += '<p>This text, below, was converted to speech. <a download="'+d.name+'.mp3" href="audio/'+d.item_id+'/'+d.content_id+'/sound.mp3">Download a copy</a><br />'+d.written_text+'</p>';
     }
     else {
-      to_display += '<p><a download="'+d.soundfile_location+'" href="audio/'+d.soundfile_location+'">'+d.soundfile_location+'</a>  was uploaded to play when the tag is scanned.</p>';
+      to_display += '<p><a download="'+d.name+'.mp3" href="audio/'+d.item_id+'/'+d.content_id+'/sound.mp3">'+d.name+'</a>  was uploaded to play when the tag is scanned.</p>';
     }
     return to_display;
   }
@@ -144,8 +152,8 @@ $(document).ready(function() {
                   "width":        "100px"
                 },
                 { "data": "active" },
-                { "data": "gesture" },
-                { "data": "next_content" },
+                { "data": "gesture_name" },
+                { "data": "next_content_name" },
                 { 
                   "data":         "buttons",
                   "searchable":   false,
@@ -230,6 +238,7 @@ $(document).ready(function() {
     //send the data as a GET request to the PHP page specified in direct_to_url
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
         item_table.ajax.reload(); //reload the table with the new data
+        set_localstorage();
       });
       function save_to_database(){ //call the ajax for saving the changes
       return $.ajax({url: direct_to_url, success: function(result){
@@ -271,6 +280,7 @@ $('#edit_form').submit(function(event){
   //send the data as a GET request to the PHP page specified in direct_to_url
   $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
     item_table.ajax.reload(); //reload the table with the new data
+    set_localstorage();
   });
   function save_to_database(){ //call the ajax for saving the changes
     return $.ajax({url: direct_to_url, success: function(result){
@@ -297,6 +307,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   //send the data as a GET request to the PHP page specified in direct_to_url
   $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
     item_table.ajax.reload(); //reload the table with the new data
+    set_localstorage();
   });
   function save_to_database(){ //call the ajax for saving the changes
     return $.ajax({url: "ajax.content_actions.php?action=delete_item&item_id="+item_id, success: function(result){
@@ -320,7 +331,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
  * 
  */  
 
-
   
   /**
    * 
@@ -333,8 +343,11 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   $(document).on("click", ".newContentModalBox", function () { //onclick of the Edit icon/button
     //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
     item_id = $(this).data('id').item_id;
-    console.log(item_id);
     $(".modal-body #item_id").val($(this).data('id').item_id);
+    var db = JSON.parse(localStorage.getItem('db')); 
+    $.each(db.data[0].content, function (key, c) {
+      $('#new_next_content').append('<option value="'+c.content_id+'">'+c.name+'</option>'); 
+    });
   });
 
   $('#form_new_content').submit(function(event){
@@ -364,6 +377,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
         item_table.ajax.reload(); //reload the table with the new data
+        set_localstorage();
       });
       function save_to_database(){ //call the ajax for saving the changes
         return $.ajax({
@@ -411,13 +425,20 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     }
     else {
       $("#edit_tts_enabled_no").prop("checked", true);
-      var soundfile_location = $(this).data('id').soundfile_location;
-      if(soundfile_location!=null)    $(".modal-body #edit_sound_file_label").html('<a download="'+soundfile_location+'" href="audio/'+soundfile_location+'">'+soundfile_location+'</a> already exists. Replace it: ');
+      $(".modal-body #edit_sound_file_label").html('A <a download="'+$(this).data('id').name+'.mp3" href="audio/'+$(this).data('id').item_id+'/'+$(this).data('id').content_id+'/sound.mp3">sound file</a> has already been uploaded. Replace it: ');
       $(".modal-body #edit_collapseTwo").addClass("show");
       $(".modal-body #edit_collapseOne").removeClass("show");
     }
     
     $(".edit_gesture_options select").val($(this).data('id').gesture_id);
+
+
+    var db = JSON.parse(localStorage.getItem('db')); 
+    $.each(db.data[0].content, function (key, c) {
+      $('#edit_next_content').append('<option value="'+c.content_id+'">'+c.name+'</option>'); 
+    });
+
+
     $(".edit_active_options select").val($(this).data('id').active);
   });
 
@@ -456,6 +477,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     //send the data as a GET request to the PHP page specified in direct_to_url
     $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
       item_table.ajax.reload(); //reload the table with the new data
+      set_localstorage();
     });
     function save_to_database(){ //call the ajax for saving the changes
       return $.ajax({
@@ -485,7 +507,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     //grab the data provided via JSON on the Delete icon/button
     name = "'" + $(this).data('id').name + "'";
     content_id = $(this).data('id').content_id;
-    console.log("You are attempting to delete " + name + " with the content ID of " + content_id);
     $(".modal-body #span_name").text(name);
   });
 
@@ -493,6 +514,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     //send the data as a GET request to the PHP page specified in direct_to_url
     $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
       item_table.ajax.reload(); //reload the table with the new data
+      set_localstorage();
     });
     function save_to_database(){ //call the ajax for saving the changes
       return $.ajax({url: "ajax.content_actions.php?action=delete_content&content_id="+content_id, success: function(result){
@@ -511,7 +533,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
  $("#btn_newNFCTag").click(function(){ //on click of the confirmation delete button (AKA submit the form)
   //send the data as a GET request to the PHP page specified in direct_to_url
   $.ajax({url: "ajax.content_actions.php?action=scan_nfc_tag&content_id="+content_id, success: function(result){
-    console.log(result);
        $(".modal-body #NFCTagModal_bodytext").text("Please scan the NFC tag on the server device.");
        $(".modal-content #NFCTagModalFooter").removeClass("d-none");
     }});
@@ -524,17 +545,44 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
 */
 $("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation delete button (AKA submit the form)
  //send the data as a GET request to the PHP page specified in direct_to_url
- $.ajax({url: "ajax.content_actions.php?action=get_nfc_id&content_id="+content_id, success: function(result){
+ console.log('Line 547');
+ $.ajax({
+   url: "ajax.content_actions.php?action=get_nfc_id&content_id="+content_id,
+   success: function(result){
       var tag_id = result.tag_id;
-      console.log(result)
-      if(tag_id==-1) {
+      console.log("tag_id type: "+ typeof(tag_id));
+      console.log("tag_id : "+ tag_id);
+      console.log("result type: "+ typeof(result));
+      console.log("result : "+ result);
+      if(result==-1) {
         $(".modal-body #nfc_tag_id_label_error").html("Something went wrong. Please try again.<br />");
       }
       else {
         $(".modal-body #tag_id").val(tag_id);
         $(".modal-body #nfc_tag_id_label").text(": '"+tag_id+"'");
+        $(".modal-body #nfc_tag_id_label_error").html("");
       }
-   }});
+   },
+   error: function (jqXHR, exception) {
+       var msg = '';
+       if (jqXHR.status === 0) {
+           msg = 'Not connect.\n Verify Network.';
+       } else if (jqXHR.status == 404) {
+           msg = 'Requested page not found. [404]';
+       } else if (jqXHR.status == 500) {
+           msg = 'Internal Server Error [500].';
+       } else if (exception === 'parsererror') {
+           msg = 'Requested JSON parse failed.';
+       } else if (exception === 'timeout') {
+           msg = 'Time out error.';
+       } else if (exception === 'abort') {
+           msg = 'Ajax request aborted.';
+       } else {
+           msg = 'Uncaught Error.\n' + jqXHR.responseText;
+       }
+       console.log(msg);
+   }
+  });
 });
   
 });

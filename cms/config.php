@@ -9,11 +9,17 @@
  */
 
 define("DATABASE_FILE","audio_culture.db");
-define("DATABASE",'audio_culture.db');
+// define("DATABASE",'audio_culture.db');
+
+//staff roles for access to parts of the CMS
 define("STAFF_DB_MANAGER",1);
 define("CONTENT_MANAGER",2);
 define("REPORT_MANAGER",3);
 define("VISITOR_DB_MANAGER",4);
 define("DEVICE_MANAGER",5);
+
+define("CONTENT_ID_FILE","json/content.json");//contains the outgoing content id (i.e. from the PHP script to the C++ app)
+define("NFC_ID_FILE","json/tag_data.json");//contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
+define("AUDIO_FOLDER","audio/"); //folder to store the sound files
 
 ?>

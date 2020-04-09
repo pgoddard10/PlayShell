@@ -135,9 +135,10 @@ class Content_View
                 $content_details_array['last_modified'] = $last_modified;
                 $content_details_array['tts_enabled'] = $contents->tts_enabled;
                 $content_details_array['written_text'] = $contents->written_text;
-                $content_details_array['soundfile_location'] = $contents->soundfile_location;
-                $content_details_array['gesture'] = 'I_V->jsonify all contents -> ges_id'.$contents->gesture_id;
-                $content_details_array['next_content'] = 'I_V->jsonify all contents -> nxt_cntnt'.$contents->next_content;
+                $content_details_array['gesture_id'] = $contents->gesture_id;
+                $content_details_array['gesture_name'] = $contents->gesture_name;
+                $content_details_array['next_content_id'] = $contents->next_content_id;
+                $content_details_array['next_content_name'] = $contents->next_content_name;
 
                 $content_as_json = json_encode($contents, JSON_HEX_APOS);
                 $content_details_array['buttons'] = "<a href='#' data-toggle='modal' data-id='$content_as_json' class='editContentModalBox btn-success btn-circle btn-sm' data-target='#editContentModalCenter'><i class='fas fa-edit bg-success'></i></a>";
@@ -204,8 +205,11 @@ class Content_View
                                     <option value="1">Gesture 2</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control form-control-user" id="new_next_content" name="next_content" placeholder="Next content link: TO DO">
+                            <div class="form-group edit_next_content_options">
+                                After all of the above has been performed, which content should play next?<br />
+                                <select id="new_next_content" name="next_content" class="form-control-sm form-control-user-sm">
+                                    <option value selected>None</option>
+                                </select>
                             </div>
                             <div class="form-group new_active_options">
                                 Active?<br />
@@ -242,11 +246,10 @@ class Content_View
         
         <!-- Edit Content - Form Modal-->
         <div class="modal hide fade" id="editContentModalCenter" tabindex="-1" role="dialog" aria-labelledby="editContentModalLabel" aria-hidden="true" data-focus-on="input:first">
-        <!-- <div class="modal fade" id="editContentModalCenter" tabindex="-1" role="dialog" aria-labelledby="editContentModalLabel" aria-hidden="true"> -->
             <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="editContentModalLabel">Edit</h5>
+                <h5 class="modal-title" id="editContentModalLabel">Edit Content</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -260,11 +263,11 @@ class Content_View
                             <div class="form-group">
                                 Use Text-To-Speech to create the audio file?<br />
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" id="edit_tts_enabled_yes" value="1" data-toggle="collapse" data-target="#edit_collapseOne" aria-expanded="false" aria-controls="edit_collapseOne" required>
+                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" id="edit_tts_enabled_yes" data-toggle="collapse" data-target="#edit_collapseOne" aria-expanded="false" aria-controls="edit_collapseOne" required>
                                     <label class="form-check-label" for="edit_tts_enabled_yes">Yes</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" id="edit_tts_enabled_no" value="0" class="btn btn-link collapsed" data-toggle="collapse" data-target="#edit_collapseTwo" aria-expanded="false" aria-controls="edit_collapseTwo">
+                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" id="edit_tts_enabled_no" class="btn btn-link collapsed" data-toggle="collapse" data-target="#edit_collapseTwo" aria-expanded="false" aria-controls="edit_collapseTwo">
                                     <label class="form-check-label" for="edit_tts_enabled_no">No</label>
                                 </div>
 
@@ -287,8 +290,11 @@ class Content_View
                                     <option value="1">Gesture 2</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control form-control-user" id="edit_next_content" name="next_content" placeholder="Next content link: TO DO">
+                            <div class="form-group edit_next_content_options">
+                                After all of the above has been performed, which content should play next?<br />
+                                <select id="edit_next_content" name="next_content" class="form-control-sm form-control-user-sm">
+                                    <option value selected>None</option>
+                                </select>
                             </div>
                             <div class="form-group edit_active_options">
                                 Active?<br />
@@ -396,9 +402,9 @@ class Content_View
      * @return void
      */
     public function get_nfc_id() {
-        $tag_id = $this->content_controller->get_nfc_id();
+        $tag_id_json = $this->content_controller->get_nfc_id();
         echo header('Content-Type: application/json');
-        echo '{"tag_id": '.$tag_id.'}';
+        echo $tag_id_json;
     }
 } /* end of class Content_View */
 

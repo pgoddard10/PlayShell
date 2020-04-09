@@ -34,21 +34,12 @@ class Content_Controller
     {
         $returnValue = -1;//unknown error
         $written_text = null;
-        $sound_file = null;
         $gesture = null;
         
         if($_POST['tts_enabled']==1) {
             $written_text = $_POST['written_text'];
             $written_text_for_tts = $_POST['written_text'];
             $written_text = filter_var($_POST['written_text'], FILTER_SANITIZE_MAGIC_QUOTES);
-        }
-        else {
-            print('File to upload <pre>'.print_r($_FILES['sound_file'],true).'</pre>');
-            $sound_file = $_FILES['sound_file'];
-            // Configure The "php.ini" File
-            // In your "php.ini" file, search for the file_uploads directive, and set it to On:
-            // file_uploads = On
-            // see bottom of https://www.w3schools.com/php/php_file_upload.asp for complete script, including validation
         }
         if(isset($_POST['gesture'])) $gesture = $_POST['gesture'];
 
@@ -57,7 +48,7 @@ class Content_Controller
         $next_content = $_POST['next_content'];
         $active = $_POST['active'];
         $item_id = $_POST['item_id'];
-        if($this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $sound_file)==0) {
+        if($this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture)==0) {
             if($_POST['tts_enabled']==1) {
                 if($this->content_model->convert_text_to_speech($written_text_for_tts)==0) $returnValue = 0;
                 else $returnValue = -2; //created in database successfully but TTS failed
@@ -79,21 +70,12 @@ class Content_Controller
         $content_id = $_POST['content_id'];
         $this->content_model->populate_from_db($content_id);
         $written_text = null;
-        $sound_file = null;
         $gesture = null;
         
         if($_POST['edit_tts_enabled']==1) {
             $written_text = $_POST['written_text'];
             $written_text_for_tts = $_POST['written_text'];
             $written_text = filter_var($_POST['written_text'], FILTER_SANITIZE_MAGIC_QUOTES);
-        }
-        else {
-            print('File to upload <pre>'.print_r($_FILES['edit_sound_file'],true).'</pre>');
-            $sound_file = $_FILES['edit_sound_file'];
-            // Configure The "php.ini" File
-            // In your "php.ini" file, search for the file_uploads directive, and set it to On:
-            // file_uploads = On
-            // see bottom of https://www.w3schools.com/php/php_file_upload.asp for complete script, including validation
         }
         if(isset($_POST['gesture'])) $gesture = $_POST['gesture'];
 
@@ -102,7 +84,7 @@ class Content_Controller
         $next_content = $_POST['next_content'];
         $active = $_POST['active'];
         $tag_id = $_POST['tag_id'];
-        if($this->content_model->edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $sound_file, $tag_id)==0) {
+        if($this->content_model->edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $tag_id)==0) {
             if($tts_enabled==1) {
                 if($this->content_model->convert_text_to_speech($written_text_for_tts)==0) $returnValue = 0;
                 else $returnValue = -2; //created in database successfully but TTS failed
@@ -165,18 +147,15 @@ class Content_Controller
      * @return void
      */
     public function scan_nfc_tag() {
-        $content_id_file = "json/content.json"; //contains the outgoing content id (i.e. from the PHP script to the C++ app)
-        $nfc_details_file = "json/tag_data.json"; //contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
-        
         //initialisation
-        if(!file_exists($content_id_file)) write_blank_file($content_id_file);
-        if(!file_exists($nfc_details_file)) write_blank_file($nfc_details_file);
+        if(!file_exists(CONTENT_ID_FILE)) write_blank_file(CONTENT_ID_FILE);
+        if(!file_exists(NFC_ID_FILE)) write_blank_file(NFC_ID_FILE);
         
         if(isset($_GET['content_id'])) { //onclick of [Add/Change NFC tag] button send ajax request to perform the below
             //mimic a content ID being provided from the Database
             //convert the content ID into a JSON object and save into a file
             $posts['content_id'] = $_GET['content_id'];
-            $fp = fopen($content_id_file, 'w');
+            $fp = fopen(CONTENT_ID_FILE, 'w');
             fwrite($fp, json_encode($posts));
             fclose($fp);
         }
@@ -189,9 +168,7 @@ class Content_Controller
      */
     public function get_nfc_id() {
         $returnValue = -1;
-        $content_id_file = "json/content.json"; //contains the outgoing content id (i.e. from the PHP script to the C++ app)
-        $nfc_details_file = "json/tag_data.json"; //contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
-        if($tag_data = file_get_contents($nfc_details_file)) { //onclick of [I've scanned the tag] button send ajax request to perform the below
+        if($tag_data = file_get_contents(NFC_ID_FILE)) { //onclick of [I've scanned the tag] button send ajax request to perform the below
             //if the NFC details have been provided from the C++ app
             //open the file, get the JSON
             $tag_data_json = json_decode($tag_data, true);
@@ -199,12 +176,13 @@ class Content_Controller
             
             //check that the content_id in the file matches the one provided in the PHP (to ensure no accidental cross-over)
             if($tag_data_json['content_id']==$_GET['content_id']) {
-                $returnValue = $tag_data_json['nfc_tag'];
+                // $returnValue = $tag_data_json['nfc_tag'];
+                $returnValue = json_encode(array("tag_id"=>$tag_data_json['nfc_tag']));
             }
         
             //empty the files to prevent accidents on future reads
-            $this->write_blank_file($content_id_file);
-            $this->write_blank_file($nfc_details_file);
+            $this->write_blank_file(CONTENT_ID_FILE);
+            $this->write_blank_file(NFC_ID_FILE);
         }
         return $returnValue;
     }

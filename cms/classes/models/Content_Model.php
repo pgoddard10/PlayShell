@@ -10,14 +10,15 @@ class Content_Model
 	public $name = null;
 	public $tag_id = null;
     public $tts_enabled = null; //boolean
-    public $soundfile_location = null; //if $tts_enabled==false this stores the user uploaded file, else stores the TTS content
 	public $written_text = null; //text for TTS
-	public $next_content = null;
+	public $next_content_name = null;
+	public $next_content_id = null;
 	public $created = null; //timestamp
 	public $last_modified = null; //timestamp
 	public $modified_by = null;
 	public $active = null;
 	public $gesture_id = null;
+	public $gesture_name = null;
 	public $item_id = null;
 
     // --- OPERATIONS ---
@@ -63,27 +64,30 @@ class Content_Model
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("SELECT tbl_content.tag_id, tbl_content.name, tbl_content.tts_enabled, tbl_content.soundfile_location, tbl_content.written_text, 
-                                        tbl_content.next_content, tbl_content.created, tbl_content.last_modified, tbl_content.modified_by, tbl_content.active, 
-                                        tbl_content.gesture_id, tbl_content.item_id,
-                                        tbl_mod_staff.first_name, tbl_mod_staff.last_name
+			$stm = $db->prepare("SELECT tbl_content.tag_id, tbl_content.name AS 'content_name', tbl_content.tts_enabled, tbl_content.written_text, 
+                                        tbl_content.next_content AS 'next_content_id', tbl_content.created, tbl_content.last_modified, tbl_content.modified_by, tbl_content.active, 
+                                        tbl_content.gesture_id, tbl_gesture.name AS 'gesture_name', tbl_content.item_id,
+                                        tbl_mod_staff.first_name, tbl_mod_staff.last_name, tbl_next_content.name AS 'next_content_name'
                                         FROM content tbl_content
                                         LEFT JOIN staff tbl_mod_staff ON tbl_content.modified_by = tbl_mod_staff.staff_id
+                                        LEFT JOIN gesture tbl_gesture ON tbl_content.gesture_id = tbl_gesture.gesture_id
+                                        LEFT JOIN content tbl_next_content ON tbl_content.next_content = tbl_next_content.content_id
                                         WHERE tbl_content.content_id = :content_id");
             $stm->bindParam(':content_id', $content_id);
             $results = $stm->execute();
             if($row = $results->fetchArray()) {
                 $this->content_id = $content_id;
-                $this->name = $row['name'];
+                $this->name = $row['content_name'];
                 $this->tag_id = $row['tag_id'];
                 $this->tts_enabled = $row['tts_enabled'];
-                $this->soundfile_location = $row['soundfile_location'];
                 $this->written_text = $row['written_text'];
-                $this->next_content = $row['next_content'];
+                $this->next_content_id = $row['next_content_id'];
+                $this->next_content_name = $row['next_content_name'];
                 $this->created = $row['created'];
                 $this->last_modified = $row['last_modified'];
                 $this->modified_by = $row['first_name'].' '.$row['last_name'];
                 $this->active = $row['active'];
+                $this->gesture_name = $row['gesture_name'];
                 $this->gesture_id = $row['gesture_id'];
                 $this->item_id = $row['item_id'];
                 $returnValue = 0; //success
@@ -98,15 +102,14 @@ class Content_Model
      * @param  
      * @return Integer
      */
-    public function create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text=null, $gesture_id=null, $soundfile_location=null)
+    public function create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text=null, $gesture_id=null)
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("INSERT INTO `content` (`name`,`tts_enabled`,`soundfile_location`,`written_text`,`next_content`,`active`,`modified_by`,`gesture_id`,`item_id`)
-                                                VALUES (:name,:tts_enabled,:soundfile_location,:written_text,:next_content,:active,:created_by,:gesture_id,:item_id)");
+			$stm = $db->prepare("INSERT INTO `content` (`name`,`tts_enabled`,`written_text`,`next_content`,`active`,`modified_by`,`gesture_id`,`item_id`)
+                                                VALUES (:name,:tts_enabled,:written_text,:next_content,:active,:created_by,:gesture_id,:item_id)");
                 $stm->bindValue(':name', $name, SQLITE3_TEXT);
                 $stm->bindValue(':tts_enabled', $tts_enabled, SQLITE3_TEXT);
-                $stm->bindValue(':soundfile_location', $soundfile_location, SQLITE3_TEXT);
                 $stm->bindValue(':written_text', $written_text, SQLITE3_TEXT);
                 $stm->bindValue(':next_content', $next_content, SQLITE3_TEXT);
                 $stm->bindValue(':active', $active, SQLITE3_TEXT);
@@ -128,16 +131,15 @@ class Content_Model
      * @param  
      * @return Integer
      */
-    public function edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $soundfile_location, $tag_id)
+    public function edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $tag_id)
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("UPDATE content SET `name`= :name,`tts_enabled`=:tts_enabled,`soundfile_location`=:soundfile_location, `written_text`=:written_text, 
+			$stm = $db->prepare("UPDATE content SET `name`= :name,`tts_enabled`=:tts_enabled,`written_text`=:written_text, 
                                     `last_modified` = CURRENT_TIMESTAMP, `next_content`=:next_content, `active`=:active, `modified_by`=:modified_by, 
                                     `gesture_id`=:gesture_id, `tag_id`=:tag_id WHERE content_id = :content_id");
 			$stm->bindValue(':name', $name, SQLITE3_TEXT);
 			$stm->bindValue(':tts_enabled', $tts_enabled, SQLITE3_TEXT);
-			$stm->bindValue(':soundfile_location', $soundfile_location, SQLITE3_TEXT);
 			$stm->bindValue(':written_text', $written_text, SQLITE3_TEXT);
 			$stm->bindValue(':next_content', $next_content, SQLITE3_TEXT);
 			$stm->bindValue(':active', $active, SQLITE3_TEXT);
@@ -147,7 +149,39 @@ class Content_Model
 			$stm->bindParam(':content_id', $this->content_id);
 			if($stm->execute()) {
                 $this->populate_from_db($this->content_id);
-                $returnValue = 0;
+                $returnValue = -3; //saved to db but unable to upload soundfile
+
+                if($tts_enabled==0){
+                    if(isset($_FILES['sound_file'])) {
+                        $sound_file = $_FILES['sound_file'];
+                        $dir_name = AUDIO_FOLDER.$this->item_id.'/';
+                        if (!is_dir($dir_name)) {
+                            //Create our directory if it does not exist
+                            mkdir($dir_name);
+                        }
+                        $dir_name = $dir_name . $this->content_id.'/';
+                        if (!is_dir($dir_name)) {
+                            //Create our directory if it does not exist
+                            mkdir($dir_name);
+                        }
+                        $complete_file_path = $dir_name."sound.mp3";
+                        $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
+                        // Allow certain file formats
+                        if($file_type != "mp3") {
+                            $returnValue = -4; //file is of non-accepted filetype
+                        }
+                        else {
+                            if (move_uploaded_file($_FILES["sound_file"]["tmp_name"][0], $complete_file_path)) {
+                                $returnValue = 0; //everything successful
+                            } else {
+                                $returnValue = -5; //could save file
+                            }
+                        }
+                    }
+                    else $returnValue = 0; //file has not been changed on the edit form
+                }
+                else $returnValue = 0; //saved to db and no requirement for soundfile
+
             }
             else $returnValue = -2;
 		}
@@ -186,7 +220,7 @@ class Content_Model
         $returnValue = -1;
 		$provider = new \duncan3dc\Speaker\Providers\PicottsProvider;
         $tts = new \duncan3dc\Speaker\TextToSpeech($written_text, $provider);
-        $dir_name = 'audio/'.$this->item_id.'/';
+        $dir_name = AUDIO_FOLDER.$this->item_id.'/';
         if (!is_dir($dir_name)) {
             //Create our directory if it does not exist
             mkdir($dir_name);
@@ -212,7 +246,7 @@ class Content_Model
     public function delete_soundfile()
     {
         $returnValue = -1; //unknown error
-        $file_name = 'audio/'.$this->item_id.'/'. $this->content_id.'/sound.mp3';
+        $file_name = AUDIO_FOLDER.$this->item_id.'/'. $this->content_id.'/sound.mp3';
         if (file_exists($file_name)) {
             if(unlink($file_name)) $returnValue = 0;
         }
