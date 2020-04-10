@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 		std::cout << "Tag successfully scanned. The ID is: " << nfcID << std::endl;
 
 		//read the JSON file and get the content ID
-		std::ifstream ifs("../json/content.json");
+		std::ifstream ifs("../json/tag_setup/content.json");
 		if(ifs.is_open()) { //only continue if the file is found
 			Json::Reader reader;
 			Json::Value obj;
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 				Json::FastWriter writer;
 				const std::string json_file = writer.write(root);
 
-				std::ofstream results_file("../json/tag_data.json"); //open the file to respond to the request
+				std::ofstream results_file("../json/tag_setup/tag_data.json"); //open the file to respond to the request
 				if (results_file.is_open()) {
 					results_file << json_file; //push the contents of the json_file into the actual file
 					results_file.close(); //close the file handler

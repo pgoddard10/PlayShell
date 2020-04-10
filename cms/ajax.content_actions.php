@@ -45,5 +45,8 @@ switch($_GET['action']) {
     case 'get_nfc_id':
         $content_view->get_nfc_id();
         break;
+    case 'publish':
+        $item_view->publish();
+        break;
 }
 ?>

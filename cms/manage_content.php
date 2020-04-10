@@ -35,10 +35,13 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
           <h1 class="h2 mb-0 text-gray-800">
-              <i class="fas fa-fw fa-file-audio"></i>
-              Manage Content
-            </h1>
-          <a href="#" data-toggle="modal" data-target="#addNewItemModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-plus-circle"></i></span><span class="text">Add New</span></a>
+            <i class="fas fa-fw fa-file-audio"></i>
+            Manage Content
+          </h1>
+          <div class="mb-4">
+            <a href="#" data-toggle="modal" data-target="#addNewItemModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-plus-circle"></i></span><span class="text">Add New</span></a>
+            <a href="#" data-toggle="modal" data-target="#publishModal" id="btn_publishModal" class="btn btn-primary btn-icon-split"><span class="icon text-white-50"><i class="fas fa-share-square"></i></span><span class="text">Publish for Devices</span></a>
+          </div>
         </div>
         <p class="mb-4">
           Add, edit and remove all digital content.<br />
@@ -74,6 +77,7 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
         $item_view->delete_item_modal();
         $item_view->new_item_modal();
         $item_view->edit_item_modal();
+        $item_view->show_publish_modal();
 
         $content_view->delete_content_modal();
         $content_view->new_content_modal();

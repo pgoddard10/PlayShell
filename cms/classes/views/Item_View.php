@@ -99,37 +99,20 @@ class Item_View
      */
     public function JSONify_All_Items()
     {
-        $data = array();
-        if(count($this->item_controller->all_items)<=0) echo '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
-        else {
-            foreach($this->item_controller->all_items as $item=>$details) {
-                $individual_item = array();
-                
-                $individual_item['item_id'] = $details->item_id;
-                if(strlen($details->url) > 1) $individual_item['name_with_url'] = '<a href="'.$details->url.'" target="_blank">' . $details->name .'</a>';
-                else $individual_item['name_with_url'] = $details->name;
-                $individual_item['name_without_url'] = $details->name;
-                $individual_item['heritage_id'] = $details->heritage_id;
-                $individual_item['location'] = $details->location;
-                $individual_item['created'] = date("d/m/Y \a\\t H:i", strtotime($details->created));
-                $last_modified = date("d/m/Y \a\\t H:i", strtotime($details->last_modified));
-                if(strlen($details->modified_by) > 1) $last_modified = $last_modified. ' by ' . $details->modified_by;
-                else $last_modified = $last_modified. ' by [deleted staff member]';
-                $individual_item['last_modified'] = $last_modified;
-                if($details->active==1)
-                    $individual_item['active'] = 'Yes';
-                else
-                    $individual_item['active'] = 'No';
+        echo $this->item_controller->JSONify_All_Items();
+    }
 
-                $individual_item['content'] = $details->content;
-                    
-                $items_as_json = json_encode($details, JSON_HEX_APOS);
-                $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
-                $individual_item['buttons'] = $individual_item['buttons'] . " <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox btn-circle btn-sm btn-primary' data-target='#deleteItemModalCenter'><i class='fas fa-trash'></i></a>";
-                $data["data"][] = $individual_item;
-            }
-            echo json_encode($data, JSON_PRETTY_PRINT );
-        }
+    /**
+     * Short description of method publish
+     *
+     * @return void
+     */
+    public function publish()
+    {
+        echo header('Content-Type: application/json');
+        $returnValue = json_encode(array("result"=>"Content not published. An unknown error occurred"));
+        if($this->item_controller->publish()==0) $returnValue = json_encode(array("result"=>"Successfully published all content."));
+        echo $returnValue;
     }
 
     /**
@@ -272,6 +255,38 @@ class Item_View
             </div>
           </div>
         </div>
+        <?php
+    }
+
+    
+    /**
+     * Short description of method show_publish_modal
+     *
+     * @return void
+     */
+    public function show_publish_modal()
+    {
+        ?>
+        <!-- Confirming Publish -->
+        <div class="modal hide fade" id="publishModal" tabindex="-1" role="dialog" aria-labelledby="publishModalTitle" aria-hidden="true" data-focus-on="input:first">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="publishModalLongTitle">Publish All Content</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span id="publishModal_bodytext">Publishing the content, please wait...</span>
+                </div>
+                <div class="modal-footer d-none" id="publishModalFooter">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+          </div>
+        </div>
+
         <?php
     }
 

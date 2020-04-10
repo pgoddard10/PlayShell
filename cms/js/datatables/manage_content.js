@@ -1,5 +1,4 @@
 //Call the dataTables jQuery plugin
-
 $(document).ready(function() {
 
   //store all the ITems in the local storage
@@ -9,6 +8,8 @@ $(document).ready(function() {
       localStorage.setItem("db",JSON.stringify(result));
     }});
   }
+
+  set_localstorage();
 
   /**
    * 
@@ -317,6 +318,20 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   }
 });
 
+  /**
+  * 
+  * Publishing content
+  * 
+  */
+
+ $("#btn_publishModal").click(function(){ //on click of the "publish for devices" button
+  //trigger an ajax request to create the relevant JSON file.
+  $.ajax({url: "ajax.content_actions.php?action=publish", success: function(r){
+      //Overwrite the "please wait" message upon completion of the request
+       $(".modal-body #publishModal_bodytext").text(r.result);
+       $(".modal-content #publishModalFooter").removeClass("d-none");
+    }});
+});
 
 
   /**
@@ -545,15 +560,10 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
 */
 $("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation delete button (AKA submit the form)
  //send the data as a GET request to the PHP page specified in direct_to_url
- console.log('Line 547');
  $.ajax({
    url: "ajax.content_actions.php?action=get_nfc_id&content_id="+content_id,
    success: function(result){
       var tag_id = result.tag_id;
-      console.log("tag_id type: "+ typeof(tag_id));
-      console.log("tag_id : "+ tag_id);
-      console.log("result type: "+ typeof(result));
-      console.log("result : "+ result);
       if(result==-1) {
         $(".modal-body #nfc_tag_id_label_error").html("Something went wrong. Please try again.<br />");
       }

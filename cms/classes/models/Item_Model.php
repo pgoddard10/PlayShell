@@ -65,8 +65,8 @@ class Item_Model
                 $this->modified_by = $item['first_name'].' '.$item['last_name'];
                 $this->url = $item['url'];
                 $this->active = $item['active'];
-                $content_model = new Content_Model();
-                $all_contents_ids = $content_model->get_all_content_ids($item_id);
+                $content_model = new Content_Model($item_id);
+                $all_contents_ids = $content_model->get_all_content_ids();
                 foreach($all_contents_ids as $content_id) {
                     $cm = new Content_Model();
                     $cm->populate_from_db($content_id);

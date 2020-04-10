@@ -151,8 +151,7 @@ class Content_Controller
         if(!file_exists(CONTENT_ID_FILE)) write_blank_file(CONTENT_ID_FILE);
         if(!file_exists(NFC_ID_FILE)) write_blank_file(NFC_ID_FILE);
         
-        if(isset($_GET['content_id'])) { //onclick of [Add/Change NFC tag] button send ajax request to perform the below
-            //mimic a content ID being provided from the Database
+        if(isset($_GET['content_id'])) {
             //convert the content ID into a JSON object and save into a file
             $posts['content_id'] = $_GET['content_id'];
             $fp = fopen(CONTENT_ID_FILE, 'w');
