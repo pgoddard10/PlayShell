@@ -57,4 +57,5 @@ $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
         $visitor_view->delete_modal();
         $visitor_view->new_modal();
         $visitor_view->edit_modal();
+        $visitor_view->check_out_modal();
       ?>

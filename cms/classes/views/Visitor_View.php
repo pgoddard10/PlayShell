@@ -26,10 +26,10 @@ class Visitor_View
      * 
      * @return void
      */
-    public function create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)
+    public function create_new()
     {
-        $success = $this->visitor_controller->create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode);
-        if($success==0) $msg = "Successfully created $first_name $last_name.";
+        $success = $this->visitor_controller->create_new();
+        if($success==0) $msg = "Successfully created ".$_GET['first_name']." ".$_GET['last_name'].".";
         else $msg = "An unknown error occurred.";
         ?>
               <!-- Add Message Card -->
@@ -46,19 +46,19 @@ class Visitor_View
      *
      * @return void
      */
-    public function edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)
+    public function edit()
     { 
-        $success = $this->visitor_controller->edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode);
+        $success = $this->visitor_controller->edit();
         switch($success) {
             case 0:
-                $msg = "Successfully edited $first_name $last_name.";
+                $msg = "Successfully edited ".$_GET['first_name']." ".$_GET['last_name'].".";
                 break;
             case -2:
-                $msg = "Changes for $first_name $last_name were not saved. There was a database error editing the visitor details.";
+                $msg = "Changes for ".$_GET['first_name']." ".$_GET['last_name']." were not saved. There was a database error editing the visitor details.";
                 break;
             case -1:
             default:
-                $msg = "Changes for $first_name $last_name were not saved. An unknown error occurred.";
+                $msg = "Changes for ".$_GET['first_name']." ".$_GET['last_name']." were not saved. An unknown error occurred.";
                 break;
         }
         ?>
@@ -77,9 +77,9 @@ class Visitor_View
      * @param  visitor_id
      * @return void
      */
-    public function delete($visitor_id)
+    public function delete()
     {
-        $success = $this->visitor_controller->delete($visitor_id);
+        $success = $this->visitor_controller->delete();
         if($success==0) $msg = "Successfully deleted the visitor.";
         else $msg = "An unknown error occurred.";
         ?>
@@ -99,19 +99,17 @@ class Visitor_View
      */
     public function JSONify_All_Visitors()
     {
-        $data = array();
-        if(count($this->visitor_controller->all_visitors)<=0) return '{"data": []}'; //empty JSON for datatables to read correctly.
-        foreach($this->visitor_controller->all_visitors as $visitor=>$details) {
-            $myvisitor = array();
-            $myvisitor['name'] = $details->first_name.' '.$details->last_name;
-            $myvisitor['email'] = $details->email;
-            $myvisitor['address'] = $details->address;
-            $visitor_as_json = json_encode($details, JSON_HEX_APOS);
-            $myvisitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$visitor_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-            $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='deleteModalBox' data-target='#deleteModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-            $data["data"][] = $myvisitor;
-        }
-        return json_encode($data);
+        echo $this->visitor_controller->JSONify_All_Visitors();
+    }
+
+    /**
+     * Short description of method check_out_device
+     *
+     * @return void
+     */
+    public function check_out_device()
+    {
+        echo $this->visitor_controller->check_out_device();
     }
 
     /**
@@ -265,6 +263,36 @@ class Visitor_View
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn_visitor_delete">Delete Visitor</button>
+                </div>
+            </div>
+          </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Short description of method delete_modal
+     *
+     * @return void
+     */
+    public function check_out_modal()
+    {
+        ?>
+        <!-- Check-Out Modal -->
+        <div class="modal fade" id="checkOutModalCenter" tabindex="-1" role="dialog" aria-labelledby="checkOutModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="checkOutModalLongTitle">Check Out Device</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                <div class="modal-body">
+                    Finding available device, please wait...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
           </div>

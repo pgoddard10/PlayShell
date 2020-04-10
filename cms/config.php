@@ -20,7 +20,8 @@ define("DEVICE_MANAGER",5);
 define("CONTENT_ID_FILE","json/tag_setup/content.json");//contains the outgoing content id (i.e. from the PHP script to the C++ app)
 define("NFC_ID_FILE","json/tag_setup/tag_data.json");//contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
 
-define("PUBLISHED_CONTENT","json/published_content.json"); 
+define("PUBLISHED_CONTENT_FOLDER","json/device_data_exchange/"); 
+define("PUBLISHED_CONTENT_FILE","published_content.json"); 
 
 define("AUDIO_FOLDER","audio/"); //folder to store the sound files
 

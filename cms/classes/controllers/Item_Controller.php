@@ -76,20 +76,62 @@ class Item_Controller
         $returnValue = -1; //unknown error
         
         //initialisation
-        if(!file_exists(PUBLISHED_CONTENT)) {
-            $fp = fopen(PUBLISHED_CONTENT, 'w');
-            fwrite($fp, "");
-            fclose($fp);
-            chmod(PUBLISHED_CONTENT,0666);
-        }
+        $complete_path = PUBLISHED_CONTENT_FOLDER.PUBLISHED_CONTENT_FILE;
         
-        $fp = fopen(PUBLISHED_CONTENT, 'w');
+        $fp = fopen($complete_path, 'w');
         if(fwrite($fp, $this->JSONify_All_Items())) $returnValue = 0;
         fclose($fp);
+
+        //to ensure that audio files are not stranded in this folder:
+        $this->delete_files(PUBLISHED_CONTENT_FOLDER.'audio/'); //remove all existing audio files
+        $this->recurse_copy(AUDIO_FOLDER,PUBLISHED_CONTENT_FOLDER.'audio/'); //replace with new copies
 
         return $returnValue;
     }
 
+    /**
+     * Short description of method recurse_copy
+     * copied from https://stackoverflow.com/a/2050909
+     * @param  item_id
+     * @return Integer
+     */
+    public function recurse_copy($src,$dst) { 
+        $dir = opendir($src); 
+        @mkdir($dst); 
+        while(false !== ( $file = readdir($dir)) ) { 
+            if (( $file != '.' ) && ( $file != '..' )) { 
+                if ( is_dir($src . '/' . $file) ) { 
+                    $this->recurse_copy($src . '/' . $file,$dst . '/' . $file); 
+                } 
+                else { 
+                    copy($src . '/' . $file,$dst . '/' . $file); 
+                } 
+            } 
+        } 
+        closedir($dir); 
+    } 
+
+    
+
+    /**
+     * Short description of method recurse_copy
+     * copied from https://paulund.co.uk/php-delete-directory-and-files-in-directory
+     * @param  item_id
+     * @return Integer
+     */
+    public function delete_files($target) {
+        if(is_dir($target)){
+            $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
+
+            foreach( $files as $file ){
+                $this->delete_files( $file );      
+            }
+
+            rmdir( $target );
+        } elseif(is_file($target)) {
+            unlink( $target );  
+        }
+    }
     
     /**
      * Short description of method JSONify_All_Items
