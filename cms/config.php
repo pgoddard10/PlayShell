@@ -25,4 +25,9 @@ define("PUBLISHED_CONTENT_FILE","published_content.json");
 
 define("AUDIO_FOLDER","audio/"); //folder to store the sound files
 
+define("VISITOR_DEVICE_PREFIX","ac-device"); //numbers will be added to the name, i.e. 'ac-device'   becomes:  ac-device-1     ac-device-2    ac-device-3    etc
+define("NUMBER_OF_VISITOR_DEVICES",10); //actually only have 1 for testing, but this will help nicely simulate 2 devices being out-of-range
+define("FTP_USERNAME","pi"); define("FTP_PASSWORD","raspberry"); //used for transferring visitor data from the CMS to individual devices.
+define("DEVICE_DATA_FOLDER","/home/pi/audio_culture/app/json/cms_data_exchange/")
+
 ?>

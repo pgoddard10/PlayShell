@@ -100,7 +100,7 @@ class Visitor_Controller
             $visitor_as_json = json_encode($details, JSON_HEX_APOS);
             $myvisitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$visitor_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
             $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='deleteModalBox' data-target='#deleteModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-            $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='checkOutModalBox' data-target='#checkOutModalCenter'><i class='.btn-circle .btn-sm fas fa-sign-out-alt'></i></a>";
+            $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='btn_checkOutModal' data-target='#checkOutModalCenter'><i class='.btn-circle .btn-sm fas fa-sign-out-alt'></i></a>";
             $data["data"][] = $myvisitor;
         }
         return json_encode($data);
@@ -128,55 +128,66 @@ class Visitor_Controller
      */
     public function check_out_device()
     {
-        $returnValue["xxxxxxxxxxx"]["error"][] = array("code"=>-1,"description"=>"An unknown error has occurred");
-        // connect to FTP server
-        $host = 'ac-device-23';
-        $port = 22;
-        $connection = @ssh2_connect($host, $port);
-        if ($connection) {
-            ssh2_auth_password($connection, 'pi', 'raspberry');
+        $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
+        for($i = 1; $i < (NUMBER_OF_VISITOR_DEVICES+1); $i++) { //+1 as NUMBER_OF_VISITOR_DEVICES is human number, not computer number
+            // connect to FTP server
+            $host = VISITOR_DEVICE_PREFIX.'-'.$i;
+            $port = 22;
+            $connection = @ssh2_connect($host, $port);
+            if ($connection) {
+                ssh2_auth_password($connection, FTP_USERNAME, FTP_PASSWORD);
 
-            $sftp = ssh2_sftp($connection);
-            if($sftp) {
-                $remote_file = "/visitor/device/path/to/status.json"; //is this device ready for a visitor to take out, already in use, or performing a system update?
-                $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'r');
-                if(($stream) && (filesize("ssh2.sftp://$sftp$remote_file")>0)) { //if the file has a size > 0
-                    $contents = fread($stream, filesize("ssh2.sftp://$sftp$remote_file"));   
-                    
-                    //now read the JSON file - is this device ready for a visitor to take out, already in use, or performing a system update?
-                    print('<pre>'.print_r($contents,true).'</pre>');
+                $sftp = ssh2_sftp($connection);
+                if($sftp) {
+                    $remote_file = DEVICE_DATA_FOLDER."status.json"; //is this device ready for a visitor to take out, already in use, or performing a system update?
+                    $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'r');
+                    if(($stream) && (filesize("ssh2.sftp://$sftp$remote_file")>0)) { //if the file has a size > 0
+                        $contents = fread($stream, filesize("ssh2.sftp://$sftp$remote_file"));   
+                        $device_ready_json = json_decode($contents, true);
+                        //now read the JSON file - is this device ready for a visitor to take out, already in use, or performing a system update?
+                        if ($device_ready_json['status']['code']==1) { //if device is ready, copy over visitor ID in JSON via SFTP
+                            $visitor["data"] = array("visitor_id"=>$_GET['visitor_id']);
+                            $visitor_json = json_encode($visitor, JSON_PRETTY_PRINT);
+                            
+                            $local_file = PUBLISHED_CONTENT_FOLDER."visitor.json";
+                            $fp = fopen($local_file, 'w');
+                            fwrite($fp, $visitor_json);
+                            fclose($fp);
+                            chmod($local_file,0666); //set permissions
+                            $remote_file = DEVICE_DATA_FOLDER."visitor.json";
+                            $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'w');
+                            if (! $stream)
+                                break; //throw new Exception("Could not open file: $remote_file");
+                            $data_to_send = @file_get_contents($local_file);
+                            if ($data_to_send === false)
+                                break; //throw new Exception("Could not open local file: $local_file.");
+                            if (@fwrite($stream, $data_to_send) === false)
+                                break; //throw new Exception("Could not send data from file: $local_file.");
+                            @fclose($stream);
 
-                    //if yes, ready{
-                        //copy over visitor ID via JSON
-                                
-                        //upload:
-                        // $local_file = "";
-                        // $remote_file = "/var/www/html/tts/audio_culture/cms/json/device_data_exchange/published_content.jsonn";
-                        // $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'w');
-                        // if (! $stream)
-                        //     throw new Exception("Could not open file: $remote_file");
-                        // $data_to_send = @file_get_contents($local_file);
-                        // if ($data_to_send === false)
-                        //     throw new Exception("Could not open local file: $local_file.");
-                        // if (@fwrite($stream, $data_to_send) === false)
-                        //     throw new Exception("Could not send data from file: $local_file.");
-                        // @fclose($stream);
+                            //now clear the contents of the file
+                            $fp = fopen($local_file, 'w');
+                            fwrite($fp, "");
+                            fclose($fp);
 
-                        //report back the device ID in a nice, positive way.
-                    //}
+                            //report back the device ID in a nice, positive way.
+                            $returnValue["data"] = array("hostname"=>$host,"status"=>"ready");
 
-                    @fclose($stream);
+                            $i = NUMBER_OF_VISITOR_DEVICES+99; //inelegant way to end the loop
+                        }
+
+                        @fclose($stream);
+                    }
+                    else
+                        $returnValue["data"]["error"] = array("code"=>-3,"description"=>"File does not exist, or it's 0 bytes.");
                 }
-                else
-                    $returnValue["xxxxxxxxxxx"]["error"][] = array("code"=>-3,"description"=>"File does not exist, or it's 0 bytes.");
+                else {
+                    $returnValue["data"]["error"] = array("code"=>-4,"description"=>"Device found but unable to log in. Please check the username & password.");
+                }
             }
-            else {
-                $returnValue["xxxxxxxxxxx"]["error"][] = array("code"=>-4,"description"=>"Device found but unable to log in. Please check the username & password.");
-            }
+            else
+                $returnValue["data"]["error"] = array("code"=>-2,"description"=>"There are currently no available devices for use. Please ensure any returned devices have been checked-in.");
         }
-        else
-            $returnValue["xxxxxxxxxxx"]["error"][] = array("code"=>-2,"description"=>"Could not connect to host - it probably isn't on the network.");
-        
         return json_encode($returnValue, JSON_PRETTY_PRINT );
 
     }

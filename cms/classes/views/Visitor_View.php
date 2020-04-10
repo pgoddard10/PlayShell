@@ -109,6 +109,7 @@ class Visitor_View
      */
     public function check_out_device()
     {
+        header('Content-Type: application/json');
         echo $this->visitor_controller->check_out_device();
     }
 
@@ -284,15 +285,15 @@ class Visitor_View
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title" id="checkOutModalLongTitle">Check Out Device</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close btn_checkOutModalClose" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
                 <div class="modal-body">
-                    Finding available device, please wait...
+                    <span id="checkOutModal_bodytext"><i class="fas fa-spinner fa-spin"></i> Finding an available device, please wait...</span>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <div class="modal-footer d-none"  id="checkOutModalFooter">
+                    <button type="button" class="btn btn-primary btn_checkOutModalClose" data-dismiss="modal">Close</button>
                 </div>
             </div>
           </div>

@@ -312,17 +312,16 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   });
   function save_to_database(){ //call the ajax for saving the changes
     return $.ajax({url: "ajax.content_actions.php?action=delete_item&item_id="+item_id, success: function(result){
-        console.log("successfully deleted");
         $("#div1").html(result);
     }});
   }
 });
 
-  /**
-  * 
-  * Publishing content
-  * 
-  */
+/**
+* 
+* Publishing content
+* 
+*/
 
  $("#btn_publishModal").click(function(){ //on click of the "publish for devices" button
   //trigger an ajax request to create the relevant JSON file.

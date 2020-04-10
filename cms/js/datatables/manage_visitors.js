@@ -116,6 +116,31 @@ $(document).ready(function() {
           }});
         }
     });
+
+
+  /**
+  * 
+  * Check-out device
+  * 
+  */
+
+  $(document).on("click", ".btn_checkOutModal", function () {//on click of the "check out" button
+  //trigger an ajax request to create the relevant JSON file.
+    visitor_id = $(this).data('id').visitor_id;
+    $.ajax({url: "ajax.visitor_actions.php?action=check_out_device&visitor_id="+visitor_id, success: function(r){
+      //Overwrite the "please wait" message upon completion of the request
+        var msg = "";
+        if(r.data.error) msg = r.data.error.description + " Failed with error code " + r.data.error.code;
+        else msg = r.data.hostname + " is ready for use.";
+      $(".modal-body #checkOutModal_bodytext").text(msg);
+      $(".modal-content #checkOutModalFooter").removeClass("d-none");
+    }});
+  });
+
+  $(document).on("click", ".btn_checkOutModalClose", function () {//on click of the "close" button
+      //Set the "please wait" message back
+      $(".modal-body #checkOutModal_bodytext").html("<i class='fas fa-spinner fa-spin'></i> Finding an available device, please wait...");
+      $(".modal-content #checkOutModalFooter").addClass("d-none");
+  });
   
-  
-  } );
+} );
