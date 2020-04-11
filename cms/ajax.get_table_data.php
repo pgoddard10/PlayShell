@@ -25,7 +25,7 @@ switch($_GET['page']) {
     case 'visitor':
         $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
         $visitor_view = new Visitor_View();
-        echo $visitor_view->JSONify_All_Visitors();
+        $visitor_view->JSONify_All_Visitors();
         break;
     case 'staff':
         $authenticate_view->page_permissions(STAFF_DB_MANAGER);

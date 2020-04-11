@@ -243,6 +243,7 @@ $authenticate_view->has_session(); //check that the user is logged in
                 <!-- Page level custom style -->
                 <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
         <?php
+          break;
           case 'manage_content':?>
                 <!-- Manage Content -->
                   <!-- Page level plugins -->

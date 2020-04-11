@@ -187,9 +187,10 @@ class Staff_Model
      * @param  staff_id
      * @return Integer
      */
-    public function deactivate($staff_id)
+    public function deactivate()
     {
         $returnValue = -1; //unknown error
+        $staff_id = $_GET['staff_id'];
 		if($db = new SQLite3($this->db_file)){
 			$stm = $db->prepare("UPDATE staff SET active = 0 WHERE staff_id = ?");
 			$stm->bindParam(1, $staff_id);

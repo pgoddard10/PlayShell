@@ -22,6 +22,24 @@ class Visitor_Controller
         $this->populate_all_visitors();
     }
 
+
+    /**
+     * method sanitise_string()
+     * Takes a string and performs sanitising techniques to help avoid xss attacks etc.
+     * 
+     * @param  String data
+     * @param  Bool isemail
+     * @return String data
+     */
+    private function sanitise_string($data,$isemail=false) {
+        $data = filter_var($data, FILTER_SANITIZE_STRING);
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        if($isemail) $data = filter_var($data, FILTER_VALIDATE_EMAIL); //if the email address is not valid, just don't save it as it's not a required field
+        return $data;
+    }
+
     /**
      * Short description of method create_new
      *
@@ -31,14 +49,14 @@ class Visitor_Controller
     public function create_new()
     {
         $returnValue = -1;//unknown error
-        $first_name = $_GET['first_name'];
-        $last_name = $_GET['last_name'];
-        $email = $_GET['email'];
-        $address_1 = $_GET['address_1'];
-        $address_2 = $_GET['address_2'];
-        $address_3 = $_GET['address_3'];
-        $address_4 = $_GET['address_4'];
-        $address_postcode = $_GET['address_postcode'];
+        $first_name = $this->sanitise_string($_GET['first_name']);
+        $last_name = $this->sanitise_string($_GET['last_name']);
+        $email = $this->sanitise_string($_GET['email'],true);
+        $address_1 = $this->sanitise_string($_GET['address_1']);
+        $address_2 = $this->sanitise_string($_GET['address_2']);
+        $address_3 = $this->sanitise_string($_GET['address_3']);
+        $address_4 = $this->sanitise_string($_GET['address_4']);
+        $address_postcode = $this->sanitise_string($_GET['address_postcode']);
         if($this->visitor_model->create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0;
         return $returnValue;
     }
@@ -52,15 +70,15 @@ class Visitor_Controller
     public function edit()
     {
         $returnValue = -1; //unknown error
-        $visitor_id = $_GET['visitor_id'];
-        $first_name = $_GET['first_name'];
-        $last_name = $_GET['last_name'];
-        $email = $_GET['email'];
-        $address_1 = $_GET['address_1'];
-        $address_2 = $_GET['address_2'];
-        $address_3 = $_GET['address_3'];
-        $address_4 = $_GET['address_4'];
-        $address_postcode = $_GET['address_postcode'];
+        $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
+        $first_name = $this->sanitise_string($_GET['first_name']);
+        $last_name = $this->sanitise_string($_GET['last_name']);
+        $email = $this->sanitise_string($_GET['email'],true);
+        $address_1 = $this->sanitise_string($_GET['address_1']);
+        $address_2 = $this->sanitise_string($_GET['address_2']);
+        $address_3 = $this->sanitise_string($_GET['address_3']);
+        $address_4 = $this->sanitise_string($_GET['address_4']);
+        $address_postcode = $this->sanitise_string($_GET['address_postcode']);
         $this->visitor_model->populate_from_db($visitor_id);
         if($this->visitor_model->edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0; //successfully edited visitor
         else $returnValue = -2; //error with query
@@ -76,7 +94,7 @@ class Visitor_Controller
     public function delete()
     {
         $returnValue = -1; //unknown error
-        $visitor_id = $_GET['visitor_id'];
+        $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
         $this->visitor_model->populate_from_db($visitor_id);
         if($this->visitor_model->delete($visitor_id)==0) $returnValue = 0; //successfully deleted visitor
         else $returnValue = -2; //error with query
@@ -129,6 +147,7 @@ class Visitor_Controller
     public function check_out_device()
     {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
+        $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
         for($i = 1; $i < (NUMBER_OF_VISITOR_DEVICES+1); $i++) { //+1 as NUMBER_OF_VISITOR_DEVICES is human number, not computer number
             // connect to FTP server
             $host = VISITOR_DEVICE_PREFIX.'-'.$i;
@@ -146,7 +165,7 @@ class Visitor_Controller
                         $device_ready_json = json_decode($contents, true);
                         //now read the JSON file - is this device ready for a visitor to take out, already in use, or performing a system update?
                         if ($device_ready_json['status']['code']==1) { //if device is ready, copy over visitor ID in JSON via SFTP
-                            $visitor["data"] = array("visitor_id"=>$_GET['visitor_id']);
+                            $visitor["data"] = array("visitor_id"=>$visitor_id);
                             $visitor_json = json_encode($visitor, JSON_PRETTY_PRINT);
                             
                             $local_file = PUBLISHED_CONTENT_FOLDER."visitor.json";

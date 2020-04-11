@@ -126,48 +126,12 @@ class Content_View
 
 
     /**
-     * Short description of method JSONify_All_Visitors
+     * Short description of method JSONify_All_Contents
      *
      * @return void
      */
     public function JSONify_All_Contents() {
-        $array_of_contents = $this->content_controller->all_contents;
-        // print('array_of_contents: <pre>'.print_r($array_of_contents,true).'</pre>');
-        $individual_content = array();
-        if(count($array_of_contents)<=0) return '{"data": []}'; //if array is empty, provide empty JSON for datatables to read correctly.
-        else {
-            foreach($array_of_contents as $obj=>$contents) {
-
-                $content_details_array = array();
-                $content_details_array['name'] = $contents->name;
-                $content_details_array['tag_id'] = $contents->tag_id;
-                $content_details_array['content_id'] = $contents->content_id;
-                $content_details_array['item_id'] = $contents->item_id;
-                if($contents->active==1)
-                    $content_details_array['active'] = 'Yes';
-                else
-                    $content_details_array['active'] = 'No';
-                $content_details_array['created'] = date("d/m/Y \a\\t H:i", strtotime($contents->created));
-                $last_modified = date("d/m/Y \a\\t H:i", strtotime($contents->last_modified));
-                if(strlen($contents->modified_by) > 1) $last_modified = $last_modified. ' by ' . $contents->modified_by;
-                else $last_modified = $last_modified. ' by [deleted staff member]';
-                $content_details_array['last_modified'] = $last_modified;
-                $content_details_array['tts_enabled'] = $contents->tts_enabled;
-                $content_details_array['written_text'] = $contents->written_text;
-                $content_details_array['gesture_id'] = $contents->gesture_id;
-                $content_details_array['gesture_name'] = $contents->gesture_name;
-                $content_details_array['next_content_id'] = $contents->next_content_id;
-                $content_details_array['next_content_name'] = $contents->next_content_name;
-
-                $content_as_json = json_encode($contents, JSON_HEX_APOS);
-                $content_details_array['buttons'] = "<a href='#' data-toggle='modal' data-id='$content_as_json' class='editContentModalBox btn-success btn-circle btn-sm' data-target='#editContentModalCenter'><i class='fas fa-edit bg-success'></i></a>";
-                $content_details_array['buttons'] = $content_details_array['buttons'] . " <a href='#' data-toggle='modal' data-id='$content_as_json' class='deleteContentModalBox btn-success btn-circle btn-sm' data-target='#deleteContentModalCenter'><i class='fas fa-trash'></i></a>";
-
-
-                $individual_content["data"][] = $content_details_array;
-            }
-            return json_encode($individual_content, JSON_PRETTY_PRINT );
-        }
+        echo $this->content_controller->JSONify_All_Contents();
     }
 
     /**

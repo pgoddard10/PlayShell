@@ -23,14 +23,37 @@ class Item_Controller
     }
 
     /**
+     * method sanitise_string()
+     * Takes a string and performs sanitising techniques to help avoid xss attacks etc.
+     * 
+     * @param  String data
+     * @param  Bool isurl
+     * @return String data
+     */
+    private function sanitise_string($data,$isurl=false) {
+        $data = filter_var($data, FILTER_SANITIZE_STRING);
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        if($isurl) $data = filter_var($data, FILTER_VALIDATE_URL); //if the url is not valid, just don't save it as it's not a required field
+        return $data;
+    }
+
+    /**
      * Short description of method create_new
      *
      * @param 
      * @return Integer
      */
-    public function create_new($heritage_id, $name, $location, $url, $active, $modified_by)
+    public function create_new($modified_by)
     {
         $returnValue = -1;//unknown error
+        $heritage_id = $this->sanitise_string($_GET['heritage_id']);
+        $name = $this->sanitise_string($_GET['name']);
+        $location = $this->sanitise_string($_GET['location']);
+        $url = $this->sanitise_string($_GET['url'],true);
+        $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
+        $modified_by = filter_var($modified_by, FILTER_VALIDATE_INT);
         if($this->item_model->create_new($heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0;
         return $returnValue;
     }
@@ -41,9 +64,16 @@ class Item_Controller
      * @param  
      * @return Integer
      */
-    public function edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)
+    public function edit()
     {
         $returnValue = -1; //unknown error
+        $heritage_id = $this->sanitise_string($_GET['heritage_id']);
+        $name = $this->sanitise_string($_GET['name']);
+        $location = $this->sanitise_string($_GET['location']);
+        $url = $this->sanitise_string($_GET['url'],true);
+        $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
+        $modified_by = filter_var($_GET['modified_by'], FILTER_VALIDATE_INT);
+        $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
         $this->item_model->populate_from_db($item_id);
         if($this->item_model->edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0; //successfully edited visitor
         else $returnValue = -2; //error with query
@@ -56,9 +86,10 @@ class Item_Controller
      * @param  item_id
      * @return Integer
      */
-    public function delete($item_id)
+    public function delete()
     {
         $returnValue = -1; //unknown error
+        $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
         $this->item_model->populate_from_db($item_id);
         if($this->item_model->delete($item_id)==0) $returnValue = 0; //successfully deleted the item
         else $returnValue = -2; //error with query

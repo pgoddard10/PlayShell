@@ -22,13 +22,13 @@ if(isset($_GET['item_id'])) $content_view = new Content_View($_GET['item_id']);
 else $content_view = new Content_View();
 switch($_GET['action']) {
     case 'new_item':
-        $item_view->create_new($_GET['heritage_id'],$_GET['name'],$_GET['location'],$_GET['url'],$_GET['active'],$logged_in_staff_id);
+        $item_view->create_new($logged_in_staff_id);
         break;
     case 'edit_item':
-        $item_view->edit($_GET['item_id'],$_GET['heritage_id'],$_GET['name'],$_GET['location'],$_GET['url'],$_GET['active'],$logged_in_staff_id);
+        $item_view->edit($logged_in_staff_id);
         break;
     case 'delete_item':
-        $item_view->delete($_GET['item_id']);
+        $item_view->delete();
         break;
     case 'new_content':
         $content_view->create_new($logged_in_staff_id);

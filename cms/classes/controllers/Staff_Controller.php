@@ -25,15 +25,83 @@ class Staff_Controller
         $this->role_model = new Role_Model();
     }
 
+
+    /**
+     * method sanitise_string()
+     * Takes a string and performs sanitising techniques to help avoid xss attacks etc.
+     * 
+     * @param  String data
+     * @param  Bool isemail
+     * @return String data
+     */
+    private function sanitise_string($data,$isemail=false) {
+        $data = filter_var($data, FILTER_SANITIZE_STRING);
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        if($isemail) $data = filter_var($data, FILTER_VALIDATE_EMAIL); //if the email address is not valid, just don't save it as it's not a required field
+        return $data;
+    }
+
+    /**
+     * Short description of method JSONify_All_Staff
+     *
+     * @return void
+     */
+    public function JSONify_All_Staff()
+    {
+        $data = array();
+        if(count($this->all_staff)<=0) return '{"data": []}'; //empty JSON for datatables to read correctly.
+        foreach($this->all_staff as $staff_member=>$details) {
+            $mystaff = array();
+            $mystaff['name'] = $details->display_name;
+            $mystaff['username'] = $details->username;
+            $mystaff['email'] = $details->email;
+            $mystaff['roles'] = null;
+            if($details->roles) {
+                foreach($details->roles as $role) {
+                    $mystaff['roles'] = $mystaff['roles'].$role['name'].'<br />';
+                }
+            }
+            else {
+                $mystaff['roles'] = "[No assigned roles]";
+            }
+            if($details->active==1)
+                $mystaff['active'] = 'Yes';
+            else
+                $mystaff['active'] = 'No';
+            $staff_as_json = json_encode($details, JSON_HEX_APOS);
+            $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
+            if($details->active==1) {
+                $mystaff['buttons'] = $mystaff['buttons'] . " | <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-pause-circle'></i></a>";
+            }
+            $data["data"][] = $mystaff;
+        }
+        return json_encode($data,JSON_PRETTY_PRINT);
+    }
+
     /**
      * Short description of method create_new
      *
      * @param  array<> staff_data
      * @return Integer
      */
-    public function create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)
+    public function create_new()
     {
         $returnValue = -1;
+        if(isset($_GET['roles'])){
+            $roles = $_GET['roles'];
+        }
+        else {
+            $roles = array();
+        }
+        $first_name = $this->sanitise_string($_GET['first_name']);
+        $last_name = $this->sanitise_string($_GET['last_name']);
+        $username = $this->sanitise_string($_GET['username']);
+        $password  = $_GET['password'];
+        $repeat_password  = $_GET['repeat_password'];
+        $email = $this->sanitise_string($_GET['email'],true);
+
         $username = strtolower($username);
         if($password != $repeat_password) $returnValue =-2; //password mis-match
         else {
@@ -49,10 +117,25 @@ class Staff_Controller
      * @param  array<> staff_data
      * @return Integer
      */
-    public function edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active, $roles)
+    public function edit()
     {
-        $this->staff_model->populate_from_db($staff_id);
         $returnValue = -1; //unknown error
+
+        if(isset($_GET['roles'])){
+            $roles = $_GET['roles'];
+        }
+        else {
+            $roles = array();
+        }
+        $staff_id = filter_var($_GET['staff_id'], FILTER_VALIDATE_INT);
+        $first_name = $this->sanitise_string($_GET['first_name']);
+        $last_name = $this->sanitise_string($_GET['last_name']);
+        $password  = $_GET['password'];
+        $repeat_password  = $_GET['repeat_password'];
+        $email = $this->sanitise_string($_GET['email'],true);
+        $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
+
+        $this->staff_model->populate_from_db($staff_id);
         if($password != $repeat_password) $returnValue =-2; //password mis-match
         else {
 			if(strlen($password)>8) { //only replace password if one was provided
@@ -92,7 +175,7 @@ class Staff_Controller
      * @param  staff_id
      * @return Integer
      */
-    public function deactivate($staff_id)
+    public function deactivate()
     {
         $returnValue = -1;
         //check to see if this person is staff DB manager in DB
@@ -108,7 +191,7 @@ class Staff_Controller
         if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1) && (!in_array(STAFF_DB_MANAGER,$roles))) { //check how many staffDBmanagers exist in total
             $returnValue = -3; //cannot remove the role for last DB manager
         }
-        else if($this->staff_model->deactivate($staff_id)==0) {
+        else if($this->staff_model->deactivate()==0) {
             $returnValue = 0;
         }
         return $returnValue;

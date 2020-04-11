@@ -26,10 +26,10 @@ class Item_View
      * 
      * @return void
      */
-    public function create_new($heritage_id, $name, $location, $url, $active, $modified_by)
+    public function create_new($modified_by)
     {
-        $success = $this->item_controller->create_new($heritage_id, $name, $location, $url, $active, $modified_by);
-        if($success==0) $msg = "Successfully created $name.";
+        $success = $this->item_controller->create_new($modified_by);
+        if($success==0) $msg = "Successfully created the item.";
         else $msg = "An unknown error occurred.";
         ?>
               <!-- Add Message Card -->
@@ -46,19 +46,19 @@ class Item_View
      *
      * @return void
      */
-    public function edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)
+    public function edit()
     { 
-        $success = $this->item_controller->edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by);
+        $success = $this->item_controller->edit();
         switch($success) {
             case 0:
-                $msg = "Successfully edited $name.";
+                $msg = "Successfully edited the item.";
                 break;
             case -2:
-                $msg = "Changes for $name were not saved. There was a database error editing the item details.";
+                $msg = "Changes for the item were not saved. There was a database error editing the item details.";
                 break;
             case -1:
             default:
-                $msg = "Changes for $name were not saved. An unknown error occurred.";
+                $msg = "Changes for the item were not saved. An unknown error occurred.";
                 break;
         }
         ?>
@@ -77,9 +77,9 @@ class Item_View
      * @param  item_id
      * @return void
      */
-    public function delete($item_id)
+    public function delete()
     {
-        $success = $this->item_controller->delete($item_id);
+        $success = $this->item_controller->delete();
         if($success==0) $msg = "Successfully deleted the item.";
         else $msg = "An unknown error occurred.";
         ?>

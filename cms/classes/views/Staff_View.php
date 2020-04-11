@@ -32,10 +32,10 @@ class Staff_View
      * @param  array<Integer>
      * @return void
      */
-    public function create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)
+    public function create_new()
     {
-        $success = $this->staff_controller->create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles);
-        if($success==0) $msg = "Successfully created $first_name $last_name.";
+        $success = $this->staff_controller->create_new();
+        if($success==0) $msg = "Successfully created 'staff member'.";
         if($success==-1) $msg = "An unknown error occurred.";
         if($success==-2) $msg = "Password mis-match";
         ?>
@@ -61,28 +61,28 @@ class Staff_View
      * @param  array<Integer> roles
      * @return void
      */
-    public function edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active, $roles)
+    public function edit()
     { 
-        $success = $this->staff_controller->edit($staff_id, $first_name, $last_name, $password, $repeat_password, $email, $active, $roles);
+        $success = $this->staff_controller->edit();
         switch($success) {
             case 0:
-                $msg = "Successfully edited $first_name $last_name.";
+                $msg = "Successfully edited staff member.";
                 break;
             case -2:
-                $msg = "Changes for $first_name $last_name were not saved. The specified passwords do not match.";
+                $msg = "Changes for staff member were not saved. The specified passwords do not match.";
                 break;
             case -3:
-                $msg = "Changes for $first_name $last_name were not saved. You cannot remove the role for the last Staff Database Manager.";
+                $msg = "Changes for staff member were not saved. You cannot remove the role for the last Staff Database Manager.";
                 break;
             case -4:
-                $msg = "Changes for $first_name $last_name were not saved. There was a database error editing the staff details.";
+                $msg = "Changes for staff member were not saved. There was a database error editing the staff details.";
                 break;
             case -5:
-                $msg = "Changes for $first_name $last_name were not saved. There was a database error editing the roles.";
+                $msg = "Changes for staff member were not saved. There was a database error editing the roles.";
                 break;
             case -1:
             default:
-                $msg = "Changes for $first_name $last_name were not saved. An unknown error occurred.";
+                $msg = "Changes for staff member were not saved. An unknown error occurred.";
                 break;
         }
         ?>
@@ -101,9 +101,9 @@ class Staff_View
      * @param  staff_id
      * @return void
      */
-    public function deactivate($staff_id)
+    public function deactivate()
     {
-        $success = $this->staff_controller->deactivate($staff_id);
+        $success = $this->staff_controller->deactivate();
         if($success==0) $msg = "Successfully deactivated the member of staff.";
         if($success==-1) $msg = "An unknown error occurred.";
         ?>
@@ -123,34 +123,7 @@ class Staff_View
      */
     public function JSONify_All_Staff()
     {
-        $data = array();
-        if(count($this->staff_controller->all_staff)<=0) return '{"data": []}'; //empty JSON for datatables to read correctly.
-        foreach($this->staff_controller->all_staff as $staff_member=>$details) {
-            $mystaff = array();
-            $mystaff['name'] = $details->display_name;
-            $mystaff['username'] = $details->username;
-            $mystaff['email'] = $details->email;
-            $mystaff['roles'] = null;
-            if($details->roles) {
-                foreach($details->roles as $role) {
-                    $mystaff['roles'] = $mystaff['roles'].$role['name'].'<br />';
-                }
-            }
-            else {
-                $mystaff['roles'] = "[No assigned roles]";
-            }
-            if($details->active==1)
-                $mystaff['active'] = 'Yes';
-            else
-                $mystaff['active'] = 'No';
-            $staff_as_json = json_encode($details, JSON_HEX_APOS);
-            $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-            if($details->active==1) {
-                $mystaff['buttons'] = $mystaff['buttons'] . " | <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox' data-target='#deactivateModalCenter'><i class='.btn-circle .btn-sm fas fa-pause-circle'></i></a>";
-            }
-            $data["data"][] = $mystaff;
-        }
-        echo json_encode($data,JSON_PRETTY_PRINT);
+        echo $this->staff_controller->JSONify_All_Staff();
     }
 
     /**

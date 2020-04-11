@@ -16,21 +16,15 @@ $authenticate_view->page_permissions(STAFF_DB_MANAGER);
 
 require_once('classes/views/Staff_View.php');
 $staff_view = new Staff_View();
-if(isset($_GET['roles'])){
-    $roles = $_GET['roles'];
-}
-else {
-    $roles = array();
-}
 switch($_GET['action']) {
     case 'new':
-        $staff_view->create_new($_GET['first_name'],$_GET['last_name'],$_GET['username'],$_GET['password'],$_GET['repeat_password'],$_GET['email'],$roles);
+        $staff_view->create_new();
         break;
     case 'edit':
-        $staff_view->edit($_GET['staff_id'],$_GET['first_name'],$_GET['last_name'],$_GET['password'],$_GET['repeat_password'],$_GET['email'],$_GET['active'],$roles);
+        $staff_view->edit();
         break;
     case 'deactivate':
-        $staff_view->deactivate($_GET['staff_id']);
+        $staff_view->deactivate();
         break;
 }
 ?>

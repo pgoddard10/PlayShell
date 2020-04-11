@@ -29,7 +29,7 @@ class Visitor_View
     public function create_new()
     {
         $success = $this->visitor_controller->create_new();
-        if($success==0) $msg = "Successfully created ".$_GET['first_name']." ".$_GET['last_name'].".";
+        if($success==0) $msg = "Successfully created the visitor.";
         else $msg = "An unknown error occurred.";
         ?>
               <!-- Add Message Card -->
@@ -51,14 +51,14 @@ class Visitor_View
         $success = $this->visitor_controller->edit();
         switch($success) {
             case 0:
-                $msg = "Successfully edited ".$_GET['first_name']." ".$_GET['last_name'].".";
+                $msg = "Successfully edited the visitor.";
                 break;
             case -2:
-                $msg = "Changes for ".$_GET['first_name']." ".$_GET['last_name']." were not saved. There was a database error editing the visitor details.";
+                $msg = "Changes for the visitor were not saved. There was a database error editing the visitor details.";
                 break;
             case -1:
             default:
-                $msg = "Changes for ".$_GET['first_name']." ".$_GET['last_name']." were not saved. An unknown error occurred.";
+                $msg = "Changes for the visitor were not saved. An unknown error occurred.";
                 break;
         }
         ?>
