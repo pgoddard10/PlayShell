@@ -25,22 +25,22 @@ switch($_GET['page']) {
     case 'visitor':
         $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
         $visitor_view = new Visitor_View();
-        $visitor_view->JSONify_All_Visitors();
+        $visitor_view->print_json();
         break;
     case 'staff':
         $authenticate_view->page_permissions(STAFF_DB_MANAGER);
         $staff_view = new Staff_View();
-        $staff_view->JSONify_All_Staff();
+        $staff_view->print_json();
         break;
     case 'item':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
         $item_view = new Item_View();
-        $item_view->JSONify_All_Items();
+        $item_view->print_json();
         break;
     case 'content':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
         $content_view = new Content_View($_GET['item_id']);
-        echo $content_view->JSONify_All_Contents();
+        $content_view->print_json();
         break;
 }
 ?>

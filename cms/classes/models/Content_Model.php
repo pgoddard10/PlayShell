@@ -138,10 +138,10 @@ class Content_Model
                             //Create our directory if it does not exist
                             mkdir($dir_name);
                         }
-                        $complete_file_path = $dir_name."sound.mp3";
+                        $complete_file_path = $dir_name."sound.wav";
                         $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
                         // Allow certain file formats
-                        if($file_type != "mp3") {
+                        if($file_type != "wav") {
                             $returnValue = -4; //file is of non-accepted filetype
                         }
                         else if (move_uploaded_file($_FILES["sound_file"]["tmp_name"][0], $complete_file_path)) {
@@ -198,7 +198,7 @@ class Content_Model
                             //Create our directory if it does not exist
                             mkdir($dir_name);
                         }
-                        $complete_file_path = $dir_name."sound.mp3";
+                        $complete_file_path = $dir_name."sound.wav";
                         $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
                         // Allow certain file formats
                         if($file_type != "mp3") {
@@ -265,7 +265,7 @@ class Content_Model
             mkdir($dir_name);
         }
 
-		if(file_put_contents($dir_name.'sound.mp3', $tts->getAudioData())) {
+		if(file_put_contents($dir_name.'sound.wav', $tts->getAudioData())) {
 			$returnValue = 0;
         }
         return $returnValue;
@@ -280,7 +280,7 @@ class Content_Model
     public function delete_soundfile()
     {
         $returnValue = -1; //unknown error
-        $file_name = AUDIO_FOLDER.$this->item_id.'/'. $this->content_id.'/sound.mp3';
+        $file_name = AUDIO_FOLDER.$this->item_id.'/'. $this->content_id.'/sound.wav';
         if (file_exists($file_name)) {
             if(unlink($file_name)) $returnValue = 0;
         }

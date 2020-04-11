@@ -77,7 +77,7 @@ class Staff_Controller
             }
             $data["data"][] = $mystaff;
         }
-        return json_encode($data,JSON_PRETTY_PRINT);
+        return json_encode($data, JSON_HEX_APOS);
     }
 
     /**
@@ -106,6 +106,7 @@ class Staff_Controller
         if($password != $repeat_password) $returnValue =-2; //password mis-match
         else {
             $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+            //now that everything has been checked and filter, pass data to the model for database interaction
             if($this->staff_model->create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)==0) $returnValue = 0;
         }
         return $returnValue;
@@ -158,6 +159,7 @@ class Staff_Controller
                 $returnValue = -3; //cannot remove the role for last DB manager
             }
             else {
+                //now that everything has been checked and filter, pass data to the model for database interaction
                 if($this->staff_model->edit($staff_id, $first_name, $last_name, $password, $email, $active)==0) {
                     if($this->staff_model->edit_roles($roles)==0)
                         $returnValue = 0;

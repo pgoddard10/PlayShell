@@ -401,7 +401,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
           contentType: false,
           data: data,
           success: function (result) {
-            console.log("successfully created");
             $("#div1").html(result);
           },
           error: function (e) {
@@ -484,8 +483,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
         data.append("sound_file[]", file_data[i]);
     }
     
-    //Custom data
-    data.append('key', 'value');
+    console.log(form_data);
 
 
     //send the data as a GET request to the PHP page specified in direct_to_url

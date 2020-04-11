@@ -34,6 +34,7 @@ class ComposerStaticInit87d137645cdd35b44e427d5ae7a9a44a
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'L' => 
         array (
@@ -87,6 +88,10 @@ class ComposerStaticInit87d137645cdd35b44e427d5ae7a9a44a
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'League\\CLImate\\' => 
         array (

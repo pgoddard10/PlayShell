@@ -97,7 +97,7 @@ class Visitor_View
      *
      * @return void
      */
-    public function JSONify_All_Visitors()
+    public function print_json()
     {
         echo $this->visitor_controller->JSONify_All_Visitors();
     }

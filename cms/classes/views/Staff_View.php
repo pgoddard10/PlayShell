@@ -121,7 +121,7 @@ class Staff_View
      *
      * @return void
      */
-    public function JSONify_All_Staff()
+    public function print_json()
     {
         echo $this->staff_controller->JSONify_All_Staff();
     }

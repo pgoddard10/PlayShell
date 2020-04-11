@@ -46,9 +46,9 @@ class Item_View
      *
      * @return void
      */
-    public function edit()
+    public function edit($modified_by)
     { 
-        $success = $this->item_controller->edit();
+        $success = $this->item_controller->edit($modified_by);
         switch($success) {
             case 0:
                 $msg = "Successfully edited the item.";
@@ -97,7 +97,7 @@ class Item_View
      *
      * @return void
      */
-    public function JSONify_All_Items()
+    public function print_json()
     {
         echo $this->item_controller->JSONify_All_Items();
     }

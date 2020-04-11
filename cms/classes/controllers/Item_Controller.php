@@ -54,6 +54,7 @@ class Item_Controller
         $url = $this->sanitise_string($_GET['url'],true);
         $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
         $modified_by = filter_var($modified_by, FILTER_VALIDATE_INT);
+        //now that everything has been checked and filter, pass data to the model for database interaction
         if($this->item_model->create_new($heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0;
         return $returnValue;
     }
@@ -64,7 +65,7 @@ class Item_Controller
      * @param  
      * @return Integer
      */
-    public function edit()
+    public function edit($modified_by)
     {
         $returnValue = -1; //unknown error
         $heritage_id = $this->sanitise_string($_GET['heritage_id']);
@@ -72,9 +73,9 @@ class Item_Controller
         $location = $this->sanitise_string($_GET['location']);
         $url = $this->sanitise_string($_GET['url'],true);
         $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
-        $modified_by = filter_var($_GET['modified_by'], FILTER_VALIDATE_INT);
         $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
         $this->item_model->populate_from_db($item_id);
+        //now that everything has been checked and filter, pass data to the model for database interaction
         if($this->item_model->edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0; //successfully edited visitor
         else $returnValue = -2; //error with query
         return $returnValue;
@@ -200,7 +201,7 @@ class Item_Controller
                 $individual_item['buttons'] = $individual_item['buttons'] . " <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox btn-circle btn-sm btn-primary' data-target='#deleteItemModalCenter'><i class='fas fa-trash'></i></a>";
                 $data["data"][] = $individual_item;
             }
-            return json_encode($data, JSON_PRETTY_PRINT );
+            return json_encode($data, JSON_HEX_APOS);
         }
     }
 

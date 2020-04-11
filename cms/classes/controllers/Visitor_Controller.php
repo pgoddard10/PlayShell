@@ -57,6 +57,7 @@ class Visitor_Controller
         $address_3 = $this->sanitise_string($_GET['address_3']);
         $address_4 = $this->sanitise_string($_GET['address_4']);
         $address_postcode = $this->sanitise_string($_GET['address_postcode']);
+        //now that everything has been checked and filter, pass data to the model for database interaction
         if($this->visitor_model->create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0;
         return $returnValue;
     }
@@ -80,6 +81,7 @@ class Visitor_Controller
         $address_4 = $this->sanitise_string($_GET['address_4']);
         $address_postcode = $this->sanitise_string($_GET['address_postcode']);
         $this->visitor_model->populate_from_db($visitor_id);
+        //now that everything has been checked and filter, pass data to the model for database interaction
         if($this->visitor_model->edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0; //successfully edited visitor
         else $returnValue = -2; //error with query
         return $returnValue;
@@ -121,7 +123,7 @@ class Visitor_Controller
             $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='btn_checkOutModal' data-target='#checkOutModalCenter'><i class='.btn-circle .btn-sm fas fa-sign-out-alt'></i></a>";
             $data["data"][] = $myvisitor;
         }
-        return json_encode($data);
+        return json_encode($data, JSON_HEX_APOS);
     }
 
     /**
@@ -164,16 +166,16 @@ class Visitor_Controller
                         $contents = fread($stream, filesize("ssh2.sftp://$sftp$remote_file"));   
                         $device_ready_json = json_decode($contents, true);
                         //now read the JSON file - is this device ready for a visitor to take out, already in use, or performing a system update?
-                        if ($device_ready_json['status']['code']==1) { //if device is ready, copy over visitor ID in JSON via SFTP
+                        if ($device_ready_json['status']['code']==DEVICE_READY) { //if device is ready, copy over visitor ID in JSON via SFTP
                             $visitor["data"] = array("visitor_id"=>$visitor_id);
-                            $visitor_json = json_encode($visitor, JSON_PRETTY_PRINT);
+                            $visitor_json = json_encode($visitor, JSON_HEX_APOS);
                             
                             $local_file = PUBLISHED_CONTENT_FOLDER."visitor.json";
                             $fp = fopen($local_file, 'w');
                             fwrite($fp, $visitor_json);
                             fclose($fp);
                             chmod($local_file,0666); //set permissions
-                            $remote_file = DEVICE_DATA_FOLDER."visitor.json";
+                            $remote_file = DEVICE_DATA_FOLDER."incoming_visitor_id.json";
                             $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'w');
                             if (! $stream)
                                 break; //throw new Exception("Could not open file: $remote_file");
@@ -188,6 +190,26 @@ class Visitor_Controller
                             $fp = fopen($local_file, 'w');
                             fwrite($fp, "");
                             fclose($fp);
+
+
+                            //change the status on the device to 'in use'
+                            $local_file = PUBLISHED_CONTENT_FOLDER."status.json";
+                            $status_data["status"] = array("code"=>DEVICE_IN_USE, "name"=>"in use");
+                            $status_json = json_encode($status_data, JSON_HEX_APOS);
+                            $fp = fopen($local_file, 'w');
+                            fwrite($fp, $status_json);
+                            fclose($fp);
+                            chmod($local_file,0666); //set permissions
+                            $remote_file = DEVICE_DATA_FOLDER."status.json";
+                            $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'w');
+                            if (! $stream)
+                                break; //throw new Exception("Could not open file: $remote_file");
+                            $data_to_send = @file_get_contents($local_file);
+                            if ($data_to_send === false)
+                                break; //throw new Exception("Could not open local file: $local_file.");
+                            if (@fwrite($stream, $data_to_send) === false)
+                                break; //throw new Exception("Could not send data from file: $local_file.");
+                            @fclose($stream);
 
                             //report back the device ID in a nice, positive way.
                             $returnValue["data"] = array("hostname"=>$host,"status"=>"ready");
@@ -207,7 +229,7 @@ class Visitor_Controller
             else
                 $returnValue["data"]["error"] = array("code"=>-2,"description"=>"There are currently no available devices for use. Please ensure any returned devices have been checked-in.");
         }
-        return json_encode($returnValue, JSON_PRETTY_PRINT );
+        return json_encode($returnValue, JSON_HEX_APOS);
 
     }
 

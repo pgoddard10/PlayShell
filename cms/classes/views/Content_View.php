@@ -130,7 +130,7 @@ class Content_View
      *
      * @return void
      */
-    public function JSONify_All_Contents() {
+    public function print_json() {
         echo $this->content_controller->JSONify_All_Contents();
     }
 
@@ -176,7 +176,7 @@ class Content_View
                                     </div>
                                     <div id="collapseTwo" class="collapse" aria-labelledby="No" data-parent="#accordion">
                                         <label for="new_sound_file">Upload your own audio file</label>
-                                        <input type="file" class="form-control-file" id="new_sound_file" name="new_sound_file" accept="audio/*">
+                                        <input type="file" class="form-control-file" id="new_sound_file" name="new_sound_file" accept="audio/wav">
                                     </div>
                                 </div>
                             </div>
@@ -246,11 +246,11 @@ class Content_View
                             <div class="form-group">
                                 Use Text-To-Speech to create the audio file?<br />
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" id="edit_tts_enabled_yes" data-toggle="collapse" data-target="#edit_collapseOne" aria-expanded="false" aria-controls="edit_collapseOne" required>
+                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" value="1" id="edit_tts_enabled_yes" data-toggle="collapse" data-target="#edit_collapseOne" aria-expanded="false" aria-controls="edit_collapseOne" required>
                                     <label class="form-check-label" for="edit_tts_enabled_yes">Yes</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" id="edit_tts_enabled_no" class="btn btn-link collapsed" data-toggle="collapse" data-target="#edit_collapseTwo" aria-expanded="false" aria-controls="edit_collapseTwo">
+                                    <input class="form-check-input" type="radio" name="edit_tts_enabled" value="0" id="edit_tts_enabled_no" class="btn btn-link collapsed" data-toggle="collapse" data-target="#edit_collapseTwo" aria-expanded="false" aria-controls="edit_collapseTwo">
                                     <label class="form-check-label" for="edit_tts_enabled_no">No</label>
                                 </div>
 
@@ -261,7 +261,7 @@ class Content_View
                                     </div>
                                     <div id="edit_collapseTwo" class="collapse" aria-labelledby="No" data-parent="#edit_accordion">
                                         <label for="edit_sound_file" id="edit_sound_file_label">Upload your own audio file</label>
-                                        <input type="file" class="form-control-file" id="edit_sound_file" name="edit_sound_file" accept="audio/*">
+                                        <input type="file" class="form-control-file" id="edit_sound_file" name="edit_sound_file" accept="audio/wav">
                                     </div>
                                 </div>
                             </div>
