@@ -9,10 +9,7 @@ Content_View::~Content_View() {
 
 
 int Content_View::update_db() {
-    std::cout << "hello - this is int Content_View::update_db()" << std::endl;
-
-    // this->content_controller->update_db();
-    
+    (*content_controller).update_db();
     return 0;
 }
 

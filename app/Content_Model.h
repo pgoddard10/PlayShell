@@ -10,7 +10,6 @@
 #include <wiringPi.h> //used for the delay() function
 
 
-
 class Content_Model {
     private:
         int content_id;

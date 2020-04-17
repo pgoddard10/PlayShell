@@ -12,20 +12,10 @@ Content_Controller::~Content_Controller() {
 
 
 int Content_Controller::update_db() {
-    std::cout << "hello - this is int Content_Controller::update_db()" << std::endl;
 
 
-    //loop through json, sanity check stuff
-    //call Model to update the database
-
-
-
-        // for (Json::Value::ArrayIndex i = 0; i != obj.size(); i++)
-        //     if (obj[i].isMember("attr1"))
-        //         values.push_back(obj[i]["attr1"].asString());
-
-        
-        // current_status = obj["status"]["code"].asInt();
+    Content_Model* tmp_model = new Content_Model();
+    (*tmp_model).read_new_content_json();
 
     return 0;
 }

@@ -35,11 +35,8 @@ int main() {
         
         content_view->populate_from_db();
         if(current_status==DEVICE_STATUS_READY) {
-            std::cout << "compare to last_update in db" << std::endl;
-            std::cout << "if new content > db content run update" << std::endl;
-            std::cout << "\tdelete the models from memory" << std::endl;
-            std::cout << "\tsetup the models again from the db" << std::endl;
-            std::cout << "else ignore/do nothing" << std::endl;
+            content_view->update_db();
+            break;
         }
         else if(current_status==DEVICE_STATUS_IN_USE) {
             std::cout << "get scanning the tags, etc" << std::endl;

@@ -95,26 +95,64 @@ int Content_Model::populate_from_db(int content_id) {
 }
 
 Json::Value Content_Model::read_new_content_json() {
-
-    std::cout << "hello - this is Json::Value Content_Model::read_new_content_json()" << std::endl;
-
     //read the JSON file and get the content ID
     std::cout << this->new_content_json << std::endl;
-    std::ifstream ifs_json("cms_data_exchange/published_content.json");
+    std::ifstream ifs_json(this->new_content_json);
     Json::Value obj;
     if(ifs_json.is_open()) { //only continue if the file is found
         Json::Reader reader;
-        reader.parse(ifs_json, obj);
+
+        bool parsingSuccessful = reader.parse(ifs_json, obj);
+        if ( !parsingSuccessful ) {
+            std::cout << "Error parsing the string" << std::endl;
+        }
 
 
-        // for (Json::Value::ArrayIndex i = 0; i != obj.size(); i++)
-        //     if (obj[i].isMember("attr1"))
-        //         values.push_back(obj[i]["attr1"].asString());
+        //clear out the database so it's ready for the new data
+        DELETE FROM content
+        DELETE FROM item
 
+
+
+        const Json::Value data = obj["data"]; //grab the top level from the JSON file
+
+        for (uint i = 0; i < data.size(); ++i ){ //start looping through the top levels (i.e. the Items)
+            for(uint j = 0; j < data[i]["content"].size(); j++) { //loop through the second level (i.e. the Content)
+
+                //set some temporary variables
+                int item_active;
+                int content_active;
+                int gesture;
+                int content_id;
+                int item_id;
+                int next_content;
+                std::string tag_id;
+
+                //get the data from the JSON file and correctly convert into the relevant data types
+                item_id = data[i]["item_id"].asInt();
+                content_id = stoi(data[i]["content"][j]["content_id"].asString());
+                if(!data[i]["content"][j]["gesture_id"].asString().empty()) {
+                    gesture = stoi(data[i]["content"][j]["gesture_id"].asString());
+                }
+                if(!data[i]["content"][j]["next_content_id"].asString().empty()) {
+                    next_content = stoi(data[i]["content"][j]["next_content_id"].asString());
+                }
+                tag_id = data[i]["content"][j]["tag_id"].asString();
+                content_active = data[i]["content"][j]["active"].asInt();
+                if((data[i]["active"].asString().compare("Yes")) == 0){ //convert the Yes/No into 1/0
+                    item_active = 1;
+                }
+                else {
+                    item_active = 0;
+                }
+
+                //only save content if it's active, otherwise it's a waste of resources
+                if(item_active && content_active) {
+                    //commit to database
+                }
+            }
+        }
         
-        // current_status = obj["status"]["code"].asInt();
-
-
         ifs_json.close(); //close the file handler
     }
     return obj;

@@ -15,7 +15,6 @@ class Content_Controller {
     private:
         std::vector< Content_Model* > content_models;
         std::vector< Visitor_Model* > visitor_models;
-        int update_db();
 
     public:
         Content_Controller();
@@ -23,6 +22,7 @@ class Content_Controller {
         int populate_from_db();
         std::string get_nfc_ID();
         int play_content();
+        int update_db();
 };
 
 #endif // Content_Controller_h

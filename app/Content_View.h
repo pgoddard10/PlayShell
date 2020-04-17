@@ -7,13 +7,13 @@
 class Content_View {
 
     private:
-        int update_db();
 
     public:
         Content_View();
         ~Content_View();
         Content_Controller* content_controller;// = new Content_Controller();
         int scan_tag();
+        int update_db();
         int populate_from_db();
 };
 
