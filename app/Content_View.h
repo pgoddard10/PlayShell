@@ -13,7 +13,8 @@ class Content_View {
         Content_View();
         ~Content_View();
         Content_Controller* content_controller;// = new Content_Controller();
-        int get_nfc_ID();
+        int scan_tag();
+        int populate_from_db();
 };
 
 #endif // Content_View_h

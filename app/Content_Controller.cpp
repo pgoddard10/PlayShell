@@ -30,6 +30,20 @@ int Content_Controller::update_db() {
     return 0;
 }
 
+
+int Content_Controller::populate_from_db() {
+    Content_Model* tmp_model = new Content_Model();
+    std::vector<int> content_ids;
+    content_ids = (*tmp_model).get_all_ids_from_db();
+    // std::cout << "The number of content IDs found is: " << content_ids.size() << std::endl;
+    for(std::vector<int> :: iterator it = content_ids.begin(); it != content_ids.end(); ++it){
+        Content_Model* new_content_model = new Content_Model();
+        (*new_content_model).populate_from_db(*it);
+        this->content_models.push_back(new_content_model);
+    }
+    return 0;
+}
+
 std::string Content_Controller::get_nfc_ID(){
 	char cStr [ 30 ];
 	uint8_t ucArray_ID [ 4 ]; //IC card type and UID (IC card serial number)
@@ -51,5 +65,22 @@ std::string Content_Controller::get_nfc_ID(){
 			}
 		}
 	}
-    // return cStr; //ONLY FOR TESTING - REMOVE WHEN UNCOMMENTING THE ABOVE
+}
+
+int Content_Controller::play_content() {
+    std::string nfc_tag_id = this->get_nfc_ID();
+    std::cout << this->content_models.size() << std::endl;
+    for(uint i=0; i < this->content_models.size() ; i++ ) {
+        if(nfc_tag_id.compare((*this->content_models[i]).get_tag_id()) == 0) {
+            std::cout << "They match! " << nfc_tag_id << std::endl;
+            int item_id = (*this->content_models[i]).get_item_id();
+            int content_id = (*this->content_models[i]).get_content_id();
+            //create file path (i.e. cms_data_exchange/audio/[item_id]/[content_id]/sound.wav)
+            std::cout << "cms_data_exchange/audio/" << item_id << "/" << content_id << "/sound.wav" << std::endl;
+        }
+        else {
+            // std::cout << "They DO NOT match! " << std::endl;
+        }
+    }
+    return 0;
 }

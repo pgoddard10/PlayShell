@@ -33,6 +33,7 @@ int main() {
             ifs_status_json.close(); //close the file handler
         }
         
+        content_view->populate_from_db();
         if(current_status==DEVICE_STATUS_READY) {
             std::cout << "compare to last_update in db" << std::endl;
             std::cout << "if new content > db content run update" << std::endl;
@@ -42,7 +43,7 @@ int main() {
         }
         else if(current_status==DEVICE_STATUS_IN_USE) {
             std::cout << "get scanning the tags, etc" << std::endl;
-            content_view->get_nfc_ID();
+            content_view->scan_tag();
         }
     }
     return 0;

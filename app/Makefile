@@ -1,13 +1,12 @@
 CC = g++
 CPPFLAGS = -Wall -g 
 PROG = main.run
-OBJS = main.o Content_Model.o Content_Controller.o Content_View.o RC522.o #database.o tts.o wav.o nfc.o tag_management.o
+OBJS = main.o Content_Model.o Content_Controller.o Content_View.o RC522.o #tts.o wav.o nfc.o tag_management.o
 
 all: $(PROG)
 
 $(PROG):
 	$(CC) $(CPPFLAGS) -c -o RC522.o RC522.c
-	# $(CC) $(CPPFLAGS) -c -o database.o database.cpp
 	# $(CC) $(CPPFLAGS) -c -o tts.o tts.cpp
 	# $(CC) $(CPPFLAGS) -c -o wav.o wav.cpp
 	# $(CC) $(CPPFLAGS) -c -o nfc.o nfc.cpp

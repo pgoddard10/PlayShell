@@ -4,6 +4,8 @@
 #include <vector>
 #include <string.h>
 #include "RC522.h" //for NFC scanning
+#include <sqlite3.h> //for the database interaction
+
 #include "Content_Model.h"
 #include "Visitor_Model.h"
 
@@ -11,14 +13,16 @@
 
 class Content_Controller {
     private:
-        int update_db();
         std::vector< Content_Model* > content_models;
         std::vector< Visitor_Model* > visitor_models;
+        int update_db();
 
     public:
         Content_Controller();
         ~Content_Controller();
+        int populate_from_db();
         std::string get_nfc_ID();
+        int play_content();
 };
 
 #endif // Content_Controller_h

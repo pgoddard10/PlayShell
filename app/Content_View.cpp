@@ -17,8 +17,13 @@ int Content_View::update_db() {
 }
 
 
-int Content_View::get_nfc_ID() {
-    (*content_controller).get_nfc_ID();
+int Content_View::scan_tag() {
+    (*content_controller).play_content();
+    
+    return 0;
+}
+int Content_View::populate_from_db() {
+    (*content_controller).populate_from_db();
     
     return 0;
 }
