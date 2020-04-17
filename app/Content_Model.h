@@ -6,6 +6,9 @@
 #include <jsoncpp/json/json.h> //for handling JSON
 #include <fstream> //used for file handling (including JSON)
 #include <sqlite3.h> //for the database interaction
+#include <SFML/Audio.hpp> //for music/audio playback of .wav files
+#include <wiringPi.h> //used for the delay() function
+
 
 
 class Content_Model {

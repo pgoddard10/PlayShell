@@ -48,38 +48,51 @@ std::string Content_Controller::get_nfc_ID(){
 	char cStr [ 30 ];
 	uint8_t ucArray_ID [ 4 ]; //IC card type and UID (IC card serial number)
 	uint8_t ucStatusReturn; //Return status
-	while ( 1 ) {
-		if ( ( ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID ) ) != MI_OK ) { // If you fail to find the card again
-			ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID );
-		}
+    std::string nfc_id;
+    if ( ( ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID ) ) != MI_OK ) { // If you fail to find the card again
+        ucStatusReturn = PcdRequest ( PICC_REQALL, ucArray_ID );
+    }
 
-		if ( ucStatusReturn == MI_OK  ) {
-			// Anti-collision (when multiple cards enter the reader's operating range, the anti-collision mechanism will choose one of them to operate)
-			if ( PcdAnticoll ( ucArray_ID ) == MI_OK ) {
-				sprintf ( cStr, "%02X%02X%02X%02X",
-				          ucArray_ID [ 0 ],
-				          ucArray_ID [ 1 ],
-				          ucArray_ID [ 2 ],
-				          ucArray_ID [ 3 ] );
-				return cStr;
-			}
-		}
-	}
+    if ( ucStatusReturn == MI_OK  ) {
+        // Anti-collision (when multiple cards enter the reader's operating range, the anti-collision mechanism will choose one of them to operate)
+        if ( PcdAnticoll ( ucArray_ID ) == MI_OK ) {
+            sprintf ( cStr, "%02X%02X%02X%02X",
+                        ucArray_ID [ 0 ],
+                        ucArray_ID [ 1 ],
+                        ucArray_ID [ 2 ],
+                        ucArray_ID [ 3 ] );
+            nfc_id = std::string(cStr);
+        }
+    }
+    return nfc_id;
 }
 
 int Content_Controller::play_content() {
-    std::string nfc_tag_id = this->get_nfc_ID();
-    std::cout << this->content_models.size() << std::endl;
+    std::string nfc_tag_id;
+	while (nfc_tag_id.empty()) {
+        nfc_tag_id = this->get_nfc_ID();
+	}
     for(uint i=0; i < this->content_models.size() ; i++ ) {
         if(nfc_tag_id.compare((*this->content_models[i]).get_tag_id()) == 0) {
             std::cout << "They match! " << nfc_tag_id << std::endl;
             int item_id = (*this->content_models[i]).get_item_id();
             int content_id = (*this->content_models[i]).get_content_id();
-            //create file path (i.e. cms_data_exchange/audio/[item_id]/[content_id]/sound.wav)
+
             std::cout << "cms_data_exchange/audio/" << item_id << "/" << content_id << "/sound.wav" << std::endl;
-        }
-        else {
-            // std::cout << "They DO NOT match! " << std::endl;
+            std::string filename = "cms_data_exchange/audio/" + std::to_string(item_id) + "/" + std::to_string(content_id) + "/sound.wav";
+            sf::Music buffer;
+            if (!buffer.openFromFile(filename)) {
+                std::cout << "error loading file: '" << filename << "'" << std::endl;
+                return -1; // error
+            }
+            buffer.play();
+            float duration = buffer.getDuration().asSeconds();
+            duration = (duration * 1000)+1000;
+            std::cout << "file duration: " << duration << std::endl;
+            delay(duration); //uses the WiringPi include
+            //*****
+            //    now play the next content or wait for a gesture!!
+            //*****
         }
     }
     return 0;
