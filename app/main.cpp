@@ -13,34 +13,32 @@
 #define DEVICE_STATUS_DEVICE_UPDATING 2
 #define DEVICE_STATUS_CMS_UPDATING 3
 
-std::string status_json = "cms_data_exchange/status.json";
-std::string incoming_visitor_id = "cms_data_exchange/incoming_visitor_id.json";
 std::string outgoing_visitor_data = "cms_data_exchange/outgoing_visitor_data.json";
 
-Content_View* content_view = new Content_View(); //<---- something is up with this
+Content_View* content_view = new Content_View();
 
 int main() {
     while(1) {
-        int current_status = -1;
-        //read the JSON file and get the content ID
-        std::ifstream ifs_status_json(status_json);
-        if(ifs_status_json.is_open()) { //only continue if the file is found
-            Json::Reader reader;
-            Json::Value obj;
-            reader.parse(ifs_status_json, obj);
-            // std::string content_id_str = obj["status"]["code"].asString();
-            current_status = obj["status"]["code"].asInt();
-            ifs_status_json.close(); //close the file handler
-        }
-        
+        int current_status = content_view->get_current_status(); //get the device status from status.json
         content_view->populate_from_db();
-        if(current_status==DEVICE_STATUS_READY) {
+        if(current_status==DEVICE_STATUS_DEVICE_UPDATING) {
+            //trigger a database update
             content_view->update_db();
-            break;
         }
         else if(current_status==DEVICE_STATUS_IN_USE) {
             std::cout << "get scanning the tags, etc" << std::endl;
             content_view->scan_tag();
+        }
+        else if(current_status==DEVICE_STATUS_READY) {
+            //the device is not wanted right now :'(
+            //wait for the CMS to give a command
+            std::cout << "Device is ready for a command from the CMS" << std::endl;
+            delay(10000); // 10 seconds (let's not drain the battery)
+        }
+        else {
+            //error state. This should never happen and a sync with the CMS should fix it.
+            std::cout << "Current status is not recognised. The status number is " << current_status << std::endl;
+            delay(5000); // 5 seconds
         }
     }
     return 0;

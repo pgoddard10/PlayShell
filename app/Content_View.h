@@ -14,6 +14,7 @@ class Content_View {
         Content_Controller* content_controller;// = new Content_Controller();
         int scan_tag();
         int update_db();
+        int get_current_status();
         int populate_from_db();
 };
 

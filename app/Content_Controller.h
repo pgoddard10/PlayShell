@@ -23,6 +23,7 @@ class Content_Controller {
         std::string get_nfc_ID();
         int play_content();
         int update_db();
+        int get_current_status();
 };
 
 #endif // Content_Controller_h

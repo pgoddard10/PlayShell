@@ -18,14 +18,18 @@ class Content_Model {
         int gesture_id;
         int item_id;
         std::string new_content_json = "cms_data_exchange/published_content.json";
+        std::string status_json = "cms_data_exchange/status.json";
+        std::string incoming_visitor_json = "cms_data_exchange/incoming_visitor_id.json";
     public:
         Content_Model();
         ~Content_Model();
-        Json::Value read_new_content_json();
+        int save_new_content_json();
         std::vector<int> get_all_ids_from_db();
         int populate_from_db(int content_id);
         std::string get_tag_id();
         int get_item_id();
         int get_content_id();
+        int get_current_status();
+        int get_current_visitor();
 };
 #endif // Content_Model_h

@@ -9,13 +9,15 @@ Content_Controller::Content_Controller() {
 Content_Controller::~Content_Controller() {
 }
 
+int Content_Controller::get_current_status() {
+    Content_Model* tmp_model = new Content_Model();
+    return (*tmp_model).get_current_status();
+}
 
 
 int Content_Controller::update_db() {
-
-
     Content_Model* tmp_model = new Content_Model();
-    (*tmp_model).read_new_content_json();
+    (*tmp_model).save_new_content_json();
 
     return 0;
 }
@@ -59,6 +61,7 @@ std::string Content_Controller::get_nfc_ID(){
 
 int Content_Controller::play_content() {
     std::string nfc_tag_id;
+    int visitor_id = -1;
 	while (nfc_tag_id.empty()) {
         nfc_tag_id = this->get_nfc_ID();
 	}
@@ -75,6 +78,11 @@ int Content_Controller::play_content() {
                 std::cout << "error loading file: '" << filename << "'" << std::endl;
                 return -1; // error
             }
+
+            //save the visitor interaction in the db
+            visitor_id = (*this->content_models[i]).get_current_visitor();
+            std::cout << "Visitor ID: " << visitor_id << std::endl;
+
             buffer.play();
             float duration = buffer.getDuration().asSeconds();
             duration = (duration * 1000)+1000;
