@@ -19,7 +19,7 @@ class Content_Model {
         int item_id;
         std::string new_content_json = "cms_data_exchange/published_content.json";
         std::string status_json = "cms_data_exchange/status.json";
-        std::string incoming_visitor_json = "cms_data_exchange/incoming_visitor_id.json";
+        const char* db_name = "audio_culture.db";
     public:
         Content_Model();
         ~Content_Model();
@@ -30,6 +30,7 @@ class Content_Model {
         int get_item_id();
         int get_content_id();
         int get_current_status();
-        int get_current_visitor();
+        int get_next_content();
+        void update_device_status(int status);
 };
 #endif // Content_Model_h

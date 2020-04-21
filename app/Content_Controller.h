@@ -10,20 +10,20 @@
 #include "Visitor_Model.h"
 
 
-
 class Content_Controller {
     private:
         std::vector< Content_Model* > content_models;
-        std::vector< Visitor_Model* > visitor_models;
+        Visitor_Model* visitor_model;
 
     public:
         Content_Controller();
         ~Content_Controller();
         int populate_from_db();
         std::string get_nfc_ID();
-        int play_content();
+        int scan_tag();
         int update_db();
         int get_current_status();
+        int save_visitor_details_as_json();
 };
 
 #endif // Content_Controller_h

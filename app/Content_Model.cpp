@@ -19,6 +19,10 @@ int Content_Model::get_content_id() {
     return this->content_id;
 }
 
+int Content_Model::get_next_content() {
+    return this->next_content;
+}
+
 int Content_Model::get_current_status() {
     int status = -1;
     //read the JSON file and get the content ID
@@ -33,26 +37,12 @@ int Content_Model::get_current_status() {
     return status;
 }
 
-int Content_Model::get_current_visitor() {
-    int visitor_id = -1;
-    //read the JSON file and get the content ID
-    std::ifstream ifs(this->incoming_visitor_json);
-    if(ifs.is_open()) { //only continue if the file is found
-        Json::Reader reader;
-        Json::Value obj;
-        reader.parse(ifs, obj);
-        visitor_id = obj["data"]["visitor_id"].asInt();
-        ifs.close(); //close the file handler
-    }
-    return visitor_id;
-}
 
 std::vector<int> Content_Model::get_all_ids_from_db() {
-    const char* db_name = "audio_culture.db";
     sqlite3* db_obj; //database object
     std::vector<int> vec_content_ids;
 
-	if(sqlite3_open(db_name, &db_obj) == SQLITE_OK) { //open db
+	if(sqlite3_open(this->db_name, &db_obj) == SQLITE_OK) { //open db
 		const char* search_str = "SELECT content_id FROM content LEFT JOIN item ON content.item_id = item.item_id WHERE content.active = 1 AND item.active = 1";
 		
 		sqlite3_stmt *statement;
@@ -82,14 +72,34 @@ std::vector<int> Content_Model::get_all_ids_from_db() {
     return vec_content_ids;
 }
 
+void Content_Model::update_device_status(int status) {
+    std::string name;
+    if(status==0) name = "Device is ready";
+    else if(status==1) name = "Device is in use";
+    else if(status==2) name = "Device is updating";
+    else if(status==3) name = "CMS is updating";
+
+    Json::Value root;
+    root["status"]["code"] = status;
+    root["status"]["name"] = name;
+
+    Json::FastWriter writer;
+    const std::string json_file = writer.write(root);
+
+    std::ofstream ifs(this->status_json); //open the file to respond to the request
+    if (ifs.is_open()) {
+        ifs << json_file; //push the contents of the json_file into the actual file
+        ifs.close(); //close the file handler
+    }
+}
+
 
 // based heavily on code from https://stackoverflow.com/a/31747742/2747620
 int Content_Model::populate_from_db(int content_id) {
-    const char* db_name = "audio_culture.db";
     sqlite3* conn;
     sqlite3_stmt* stmt = 0;
 
-    int rc = sqlite3_open(db_name, &conn);
+    int rc = sqlite3_open(this->db_name, &conn);
     //  Good idea to always check the return value of sqlite3 function calls. 
     //  Only done once in this example:
     if ( rc != SQLITE_OK ) {
@@ -132,15 +142,14 @@ int Content_Model::save_new_content_json() {
 
         bool parsingSuccessful = reader.parse(ifs_json, obj);
         if ( !parsingSuccessful ) {
-            std::cout << "Error parsing the string" << std::endl;
+            return -1;
         }
 
         //clear out the database so it's ready for the new data
-        const char* db_name = "audio_culture.db";
         sqlite3* conn;
         sqlite3_stmt* stmt = 0;
 
-        int rc = sqlite3_open(db_name, &conn);
+        int rc = sqlite3_open(this->db_name, &conn);
         //  Good idea to always check the return value of sqlite3 function calls. 
         //  Only done once in this example:
         if ( rc != SQLITE_OK ) {
@@ -229,20 +238,7 @@ int Content_Model::save_new_content_json() {
 
             //now that the update has finished, set the device status back to "ready" (code 0)
             //if the device is ready, it means that the CMS can start another action
-            Json::Value root;
-            root["status"]["code"] = 0;
-            root["status"]["name"] = "Device is ready";
-
-            Json::FastWriter writer;
-            const std::string json_file = writer.write(root);
-
-            std::ofstream ifs(this->status_json); //open the file to respond to the request
-            if (ifs.is_open()) {
-                ifs << json_file; //push the contents of the json_file into the actual file
-                ifs.close(); //close the file handler
-                std::cout << "Saved the JSON formatted content: " << json_file << std::endl;
-            }
-
+            this->update_device_status(0);
         }
         
     }
