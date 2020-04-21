@@ -4,6 +4,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 require_once "vendor/autoload.php";
+require_once('classes/models/Visitor_Model.php');
 
 /**
  * Short description of class Device_Controller
@@ -113,13 +114,11 @@ class Device_Controller
         fclose($fp);
         chmod($local_file,0666); //set permissions
         $this->upload_file($host,$local_file,DEVICE_DATA_FOLDER."status.json");
-        echo "set status to $status, $name";
     }
 
 
     private function check_status_on_device($host) {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
-        $host = "ac-device-1";
         $port = 22;
         $connection = @ssh2_connect($host, $port);
         if ($connection) {
@@ -140,78 +139,12 @@ class Device_Controller
         }
         else
             $returnValue["data"]["error"] = array("code"=>-2,"description"=>"Connection failed.");
+
         return $returnValue;
     }
     
-    // retreive_visitor_data from device and copy into db (user_history)
-    public function retreive_visitor_data() {
-        $host = $_GET['device'];
-        $host = "ac-device-1";
-        $current_status = $this->check_status_on_device($host);
-        if($current_status['status']['code']==DEVICE_READY) {
-            $visitor_json = $this->read_remote_json_file($host,DEVICE_DATA_FOLDER."outgoing_visitor_data.json"); //read remote JSON file
-
-            $this->update_status_on_device(CMS_UPDATING,$host); //update status.json to make device unavailable for check-out
-            
-            print('<pre>'.print_r($visitor_json, true).'</pre>');
-            //remote_visitor.last_update
-            //loop through json
-                //if (remote.(content_id, visitor_id, timestamp) != db.user_history.(content_id, visitor_id, timestamp)
-                    //save contents into DB
-            $this->update_status_on_device(DEVICE_READY,$host); //update status.json to make device available for check-out
-        }
-        else {
-            echo "retreive_visitor_data() device is not ready for use";
-        }
-    }
-
-    // push content updates over to the device
-    public function update_device() {
-        $host = $_GET['device'];
-        $host = "ac-device-1";
-        $current_status = $this->check_status_on_device($host);
-        if($current_status['status']['code']==DEVICE_READY) {
-            $local_file = PUBLISHED_CONTENT_FOLDER.PUBLISHED_CONTENT_FILE;
-            $remote_file = DEVICE_DATA_FOLDER."published_content.json";
-            $this->update_status_on_device(DEVICE_UPDATING,$host); //update status.json to make device unavailable for check-out
-            $this->upload_file($host,$local_file,$remote_file); //copy published_content.json
-            //copy entire audio folder
-            $this->update_status_on_device(DEVICE_READY,$host); //update status.json to make device available for check-out
-        }
-        else {
-            echo "update_device() device is not ready for use";
-        }
-    }
-
-    public function copy_all(){
-        $host = $_GET['device'];
-        $host = "ac-device-1";
-        $current_status = $this->check_status_on_device($host);
-        if($current_status['status']['code']==DEVICE_READY) {
-            $this->update_status_on_device(DEVICE_UPDATING,$host); //update status.json to make device unavailable for check-out
-            $remote_file = DEVICE_DATA_FOLDER."audio";
-            $local_file = PUBLISHED_CONTENT_FOLDER."audio";
-            foreach (
-                $iterator = new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator($local_file, \RecursiveDirectoryIterator::SKIP_DOTS),
-                    \RecursiveIteratorIterator::SELF_FIRST) as $item
-                ) {
-                    if ($item->isDir()) {
-                        $this->mk_remote_dir($host, $remote_file . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-                    } else {
-                        $response = $this->upload_file($host,$local_file,$remote_file . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-                        print('<pre>'.print_r($response, true).'</pre>');
-                    }
-                }
-            $this->update_status_on_device(DEVICE_READY,$host); //update status.json to make device available for check-out
-        }
-        else {
-            echo "copy_all() device is not ready for use";
-        }
-    }
-
-    
-    public function send_email($to_email,$to_name,$body) {
+    private function send_email($to_email,$to_name,$body) {
+        $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
         $mail = new PHPMailer();
         try {
             //Server settings
@@ -219,26 +152,140 @@ class Device_Controller
             $mail->isSMTP();                                            // Send using SMTP
             $mail->Host       = 'smtp-mail.outlook.com';                    // Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = '######';                     // SMTP username
-            $mail->Password   = '#########';                               // SMTP password
+            $mail->Username   = 'yyyyy';                     // SMTP username
+            $mail->Password   = 'xxxxx';                               // SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
             $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
         
             //Recipients
-            $mail->setFrom('###', 'Paul Goddard');
+            $mail->setFrom('yyyy', 'Paul Goddard');
             $mail->addAddress($to_email, $to_name);     // Add a recipient
         
             // Content
             $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'This is a test email';
+            $mail->Subject = 'Your recent visit to our centre';
             $mail->Body    = $body;
             $mail->AltBody = strip_tags($body);
         
             $mail->send();
-            echo 'Message has been sent';
+            // echo 'Message has been sent';
         } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            // echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
+    }
+
+    // retreive_visitor_data from device and copy into db (user_history)
+    public function retreive_visitor_data() {
+        $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred.");
+
+        //$new_json_array_for_details_in_email
+
+        for($i = 1; $i < (NUMBER_OF_VISITOR_DEVICES+1); $i++) { //+1 as NUMBER_OF_VISITOR_DEVICES is human number, not computer number
+            $host = VISITOR_DEVICE_PREFIX.'-'.$i;
+            $current_status = $this->check_status_on_device($host);
+            if(isset($current_status['status']) && $current_status['status']['code']==DEVICE_READY) {
+                $visitor_json = $this->read_remote_json_file($host,DEVICE_DATA_FOLDER."outgoing_visitor_data.json"); //read remote JSON file
+
+                $this->update_status_on_device(CMS_UPDATING,$host); //update status.json to make device unavailable for check-out
+                
+                $visitor_details = json_decode($visitor_json, true);
+                foreach($visitor_details["data"] as $row) {
+                    $visitor_model = new Visitor_Model();
+                    $visitor_model->insert_visitor_history($row['content_id'], $row['time_scanned'], $row['visitor_id']);
+                }
+                $returnValue["data"] = array("success" => array("code"=>0,"description"=>"Successfully copied visitor interactions from the device into the CMS."));
+                $this->update_status_on_device(DEVICE_READY,$host); //update status.json to make device unavailable for check-out
+            }
+            else {
+                $returnValue["data"]["error"] = array("code"=>-2,"description"=>"The device is currently busy.");
+            }
+        }
+
+
+        $returnValue = json_encode($returnValue, JSON_HEX_APOS);
+        return $returnValue;
+    }
+
+    public function compose_email() {
+        
+        
+		if($db = new SQLite3(DATABASE_FILE)){
+			$stm = $db->prepare("SELECT item.name, item.url, content.item_id, visitor.first_name, visitor.email FROM visitor_history             LEFT JOIN content ON visitor_history.content_id = content.content_id            LEFT JOIN item ON item.item_id = content.item_id            LEFT JOIN visitor ON visitor.visitor_id = visitor_history.visitor_id            WHERE visitor.email NOT NULL            GROUP BY visitor_history.visitor_id, item.item_id"); //build the SQL
+            $visitor = $stm->execute();
+            $to_email = array();
+            while($row = $visitor->fetchArray()) {
+                $visitor_email = $row['email'];
+                $visitor_first_name = $row['first_name'];
+                $item_name = $row['name'];
+                $item_url = $row['url'];
+                $to_email[$visitor_email][] = array("email" => $row['email'],"visitor_first_name" => $row['first_name'], "name"=>$item_name,"url"=>$item_url);
+            }
+
+            foreach ($to_email as $value) {
+                $visitor_first_name = $value[0]["visitor_first_name"];
+                $email = $value[0]["email"];
+                $item_name = $value[0]["name"];
+                $item_url = $value[0]["url"];
+                $body = "Dear $visitor_first_name, Many thanks for visiting our wonderful centre. You interacted with $item_name. Find out more at $item_url!";
+                $this->send_email($email, $visitor_first_name, $body);
+            }
+        }
+    }
+
+    /**
+	 * method update_device()
+	 * Copies all published content over to every audio device on the network and in the status of "ready"
+	 * @return Integer $returnValue - JSON containing successful or not. Errors are negative numbers, default unknown error is -1
+	 */
+    public function update_device() {
+        $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred.");
+
+        //loop through all devices specified in the config.php file
+        for($i = 1; $i < (NUMBER_OF_VISITOR_DEVICES+1); $i++) { //+1 as NUMBER_OF_VISITOR_DEVICES is human number, not computer number
+            $host = VISITOR_DEVICE_PREFIX.'-'.$i;
+            //if the status of this device is ready, i.e. not "in use" or "updating" then we can update
+            //otherwise we can't update right now as the system is in use!
+            $current_status = $this->check_status_on_device($host);
+            if(isset($current_status['status']) && $current_status['status']['code']==DEVICE_READY) {
+                $local_file = PUBLISHED_CONTENT_FOLDER.PUBLISHED_CONTENT_FILE;
+                $remote_file = DEVICE_DATA_FOLDER."published_content.json";
+                $this->update_status_on_device(DEVICE_UPDATING,$host); //update status.json to make device unavailable for check-out
+                $this->upload_file($host,$local_file,$remote_file); //copy published_content.json
+                
+                //copy entire audio folder
+                $remote_audio_folder = DEVICE_DATA_FOLDER."audio";
+                $local_audio_folder = PUBLISHED_CONTENT_FOLDER."audio";
+                $success = true;
+                //loop through the directory and its contents
+                foreach (
+                    $iterator = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($local_audio_folder, \RecursiveDirectoryIterator::SKIP_DOTS),
+                        \RecursiveIteratorIterator::SELF_FIRST) as $item
+                    ) {
+                        if ($item->isDir()) {
+                            //make the dir on the remote system
+                            $this->mk_remote_dir($host, $remote_audio_folder . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+                        } else {
+                            //copy the file on the remote system
+                            $response_json = $this->upload_file($host,$local_audio_folder,$remote_audio_folder . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+                            $response = json_decode($response_json, true);
+                            if($success && isset($response['data']['success']) && $response['data']['success']['code']==0)
+                                $success = true;
+                            else
+                                $success = false;
+                        }
+                    }
+
+                if($success) $returnValue["data"] = array("success" => array("code"=>0,"description"=>"Successfully updated the device."));
+                else $returnValue["data"]["error"] = array("code"=>-3,"description"=>"File upload failed.");
+                
+            }
+            else {
+                $returnValue["data"]["error"] = array("code"=>-2,"description"=>"The device is not ready to be updated.");
+            }
+        }
+        $returnValue = json_encode($returnValue, JSON_HEX_APOS);
+        return $returnValue;
     }
 
 

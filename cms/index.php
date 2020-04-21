@@ -15,7 +15,9 @@ if(isset($_GET['page'])) define("PAGE",strtolower($_GET['page']));
 else define("PAGE","home");
 
 require_once('classes/views/Authenticate_View.php');
+require_once('classes/views/Device_View.php');
 $authenticate_view = new Authenticate_View();
+$device_view = new Device_View();
 
 $authenticate_view->has_session(); //check that the user is logged in
 
@@ -73,17 +75,6 @@ $authenticate_view->has_session(); //check that the user is logged in
       <?php $authenticate_view->display_menu(); ?>
     
       <!-- Divider -->
-      <hr class="sidebar-divider">
-      <div class="sidebar-heading">
-        System
-      </div>
-        <!-- Nav Item - Staff Management -->
-        <li class="nav-item active">
-          <a class="nav-link" href="?page=about">
-            <i class="fas fa-fw fa-info-circle"></i>
-            <span>About</span></a>
-        </li>
-      <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
 
       <!-- Sidebar Toggler (Sidebar) -->
@@ -139,9 +130,6 @@ $authenticate_view->has_session(); //check that the user is logged in
           case 'manage_content':
             require_once('manage_content.php');
             break;
-          case 'manage_reports':
-            require_once('manage_reports.php');
-            break;
           case 'manage_visitors':
             require_once('manage_visitors.php');
             break;
@@ -157,6 +145,7 @@ $authenticate_view->has_session(); //check that the user is logged in
           default:
             require_once('404.html');
         }
+        $device_view->device_interaction_modal();
       ?>
       <!-- End of Main Content -->
       
@@ -259,6 +248,10 @@ $authenticate_view->has_session(); //check that the user is logged in
             break;
         }
       }
+
+        echo '<!-- Manage Devices -->';
+        echo '<!-- Page level custom scripts -->';
+        echo '<script src="js/manage_devices.js"></script>';
       ?>
 
 

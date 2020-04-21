@@ -118,23 +118,39 @@ class Visitor_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method deactivate
-     * @param  visitor_id
-     * @return Integer
-     */
+ 
+	/**
+	 * method delete()
+	 * Removes a visitor from the database
+	 * @param  String $visitor_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function delete($visitor_id)
     {
         $returnValue = -1; //unknown error
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("DELETE FROM visitor WHERE visitor_id = ?");
-			$stm->bindParam(1, $visitor_id);
-			if($stm->execute()) $returnValue = 0;
-            else $returnValue = -2;
+			$stm = $db->prepare("DELETE FROM visitor WHERE visitor_id = ?"); //build the SQL
+			$stm->bindParam(1, $visitor_id); //swap out the ? for the visitor_id
+			if($stm->execute()) $returnValue = 0; //run the SQL in the database
+            else $returnValue = -2; //db error
 		}
         return $returnValue;
     }
 
+    public function insert_visitor_history($content_id, $time_scanned,$visitor_id)
+    {
+        $returnValue = -1; //unknown error
+		if($db = new SQLite3($this->db_file)){
+			$stm = $db->prepare("INSERT INTO visitor_history (content_id, time_scanned, visitor_id) VALUES (?,?,?)"); //build the SQL
+			$stm->bindParam(1, $content_id); //swap out the ? for the content_id
+			$stm->bindParam(2, $time_scanned); //swap out the ? for the time_scanned
+			$stm->bindParam(3, $visitor_id); //swap out the ? for the visitor_id
+			if($stm->execute()) $returnValue = 0; //run the SQL in the database
+            else $returnValue = -2; //db error
+		}
+        return $returnValue;
+    }
+    
 } /* end of class Visitor_Model */
 
 ?>
