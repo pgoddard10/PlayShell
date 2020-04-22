@@ -1,11 +1,14 @@
-
 <?php
-
 /**
- * Short description of class Role_Model
+ * Class Role_Model
+ * Responsible for database interaction
  *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
  */
 class Role_Model
 {
@@ -14,10 +17,10 @@ class Role_Model
 
     // --- OPERATIONS ---
 
-    /**
-     * Short description of method populate
-     *
-     */ 
+	/**
+	 * method __construct()
+	 * Sets up the available_roles array with all possible roles from the database
+	 */
     function __construct() {
 		if($db = new SQLite3($this->db_file)){
 			$stm = $db->prepare("SELECT role_id, name FROM role ORDER BY role_id ASC");
@@ -29,11 +32,12 @@ class Role_Model
 		}
 	}
 
-    /**
-     * Short description of method select_active_roles
-     * @param  String staff_id
-     * @return Integer
-     */
+	/**
+	 * method select_active_roles()
+	 * Finds all active roles for the specified member of staff and returns them
+	 * @param Integer $staff_id
+	 * @return array(int) $results
+	 */
 	public function select_active_roles($staff_id) {
 		if($db = new SQLite3($this->db_file)){
 			$stm = $db->prepare("SELECT staff_role.role_id, role.name FROM staff_role JOIN staff ON staff.staff_id = staff_role.staff_id JOIN role on staff_role.role_id = role.role_id WHERE staff_role.staff_id = ?");

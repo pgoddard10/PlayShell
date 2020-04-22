@@ -14,9 +14,9 @@ class Visitor_Controller
     public $all_visitors = array();
 
     /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	 * method __construct()
+	 * constructor that sets up the Models
+	 */
     function __construct() {
         $this->visitor_model = new Visitor_Model();
         $this->populate_all_visitors();
@@ -40,12 +40,11 @@ class Visitor_Controller
         return $data;
     }
 
-    /**
-     * Short description of method create_new
-     *
-     * @param 
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * Sanitises the form data and calls the model, which creates a new Visitor in the database
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new()
     {
         $returnValue = -1;//unknown error
@@ -63,11 +62,10 @@ class Visitor_Controller
     }
 
     /**
-     * Short description of method edit
-     *
-     * @param  
-     * @return Integer
-     */
+	 * method edit()
+	 * Sanitises the form data and calls the model, which edits the Visitor in the database with the new values
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit()
     {
         $returnValue = -1; //unknown error
@@ -87,12 +85,11 @@ class Visitor_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method delete
-     *
-     * @param  visitor_id
-     * @return Integer
-     */
+	/**
+	 * method deactivate()
+	 * deletes the Visitor with the referenced ID from the database (via the model)
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function delete()
     {
         $returnValue = -1; //unknown error
@@ -103,11 +100,11 @@ class Visitor_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method JSONify_All_Visitors
-     *
-     * @return void
-     */
+	/**
+	 * method JSONify_All_Visitors()
+	 * Loops through the $all_visitors array (which contains Visitor_Model objects) and turns into an array. The json_encode function turns the array into a JSON object
+     * @return JSON String $data - all Item data as JSON obj
+	 */
     public function JSONify_All_Visitors()
     {
         $data = array();
@@ -126,10 +123,10 @@ class Visitor_Controller
         return json_encode($data, JSON_HEX_APOS);
     }
 
-    /**
-     * Short description of method populate_all_visitors
-     *
-     */
+	/**
+	 * method populate_all_visitors()
+	 * sets up the $all_visitors array (which contains Visitor_Model objects) and turns into an array. 
+	 */
     public function populate_all_visitors()
     {
         $model = new Visitor_Model();
@@ -142,10 +139,11 @@ class Visitor_Controller
         }
     }
     
-    /**
-     * Short description of method check_out_device
-     *
-     */
+	/**
+	 * method check_out_device()
+	 * Loops through all possible device hostnames, finds the first one which has a status.json saying it's available, marks it as in use, transfers the visitor ID over and reports back.
+	 * @return JSON object $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function check_out_device()
     {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");

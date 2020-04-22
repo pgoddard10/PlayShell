@@ -1,22 +1,27 @@
 <?php
+/**
+ * Class Item_Controller
+ * Responsible for handling the logic surrounding the Item
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/models/Item_Model.php');
 
-/**
- * Short description of class Item_Controller
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
 class Item_Controller
 {
     private $item_model = null;
     public $all_items = array();
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * Sets up the model with Item rows from the database
+	 */
     function __construct() {
         $this->item_model = new Item_Model();
         $this->populate_all_items();
@@ -39,12 +44,12 @@ class Item_Controller
         return $data;
     }
 
-    /**
-     * Short description of method create_new
-     *
-     * @param 
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * Sanitises the form data and calls the model, which creates a new Item in the database
+	 * @param Integer $modified_by - current logged in staff_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new($modified_by)
     {
         $returnValue = -1;//unknown error
@@ -59,12 +64,12 @@ class Item_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method edit
-     *
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method edit()
+	 * Sanitises the form data and calls the model, which edits the Item in the database with the new values
+	 * @param Integer $modified_by - current logged in staff_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit($modified_by)
     {
         $returnValue = -1; //unknown error
@@ -81,12 +86,11 @@ class Item_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method delete
-     *
-     * @param  item_id
-     * @return Integer
-     */
+	/**
+	 * method delete()
+	 * Removes the Item with the referenced ID from the database (via the model)
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function delete()
     {
         $returnValue = -1; //unknown error
@@ -97,12 +101,12 @@ class Item_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method publish
-     *
-     * @param  item_id
-     * @return Integer
-     */
+	/**
+	 * method publish()
+	 * Creates a JSON file of all Item & Content data from the database and copies the sound files into the Publish folder
+     * This sets everything up for device synching (handled in the Device_Controller class)
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function publish()
     {
         $returnValue = -1; //unknown error
@@ -121,12 +125,13 @@ class Item_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method recurse_copy
+	/**
+	 * method recurse_copy()
+	 * Recursively copies the files and folders from the $src location to the $dst
      * copied from https://stackoverflow.com/a/2050909
-     * @param  item_id
-     * @return Integer
-     */
+	 * @param  String $src
+	 * @param  String $dst
+	 */
     public function recurse_copy($src,$dst) { 
         $dir = opendir($src); 
         @mkdir($dst); 
@@ -145,12 +150,13 @@ class Item_Controller
 
     
 
-    /**
-     * Short description of method recurse_copy
+	/**
+	 * method delete_files()
+	 * removes all files and folders in the given $target path
      * copied from https://paulund.co.uk/php-delete-directory-and-files-in-directory
-     * @param  item_id
-     * @return Integer
-     */
+	 * @param  String $target
+	 */
+    // copied from https://paulund.co.uk/php-delete-directory-and-files-in-directory
     public function delete_files($target) {
         if(is_dir($target)){
             $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
@@ -165,11 +171,11 @@ class Item_Controller
         }
     }
     
-    /**
-     * Short description of method JSONify_All_Items
-     *
-     * @return void
-     */
+	/**
+	 * method JSONify_All_Items()
+	 * Loops through the $all_items array (which contains Item_Model objects) and turns into an array. The json_encode function turns the array into a JSON object
+     * @return JSON String $data - all Item data as JSON obj
+	 */
     public function JSONify_All_Items()
     {
         $data = array();
@@ -205,10 +211,10 @@ class Item_Controller
         }
     }
 
-    /**
-     * Short description of method populate_all_itemss
-     *
-     */
+	/**
+	 * method populate_all_items()
+	 * sets up the $all_items array (which contains Item_Model objects) and turns into an array. 
+	 */
     public function populate_all_items()
     {
         $model = new Item_Model();

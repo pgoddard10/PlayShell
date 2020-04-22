@@ -1,25 +1,30 @@
 <?php
+/**
+ * Class Staff_Controller
+ * Responsible for handling the logic for processing staff
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/models/Role_Model.php');
-//require_once('classes/controllers/Staff_Controller.php');
 require_once('classes/models/Staff_Model.php');
 
-/**
- * Short description of class Staff_Controller
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
+
 class Staff_Controller
 {
     private $staff_model = null;
     public $role_model = null;
     public $all_staff = null;
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * constructor that sets up the Models
+	 */
     function __construct() {
         $this->staff_model = new Staff_Model();
         $this->role_model = new Role_Model();
@@ -43,11 +48,11 @@ class Staff_Controller
         return $data;
     }
 
-    /**
-     * Short description of method JSONify_All_Staff
-     *
-     * @return void
-     */
+	/**
+	 * method JSONify_All_Staff()
+	 * Loops through the $all_staff array (which contains Staff_model objects) and turns into an array. The json_encode function turns the array into a JSON object
+     * @return JSON String $data - all Item data as JSON obj
+	 */
     public function JSONify_All_Staff()
     {
         $data = array();
@@ -80,12 +85,11 @@ class Staff_Controller
         return json_encode($data, JSON_HEX_APOS);
     }
 
-    /**
-     * Short description of method create_new
-     *
-     * @param  array<> staff_data
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * Sanitises the form data and calls the model, which creates a new Staff in the database
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new()
     {
         $returnValue = -1;
@@ -112,12 +116,11 @@ class Staff_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method edit
-     *
-     * @param  array<> staff_data
-     * @return Integer
-     */
+	/**
+	 * method edit()
+	 * Sanitises the form data and calls the model, which edits the Staff in the database with the new values
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit()
     {
         $returnValue = -1; //unknown error
@@ -171,12 +174,11 @@ class Staff_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method deactivate
-     *
-     * @param  staff_id
-     * @return Integer
-     */
+	/**
+	 * method deactivate()
+	 * Deactivates the Staff with the referenced ID from the database (via the model)
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function deactivate()
     {
         $returnValue = -1;
@@ -199,22 +201,20 @@ class Staff_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method populate_all_staff
-     *
-     */
+	/**
+	 * method populate_all_staff()
+	 * sets up the $all_staff array (which contains Staff_Model objects) and turns into an array. 
+	 */
     public function populate_all_staff()
     {
         $this->all_staff = null;
         $model = new Staff_Model();
         $staff_ids = $model->get_all_staff_ids();
-        //print('<pre>'.print_r($usernames,true).'</pre>');
         foreach($staff_ids as $id) {
             $staff_member = new Staff_Model();
             $staff_member->populate_from_db($id[0]);
             $this->all_staff[] = $staff_member;
         }
-        //print('hello: <pre>'.print_r($this->all_staff,true).'</pre>');
     }
 
 

@@ -235,7 +235,7 @@ class Content_Controller
 
 	/**
 	 * method get_nfc_id()
-	 * YYYYYYYY
+	 * gets the NFC tag ID from the JSON file (this happens effectively on button press)
 	 * @return Integer/String $returnValue - tag_id as JSON. Errors are negative numbers, default unknown error is -1
 	 */
     public function get_nfc_id() {
@@ -244,11 +244,9 @@ class Content_Controller
             //if the NFC details have been provided from the C++ app
             //open the file, get the JSON
             $tag_data_json = json_decode($tag_data, true);
-            // print('<pre>'.print_r($tag_data_json,true).'</pre>');
             
             //check that the content_id in the file matches the one provided in the PHP (to ensure no accidental cross-over)
             if($tag_data_json['content_id']==filter_var($_GET['content_id'], FILTER_VALIDATE_INT)) {
-                // $returnValue = $tag_data_json['nfc_tag'];
                 $returnValue = json_encode(array("tag_id"=>$tag_data_json['nfc_tag'],JSON_HEX_APOS));
             }
         

@@ -1,31 +1,35 @@
 <?php
+/**
+ * Class Visitor_View
+ * Responsible for displaying all things related to the Visitor MVC/interactions
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/controllers/Visitor_Controller.php');
 
-/**
- * Short description of class Visitor_View
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
 class Visitor_View
 {
     private $visitor_controller = null;
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * The constructor method, always called by default when an instance of Visitor_View is created.
+	 */
     function __construct() {
         $this->visitor_controller = new Visitor_Controller();
         $this->visitor_controller->populate_all_visitors();
     }
 
-    /**
-     * Short description of method create_new
-     * 
-     * @return void
-     */
+	/**
+	 * method create_new()
+	 * calls the methods for creating a new visitor, prints the success or error message
+	 */
     public function create_new()
     {
         $success = $this->visitor_controller->create_new();
@@ -41,11 +45,10 @@ class Visitor_View
         <?php
     }
 
-    /**
-     * Short description of method edit
-     *
-     * @return void
-     */
+	/**
+	 * method edit()
+	 * calls the methods for editing the visitor, prints the success or error message
+	 */
     public function edit()
     { 
         $success = $this->visitor_controller->edit();
@@ -71,12 +74,10 @@ class Visitor_View
         <?php
     }
 
-    /**
-     * Short description of method delete
-     *
-     * @param  visitor_id
-     * @return void
-     */
+	/**
+	 * method delete()
+	 * prints the outcome of the call to delete the visitor
+	 */
     public function delete()
     {
         $success = $this->visitor_controller->delete();
@@ -92,32 +93,31 @@ class Visitor_View
         <?php
     }
 
-    /**
-     * Short description of method JSONify_All_Visitors
-     *
-     * @return void
-     */
+
+	/**
+	 * method print_json()
+	 * prints the returned json
+	 */
     public function print_json()
     {
         echo $this->visitor_controller->JSONify_All_Visitors();
     }
 
-    /**
-     * Short description of method check_out_device
-     *
-     * @return void
-     */
+
+	/**
+	 * method check_out_device()
+	 * prints the returned json
+	 */
     public function check_out_device()
     {
         header('Content-Type: application/json');
         echo $this->visitor_controller->check_out_device();
     }
 
-    /**
-     * Short description of method new_modal
-     *
-     * @return void
-     */
+	/**
+	 * method new_modal()
+	 * prints the modal & form used for new_modal()
+	 */
     public function new_modal()
     {
         ?>
@@ -180,11 +180,10 @@ class Visitor_View
         <?php
     }
 
-    /**
-     * Short description of method edit_modal
-     *
-     * @return void
-     */
+	/**
+	 * method edit_modal()
+	 * prints the modal & form used for edit_modal()
+	 */
     public function edit_modal()
     {
         ?>
@@ -240,11 +239,10 @@ class Visitor_View
     <?php
     }
 
-    /**
-     * Short description of method delete_modal
-     *
-     * @return void
-     */
+	/**
+	 * method delete_modal()
+	 * prints the modal used for delete_modal()
+	 */
     public function delete_modal()
     {
         ?>
@@ -271,11 +269,10 @@ class Visitor_View
         <?php
     }
     
-    /**
-     * Short description of method delete_modal
-     *
-     * @return void
-     */
+	/**
+	 * method check_out_modal()
+	 * prints the modal used for check_out_modal()
+	 */
     public function check_out_modal()
     {
         ?>

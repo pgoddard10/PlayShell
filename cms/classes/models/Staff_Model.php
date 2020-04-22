@@ -1,9 +1,17 @@
 <?php
-require_once('classes/models/Role_Model.php');
 /**
- * Short description of class Staff_Model
- * @author Paul Goddard, <paul2.goddard@live.uwe.ac.uk>
+ * Class Staff_Model
+ * Responsible for database interaction
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
  */
+require_once('classes/models/Role_Model.php');
+
 class Staff_Model
 {
     private $db_file = DATABASE_FILE;
@@ -28,11 +36,12 @@ class Staff_Model
         //$this->staff_model = new Staff_Model();
         $this->role_model = new Role_Model();
     }
+
     /**
-     * Short description of method get_all_staff_ids
-     * @param
-     * @return array(usernames : String)
-     */
+	 * method get_all_staff_ids()
+	 * gets all staff_id from the item table
+	 * @return array(int) $returnValue - an array of staff_id
+	 */
     public function get_all_staff_ids()
     {
         $returnValue = null;
@@ -46,11 +55,12 @@ class Staff_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method populate
-     * @param  String username
-     * @return Integer
-     */
+	/**
+	 * method populate_from_db()
+	 * takes the id provided populates this model from the database with it's details
+	 * @param Integer $staff_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function populate_from_db($staff_id)
     {
         $returnValue = -1; //unknown error
@@ -76,9 +86,10 @@ class Staff_Model
     }
 
     /**
-     * Short description of method has_role
-     * @param  array<> staff_data
-     * @return Integer
+	 * method has_role()
+     * Checks the provided role_id against the one stored in the model
+     * @param  Integer $role_id
+     * @return boolean
      */
     public function has_role($role_id)
     {
@@ -88,11 +99,18 @@ class Staff_Model
         return false;
     }
 
-    /**
-     * Short description of method create_new
-     * @param  array<> staff_data
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * creates a new Staff in the database
+	 * @param  String $first_name
+	 * @param  String $last_name
+	 * @param  String $username
+	 * @param  String $password
+	 * @param  String $repeat_password
+	 * @param  String $email
+	 * @param  array (int) $roles
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)
     {
         $returnValue = -1; //unknown error
@@ -118,11 +136,17 @@ class Staff_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method edit
-     * @param  array<> staff_data
-     * @return Integer
-     */
+	/**
+	 * method edit()
+	 * replaces the database values with those provided
+	 * @param  Integer $staff_id
+	 * @param  String $first_name
+	 * @param  String $last_name
+	 * @param  String $password
+	 * @param  String $email
+	 * @param  Boolean $active
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit($staff_id, $first_name, $last_name, $password, $email, $active)
     {
         $returnValue = -1; //unknown error
@@ -147,11 +171,12 @@ class Staff_Model
     }
 
     
-    /**
-     * Short description of method edit
-     * @param  array<> staff_data
-     * @return Integer
-     */
+	/**
+	 * method edit_roles()
+	 * replaces the roles with those provided for this member of staff
+	 * @param  array (int) $roles
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit_roles($roles)
     {
         $returnValue = 0;
@@ -182,11 +207,11 @@ class Staff_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method deactivate
-     * @param  staff_id
-     * @return Integer
-     */
+	/**
+	 * method deactivate()
+	 * marks the specified staff as inactive from the database
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function deactivate()
     {
         $returnValue = -1; //unknown error
@@ -201,11 +226,11 @@ class Staff_Model
     }
 
     
-    /**
-     * Short description of method total_num_staff_db_mgrs
-     * @param  role_id
-     * @return Integer
-     */
+	/**
+	 * method total_num_active_staff_with_role()
+	 * A count of the number of staff with the role_id provided
+	 * @return Integer $returnValue - number of roles, or error which confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function total_num_active_staff_with_role($role_id)
     {
         $returnValue = -1; //unknown error
@@ -222,10 +247,11 @@ class Staff_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method get_id_from_username
-     *
-     */
+	/**
+	 * method get_id_from_username()
+	 * Turns the username into the staff ID from a database query
+	 * @return Integer $returnValue - ID number, or error which confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function get_id_from_username($username)
     {
         $returnValue = -1; //unknown error
@@ -242,10 +268,11 @@ class Staff_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method get_password
-     *
-     */
+	/**
+	 * method get_password()
+	 * Returns the password of this member of staff (model)
+	 * @return String $password
+	 */
     public function get_password() {
         return $this->password;
     }

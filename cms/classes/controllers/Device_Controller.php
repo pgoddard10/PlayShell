@@ -1,4 +1,15 @@
 <?php
+/**
+ * Class Device_Controller
+ * Responsible for handling the logic around device sync/interactions
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -6,14 +17,15 @@ use PHPMailer\PHPMailer\Exception;
 require_once "vendor/autoload.php";
 require_once('classes/models/Visitor_Model.php');
 
-/**
- * Short description of class Device_Controller
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
 class Device_Controller
 {
+    /**
+    * method read_remote_json_file()
+    * This goes off to the visitor device specified and reads the file specified
+    * @param  String $host  - remote device network name
+    * @param  String $remote_file - file location of the JSON
+    * @return JSON String $returnValue - JSON confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+    */
     private function read_remote_json_file($host,$remote_file)
     {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
@@ -42,10 +54,14 @@ class Device_Controller
         return $returnValue;
     }
 
-    /**
-     * Short description of method check_out_device
-     *
-     */
+	/**
+	 * method upload_file()
+	 * uploads the local file to the remote location on the specified device
+	 * @param  String $host  - remote device network name
+	 * @param  String $local_file location on this server
+	 * @param  String $remote_file - location on the $host
+     * @return JSON String $returnValue - JSON confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     private function upload_file($host,$local_file,$remote_file)
     {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
@@ -77,6 +93,13 @@ class Device_Controller
         return json_encode($returnValue, JSON_HEX_APOS);
     }
 
+	/**
+	 * method mk_remote_dir()
+	 * mkdir() but on the $host
+	 * @param  String $host  - remote device network name
+	 * @param  String $path - remote file path
+     * @return JSON String $returnValue - JSON confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     private function mk_remote_dir($host,$path)
     {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
@@ -101,6 +124,12 @@ class Device_Controller
         return $returnValue;
     }
 
+	/**
+	 * method update_status_on_device()
+	 * Sets the device status on the $host - prevents 
+	 * @param  int $status - device status number
+	 * @param  String $host  - remote device network name
+	 */
     private function update_status_on_device($status,$host) {
         $local_file = PUBLISHED_CONTENT_FOLDER."status.json";
         if     ($status==DEVICE_READY) $name = "ready";
@@ -116,7 +145,12 @@ class Device_Controller
         $this->upload_file($host,$local_file,DEVICE_DATA_FOLDER."status.json");
     }
 
-
+	/**
+	 * method check_status_on_device()
+	 * log onto the $host and grab the status JSON file, decode it to pass the device status back
+	 * @param  String $host  - remote device network name
+     * @return JSON String $returnValue - JSON confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     private function check_status_on_device($host) {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
         $port = 22;
@@ -143,6 +177,13 @@ class Device_Controller
         return $returnValue;
     }
     
+    /**
+	 * method send_email()
+	 * sends email via SMTP
+	 * @param  String $to_email - email address
+	 * @param  String $to_name - name for the To: field
+	 * @param  String $body - email body
+	 */
     private function send_email($to_email,$to_name,$body) {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred");
         $mail = new PHPMailer();
@@ -168,12 +209,16 @@ class Device_Controller
             $mail->AltBody = strip_tags($body);
         
             $mail->send();
-            // echo 'Message has been sent';
         } catch (Exception $e) {
-            // echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+
         }
     }
 
+    /**
+	 * method retreive_visitor_data()
+	 * Gets the visitor data off of all available devices on the network, calls the Model to load into the database
+     * @return JSON String $returnValue - JSON confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     // retreive_visitor_data from device and copy into db (user_history)
     public function retreive_visitor_data() {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred.");
@@ -205,9 +250,11 @@ class Device_Controller
         return $returnValue;
     }
 
+	/**
+	 * method compose_email()
+	 * Sets up the emails and calls the send_email function which does the actual sending
+	 */
     public function compose_email() {
-        
-        
 		if($db = new SQLite3(DATABASE_FILE)){
 			$stm = $db->prepare("SELECT item.name, item.url, content.item_id, visitor.first_name, visitor.email FROM visitor_history             LEFT JOIN content ON visitor_history.content_id = content.content_id            LEFT JOIN item ON item.item_id = content.item_id            LEFT JOIN visitor ON visitor.visitor_id = visitor_history.visitor_id            WHERE visitor.email NOT NULL            GROUP BY visitor_history.visitor_id, item.item_id"); //build the SQL
             $visitor = $stm->execute();

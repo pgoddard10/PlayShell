@@ -1,31 +1,36 @@
 <?php
+/**
+ * Class Item_View
+ * Responsible for displaying all things related to the Item MVC/interactions
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/controllers/Item_Controller.php');
 
-/**
- * Short description of class Item_View
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
 class Item_View
 {
     private $item_controller = null;
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * The constructor method, always called by default when an instance of Item_View is created.
+	 */
     function __construct() {
         $this->item_controller = new Item_Controller();
         $this->item_controller->populate_all_items();
     }
 
-    /**
-     * Short description of method create_new
-     * 
-     * @return void
-     */
+	/**
+	 * method create_new()
+	 * calls the methods for creating a new Item, prints the success or error message
+     * @param int $modified_by - the currently logged in staff ID
+	 */
     public function create_new($modified_by)
     {
         $success = $this->item_controller->create_new($modified_by);
@@ -41,11 +46,11 @@ class Item_View
         <?php
     }
 
-    /**
-     * Short description of method edit
-     *
-     * @return void
-     */
+	/**
+	 * method edit()
+	 * calls the methods for editing an Item, prints the success or error message
+     * @param int $modified_by - the currently logged in staff ID
+	 */
     public function edit($modified_by)
     { 
         $success = $this->item_controller->edit($modified_by);
@@ -71,12 +76,10 @@ class Item_View
         <?php
     }
 
-    /**
-     * Short description of method delete
-     *
-     * @param  item_id
-     * @return void
-     */
+	/**
+	 * method delete()
+	 * prints the outcome of the call to delete the item
+	 */
     public function delete()
     {
         $success = $this->item_controller->delete();
@@ -92,21 +95,19 @@ class Item_View
         <?php
     }
 
-    /**
-     * Short description of method JSONify_All_Items
-     *
-     * @return void
-     */
+	/**
+	 * method print_json()
+	 * prints the called json
+	 */
     public function print_json()
     {
         echo $this->item_controller->JSONify_All_Items();
     }
 
-    /**
-     * Short description of method publish
-     *
-     * @return void
-     */
+	/**
+	 * method publish()
+	 * prints the returned json
+	 */
     public function publish()
     {
         echo header('Content-Type: application/json');
@@ -115,11 +116,10 @@ class Item_View
         echo $returnValue;
     }
 
-    /**
-     * Short description of method new_item_modal
-     *
-     * @return void
-     */
+	/**
+	 * method new_item_modal()
+	 * prints the modal & form used for new_item_modal()
+	 */
     public function new_item_modal()
     {
         ?>
@@ -168,11 +168,10 @@ class Item_View
         <?php
     }
 
-    /**
-     * Short description of method edit_item_modal
-     *
-     * @return void
-     */
+	/**
+	 * method edit_item_modal()
+	 * prints the modal & form used for edit_item_modal()
+	 */
     public function edit_item_modal()
     {
         ?>
@@ -226,11 +225,10 @@ class Item_View
     <?php
     }
 
-    /**
-     * Short description of method delete_item_modal
-     *
-     * @return void
-     */
+	/**
+	 * method delete_item_modal()
+	 * prints the modal & form used for delete_item_modal()
+	 */
     public function delete_item_modal()
     {
         ?>
@@ -259,11 +257,10 @@ class Item_View
     }
 
     
-    /**
-     * Short description of method show_publish_modal
-     *
-     * @return void
-     */
+	/**
+	 * method show_publish_modal()
+	 * prints the modal & form used for show_publish_modal()
+	 */
     public function show_publish_modal()
     {
         ?>

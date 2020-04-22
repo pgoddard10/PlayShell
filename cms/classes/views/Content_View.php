@@ -1,22 +1,27 @@
 <?php
+/**
+ * Class Content_View
+ * Responsible for displaying all things related to the Content MVC/interactions
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/controllers/Content_Controller.php');
 
-/**
- * Short description of class Content_View
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
 class Content_View
 {
     private $content_controller = null;
     private $item_id = null;
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * The constructor method, always called by default when an instance of Content_View is created.
+	 */
     function __construct($item_id=null) {
         $this->item_id = $item_id;
         $this->content_controller = new Content_Controller($this->item_id);
@@ -24,11 +29,11 @@ class Content_View
         if($success!=0) echo "Error populating contents array: ".$success;
     }
 
-    /**
-     * Short description of method create_new
-     * 
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 * @param  int $
+	 */
     public function create_new($created_by)
     {
         $success = $this->content_controller->create_new($created_by);
@@ -73,11 +78,11 @@ class Content_View
         <?php
     }
 
-    /**
-     * Short description of method edit
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 * @return Integer $
+	 */
     public function edit($modified_by)
     { 
         $success = $this->content_controller->edit($modified_by);
@@ -103,12 +108,10 @@ class Content_View
         <?php
     }
 
-    /**
-     * Short description of method delete
-     *
-     * @param  content_id
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function delete()
     {
         $success = $this->content_controller->delete();
@@ -125,20 +128,18 @@ class Content_View
     }
 
 
-    /**
-     * Short description of method JSONify_All_Contents
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function print_json() {
         echo $this->content_controller->JSONify_All_Contents();
     }
 
-    /**
-     * Short description of method new_content_modal
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function new_content_modal()
     {
         ?>
@@ -218,11 +219,10 @@ class Content_View
         <?php
     }
 
-    /**
-     * Short description of method edit_content_modal
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function edit_content_modal()
     {
         ?>
@@ -305,11 +305,10 @@ class Content_View
     <?php
     }
 
-    /**
-     * Short description of method delete_content_modal
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function delete_content_modal()
     {
         ?>
@@ -337,11 +336,10 @@ class Content_View
     }
 
     
-    /**
-     * Short description of method show_NFC_tag_modal
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function show_NFC_tag_modal()
     {
         ?>
@@ -369,21 +367,19 @@ class Content_View
         <?php
     }
 
-    /**
-     * Short description of method scan_nfc_tag
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function scan_nfc_tag() {
         $success = $this->content_controller->scan_nfc_tag();
     }
 
 
-    /**
-     * Short description of method get_nfc_id
-     *
-     * @return void
-     */
+	/**
+	 * method XXXXXXXX()
+	 * YYYYYYYY
+	 */
     public function get_nfc_id() {
         $tag_id_json = $this->content_controller->get_nfc_id();
         echo header('Content-Type: application/json');

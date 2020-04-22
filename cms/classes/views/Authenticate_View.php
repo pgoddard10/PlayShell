@@ -1,30 +1,36 @@
 <?php
+/**
+ * Class Authenticate_View
+ * Responsible for displaying all things related to the Authentication MVC/interactions
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/controllers/Authenticate_Controller.php');
 
-/**
- * Short description of class Authenticate_View
- *
- * @access public
- * @author firstname and lastname of author, <author@example.org>
- */
 class Authenticate_View
 {
   private $authenticate_controller = null;
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * The constructor method, always called by default when an instance of Authenticate_View is created.
+	 */
     function __construct() {
       $this->authenticate_controller = new Authenticate_Controller();
     }
 
-    /**
-     * Short description of method login
-     * @param  String username
-     * @param  String password
-     */
+   /**
+	 * method login()
+	 * starts the MVC process for logging in. Displays relevant error message
+	 * @param  String $username
+	 * @param  String $password
+	 */
     public function login($username,$password)
     {
         $success = $this->authenticate_controller->login($username,$password);
@@ -48,19 +54,21 @@ class Authenticate_View
         <?php
         }
     }
-    /**
-     * Short description of method logout
-     */
+
+  /**
+	 * method logout()
+	 * removes any outstanding/open the session
+	 */
     public function logout()
     {
         session_destroy();
     }
 
-    /**
-     * Short description of method page_permissions
-     * @param  String username
-     * @param  String password
-     */
+	/**
+	 * method page_permissions()
+	 * prints permission error and stops anything else happening
+	 * @param  String $page
+	 */
     public function page_permissions($page)
     {    
        if(!$this->authenticate_controller->has_role($page)) { ?>
@@ -78,9 +86,10 @@ class Authenticate_View
        }
     }
 
-    /**
-     * Short description of method has_session
-     */
+	/**
+	 * method has_session()
+	 * displays error if there is no active session
+	 */
     public function has_session()
     {
         if(!$this->authenticate_controller->has_session()) {
@@ -89,25 +98,29 @@ class Authenticate_View
             exit;
         }
     }
-    /**
-     * Short description of method display_name
-     */
+
+	/**
+	 * method display_name()
+	 * prints the saved display name
+	 */
     public function display_name()
     {
         echo $this->authenticate_controller->get_display_name();
     }
     
-    /**
-     * Short description of method display_name
-     */
+	/**
+	 * method get_staff_id()
+	 * grabs the staff id
+	 */
     public function get_staff_id()
     {
         return $this->authenticate_controller->get_staff_id();
     }
 
-    /**
-     * Short description of method display_menu
-     */
+	/**
+	 * method display_menu()
+	 * prints the main menu (left-hand side of page)
+	 */
     public function display_menu()
     {
      if($this->authenticate_controller->has_role(STAFF_DB_MANAGER)) {

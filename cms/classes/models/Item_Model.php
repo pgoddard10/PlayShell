@@ -1,7 +1,14 @@
 <?php
 /**
- * Short description of class Item_Model
- * @author Paul Goddard, <paul2.goddard@live.uwe.ac.uk>
+ * Class Item_Model
+ * Responsible for database interaction
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
  */
 require_once('classes/models/Content_Model.php');
 
@@ -21,11 +28,11 @@ class Item_Model
 
     // --- OPERATIONS ---
 
-    /**
-     * Short description of method get_all_item_ids
-     * @param
-     * @return array(usernames : String)
-     */
+	/**
+	 * method get_all_item_ids()
+	 * gets all item_ids from the item table
+	 * @return array(int) $returnValue - an array of item_ids
+	 */
     public function get_all_item_ids()
     {
         $returnValue = array();
@@ -39,11 +46,12 @@ class Item_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method populate_from_db
-     * @param  String item_id
-     * @return Integer
-     */
+	/**
+	 * method populate_from_db()
+	 * takes the id provided populates this model from the database with it's details
+	 * @param Integer $item_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function populate_from_db($item_id)
     {
         $returnValue = -1; //unknown error
@@ -79,11 +87,17 @@ class Item_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method create_new
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * creates a new Item in the database
+	 * @param Integer $heritage_id
+	 * @param  String $name
+	 * @param  String $location
+	 * @param  String $url
+	 * @param Boolean $active
+	 * @param Integer $modified_by
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new($heritage_id, $name, $location, $url, $active, $modified_by)
     {
         $returnValue = -1; //unknown error
@@ -102,11 +116,18 @@ class Item_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method edit
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method edit()
+	 * overwrites the database values with the values passed in
+	 * @param Integer $item_id
+	 * @param Integer $heritage_id
+	 * @param  String $name
+	 * @param  String $location
+	 * @param  String $url
+	 * @param Boolean $active
+	 * @param Integer $modified_by
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)
     {
         $returnValue = -1; //unknown error
@@ -125,11 +146,12 @@ class Item_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method deactivate
-     * @param  item_id
-     * @return Integer
-     */
+	/**
+	 * method delete()
+	 * removes the specified Item from the database
+	 * @param  Integer $item_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function delete($item_id)
     {
         $returnValue = -1; //unknown error

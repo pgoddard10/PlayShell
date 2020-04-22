@@ -1,7 +1,14 @@
 <?php
 /**
- * Short description of class Content_Model
- * @author Paul Goddard, <paul2.goddard@live.uwe.ac.uk>
+ * Class Content_Model
+ * Responsible for database interaction
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
  */
 class Content_Model
 {
@@ -31,11 +38,11 @@ class Content_Model
         $this->item_id = $item_id;
     }
 
-    /**
-     * Short description of method get_all_content_ids
-     * @param
-     * @return array(usernames : String)
-     */
+	/**
+	 * method get_all_content_ids()
+	 * gets all content_id from the content table
+	 * @return array(int) $returnValue - an array of content_id
+	 */
     public function get_all_content_ids()
     {
         $returnValue = array();
@@ -55,11 +62,13 @@ class Content_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method populate_from_db
-     * @param  String content_id
-     * @return Integer
-     */
+
+	/**
+	 * method populate_from_db()
+	 * takes the id provided populates this model from the database with it's details
+	 * @param Integer $content_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function populate_from_db($content_id)
     {
         $returnValue = -1; //unknown error
@@ -97,11 +106,19 @@ class Content_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method create_new
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * creates a new Content in the database
+	 * @param Integer $item_id
+	 * @param Integer $created_by
+	 * @param  String $name
+	 * @param Boolean $tts_enabled
+	 * @param Integer $next_content
+	 * @param Boolean $active
+	 * @param  String $written_text
+	 * @param Integer $gesture_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text=null, $gesture_id=null)
     {
         $returnValue = -1; //unknown error
@@ -160,11 +177,18 @@ class Content_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method edit
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method edit()
+	 * replaces the database values with those provided
+	 * @param Integer $modified_by
+	 * @param  String $name
+	 * @param Boolean $tts_enabled
+	 * @param Integer $next_content
+	 * @param Boolean $active
+	 * @param  String $written_text
+	 * @param Integer $gesture
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $tag_id)
     {
         $returnValue = -1; //unknown error
@@ -222,11 +246,11 @@ class Content_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method deactivate
-     * @param  content_id
-     * @return Integer
-     */
+	/**
+	 * method delete()
+	 * removes this row from the database
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function delete()
     {
         $returnValue = -1; //unknown error
@@ -246,10 +270,12 @@ class Content_Model
     }
 
     
-    /**
-     * Short description of method populate_all_contentss
-     *
-     */
+	/**
+	 * method convert_text_to_speech()
+	 * Runs the Text-to-Speech library and converts the text into a sound file & saves the sound file
+	 * @param  String $written_text
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
 	public function convert_text_to_speech($written_text) {
         $returnValue = -1;
 		$provider = new \duncan3dc\Speaker\Providers\PicottsProvider;
@@ -271,12 +297,11 @@ class Content_Model
         return $returnValue;
 	}
     
-    /**
-     * Short description of method delete_soundfile
-     *
-     * @param  content_id
-     * @return Integer
-     */
+	/**
+	 * method delete_soundfile()
+	 * removes the specified sound file from the server's file system
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function delete_soundfile()
     {
         $returnValue = -1; //unknown error

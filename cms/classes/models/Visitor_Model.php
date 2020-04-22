@@ -1,7 +1,14 @@
 <?php
 /**
- * Short description of class Visitor_Model
- * @author Paul Goddard, <paul2.goddard@live.uwe.ac.uk>
+ * Class Visitor_Model
+ * Responsible for database interaction
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
  */
 class Visitor_Model
 {
@@ -19,11 +26,11 @@ class Visitor_Model
 
     // --- OPERATIONS ---
 
-    /**
-     * Short description of method get_all_visitor_ids
-     * @param
-     * @return array(usernames : String)
-     */
+	/**
+	 * method get_all_visitor_ids()
+	 * gets all visitor_id from the visitor table
+	 * @return array(int) $returnValue - an array of visitor_id
+	 */
     public function get_all_visitor_ids()
     {
         $returnValue = array();
@@ -37,11 +44,12 @@ class Visitor_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method populate_from_db
-     * @param  String visitor_id
-     * @return Integer
-     */
+	/**
+	 * method populate_from_db()
+	 * takes the id provided populates this model from the database with it's details
+	 * @param Integer $visitor_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function populate_from_db($visitor_id)
     {
         $returnValue = -1; //unknown error
@@ -69,11 +77,19 @@ class Visitor_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method create_new
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method create_new()
+	 * creates a new Visitor in the database
+	 * @param  String $first_name
+	 * @param  String $last_name
+	 * @param  String $email
+	 * @param  String $address_1
+	 * @param  String $address_2
+	 * @param  String $address_3
+	 * @param  String $address_4
+	 * @param  String $address_postcode
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)
     {
         $returnValue = -1; //unknown error
@@ -93,11 +109,20 @@ class Visitor_Model
         return $returnValue;
     }
 
-    /**
-     * Short description of method edit
-     * @param  
-     * @return Integer
-     */
+	/**
+	 * method edit()
+	 * replaces the database values with those provided
+	 * @param  Integer $visitor_id
+	 * @param  String $first_name
+	 * @param  String $last_name
+	 * @param  String $email
+	 * @param  String $address_1
+	 * @param  String $address_2
+	 * @param  String $address_3
+	 * @param  String $address_4
+	 * @param  String $address_postcode
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)
     {
         $returnValue = -1; //unknown error
@@ -121,8 +146,8 @@ class Visitor_Model
  
 	/**
 	 * method delete()
-	 * Removes a visitor from the database
-	 * @param  String $visitor_id
+	 * removes the specified Visitor from the database
+	 * @param  Integer $visitor_id
 	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
 	 */
     public function delete($visitor_id)
@@ -136,7 +161,14 @@ class Visitor_Model
 		}
         return $returnValue;
     }
-
+	/**
+	 * method insert_visitor_history()
+	 * removes the specified Visitor from the database
+	 * @param  Integer $content_id
+	 * @param  String $time_scanned
+	 * @param  Integer $visitor_id
+	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
+	 */
     public function insert_visitor_history($content_id, $time_scanned,$visitor_id)
     {
         $returnValue = -1; //unknown error

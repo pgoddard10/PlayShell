@@ -1,4 +1,15 @@
 <?php
+/**
+ * Class Staff_View
+ * Responsible for displaying all things related to the Staff MVC/interactions
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
 
 require_once('classes/controllers/Staff_Controller.php');
 
@@ -12,26 +23,19 @@ class Staff_View
 {
     private $staff_controller = null;
 
-    /**
-     * Short description of method __construct
-     * @param  String db_file
-     */
+	/**
+	 * method __construct()
+	 * The constructor method, always called by default when an instance of Staff_View is created.
+	 */
     function __construct() {
         $this->staff_controller = new Staff_Controller();
         $this->staff_controller->populate_all_staff();
     }
 
-    /**
-     * Short description of method create_new
-     * 
-     * @param first_name
-     * @param last_name
-     * @param username
-     * @param password
-     * @param email
-     * @param  array<Integer>
-     * @return void
-     */
+	/**
+	 * method create_new()
+	 * calls the methods for creating a new staff, prints the success or error message
+	 */
     public function create_new()
     {
         $success = $this->staff_controller->create_new();
@@ -48,19 +52,10 @@ class Staff_View
         <?php
     }
 
-    /**
-     * Short description of method edit
-     *
-     * @param staff_id
-     * @param first_name
-     * @param last_name
-     * @param username
-     * @param password
-     * @param email
-     * @param active
-     * @param  array<Integer> roles
-     * @return void
-     */
+	/**
+	 * method edit()
+	 * calls the methods for editing the staff, prints the success or error message
+	 */
     public function edit()
     { 
         $success = $this->staff_controller->edit();
@@ -95,12 +90,10 @@ class Staff_View
         <?php
     }
 
-    /**
-     * Short description of method deactivate
-     *
-     * @param  staff_id
-     * @return void
-     */
+	/**
+	 * method deactivate()
+	 * prints the outcome of the call to deactivate the staff
+	 */
     public function deactivate()
     {
         $success = $this->staff_controller->deactivate();
@@ -116,21 +109,19 @@ class Staff_View
         <?php
     }
 
-    /**
-     * Short description of method JSONify_All_Staff
-     *
-     * @return void
-     */
+	/**
+	 * method print_json()
+	 * prints the returned json
+	 */
     public function print_json()
     {
         echo $this->staff_controller->JSONify_All_Staff();
     }
 
-    /**
-     * Short description of method new_modal
-     *
-     * @return void
-     */
+	/**
+	 * method new_modal()
+	 * prints the modal & form used for new_modal()
+	 */
     public function new_modal()
     {
         ?>
@@ -199,11 +190,10 @@ class Staff_View
         <?php
     }
 
-    /**
-     * Short description of method edit_modal
-     *
-     * @return void
-     */
+	/**
+	 * method edit_modal()
+	 * prints the modal & form used for edit_modal()
+	 */
     public function edit_modal()
     {
         ?>
@@ -276,11 +266,10 @@ class Staff_View
     <?php
     }
 
-    /**
-     * Short description of method deactivate_modal
-     *
-     * @return void
-     */
+	/**
+	 * method deactivate_modal()
+	 * prints the modal & form used for deactivate_modal()
+	 */
     public function deactivate_modal()
     {
         ?>
