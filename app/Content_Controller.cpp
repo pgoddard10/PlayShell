@@ -140,6 +140,11 @@ int Content_Controller::scan_tag() {
                 buffer.play(); //play the sound that's now loaded in the buffer
 
                 if(gesture_id > 0) {
+
+                    float duration = buffer.getDuration().asSeconds();
+                    duration = (duration * 1000)+1000;
+                    delay(duration); //wait for the previous sound to finish playing
+
                     while(gesture_id != this->get_gesture()) {
                         
                     }
@@ -178,6 +183,7 @@ int Content_Controller::scan_tag() {
 }
 
 
+MPU6050 accelerometer(0x68);
 /**
  * method get_gesture()
  * Accesses the accelerometer library to get the accelerometer stats and turn them into gesture IDs
@@ -186,7 +192,6 @@ int Content_Controller::scan_tag() {
 int Content_Controller::get_gesture() {
 	
     //set up new instance of the accelerometer
-    MPU6050 accelerometer = MPU6050(0x68);
     int gesture_id = 0;
 
     float x, y, z; //variables used in the shake
@@ -198,7 +203,7 @@ int Content_Controller::get_gesture() {
     accelerometer.getAccel(&x, &y, &z); //for the shake (on z axis)
     
     if(z > 1.3) {
-        gesture_id = 1; //gesture_id = 1
+        gesture_id = 1;
     }
 
     delay(250); //0.25 sec
