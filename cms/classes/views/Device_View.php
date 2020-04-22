@@ -32,7 +32,6 @@ class Device_View
   public function retreive_visitor_data(){
       header('Content-Type: application/json');
       echo $this->device_controller->retreive_visitor_data();
-      $this->device_controller->compose_email();
   }
    
 	/**

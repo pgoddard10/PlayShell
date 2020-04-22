@@ -178,8 +178,6 @@ class Device_Controller
     public function retreive_visitor_data() {
         $returnValue["data"]["error"] = array("code"=>-1,"description"=>"An unknown error has occurred.");
 
-        //$new_json_array_for_details_in_email
-
         for($i = 1; $i < (NUMBER_OF_VISITOR_DEVICES+1); $i++) { //+1 as NUMBER_OF_VISITOR_DEVICES is human number, not computer number
             $host = VISITOR_DEVICE_PREFIX.'-'.$i;
             $current_status = $this->check_status_on_device($host);
@@ -201,6 +199,7 @@ class Device_Controller
             }
         }
 
+        $this->compose_email();
 
         $returnValue = json_encode($returnValue, JSON_HEX_APOS);
         return $returnValue;
