@@ -5,12 +5,12 @@
 #include <iostream>
 #include <fstream>
 #include <jsoncpp/json/json.h>
-
-#include "nfc.h" //for NFC tag interaction
+#include "nfc.h" //NFC library for NFC tag interaction
 
 int main(int argc, char** argv) {
 	NFC nfc = NFC();
 
+	//never stop!
 	while(1) {
 		std::cout << "Ready! Please scan a tag..." << std::endl;
 		std::string nfcID = "";
@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
 			std::cout << "File opened and read. The Content ID is: " << content_id << std::endl;
 
 			if(content_id.length()>0) { //if the content_id actually exists
+				//build a JSON tree with the content_id and NFC tag ID
 				Json::Value root;
 				root["content_id"] = content_id;
 				root["nfc_tag"] = nfcID;
@@ -35,7 +36,8 @@ int main(int argc, char** argv) {
 				Json::FastWriter writer;
 				const std::string json_file = writer.write(root);
 
-				std::ofstream results_file("../json/tag_setup/tag_data.json"); //open the file to respond to the request
+ 				//open the file to respond to the request
+				std::ofstream results_file("../json/tag_setup/tag_data.json");
 				if (results_file.is_open()) {
 					results_file << json_file; //push the contents of the json_file into the actual file
 					results_file.close(); //close the file handler

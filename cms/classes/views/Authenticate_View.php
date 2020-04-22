@@ -10,14 +10,14 @@ require_once('classes/controllers/Authenticate_Controller.php');
  */
 class Authenticate_View
 {
-    private $authenticate_controller = null;
+  private $authenticate_controller = null;
 
     /**
      * Short description of method __construct
      * @param  String db_file
      */
     function __construct() {
-        $this->authenticate_controller = new Authenticate_Controller();
+      $this->authenticate_controller = new Authenticate_Controller();
     }
 
     /**
@@ -130,16 +130,6 @@ class Authenticate_View
         </li>
         <?php
        }
-      if($this->authenticate_controller->has_role(REPORT_MANAGER)) { 
-        ?>
-        <!-- Nav Item - Report Management -->
-        <li class="nav-item active">
-          <a class="nav-link" href="?page=manage_reports">
-            <i class="fas fa-fw fa-chart-bar"></i>
-            <span>Manage Reports</span></a>
-        </li>
-        <?php
-       }
        if($this->authenticate_controller->has_role(VISITOR_DB_MANAGER)) { 
         ?>
         <!-- Nav Item - Visitor Management -->
@@ -150,6 +140,24 @@ class Authenticate_View
         </li>
         <?php
        }
+       if($this->authenticate_controller->has_role(DEVICE_MANAGER)) { 
+         ?>
+         <!-- Nav Item - Device Collapse Menu -->
+         <li class="nav-item active">
+           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+             <i class="fas fa-fw fa-hdd"></i>
+             <span>Manage Devices</span>
+           </a>
+           <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionSidebar">
+             <div class="bg-white py-2 collapse-inner rounded">
+               <a class="collapse-item" href="#" data-toggle="modal" data-target="#deviceInteractionModalCenter" id="btn_retreiveVisitorDataModal">Retreive visitor data</a>
+               <a class="collapse-item" href="#" data-toggle="modal" data-target="#deviceInteractionModalCenter" id="btn_pushContentToDevicesModal">Push content to devices</a>
+             </div>
+           </div>
+         </li>
+         <?php
+       }
+ 
     }
 }
 ?>
