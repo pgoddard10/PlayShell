@@ -7,11 +7,26 @@
 class Content_View {
 
     private:
+        Content_Controller* content_controller;
 
     public:
+    
+        /**
+         * method Content_View()
+         * default constructor
+         */
         Content_View();
+
+        /**
+         * method ~Content_View()
+         * default desstructor
+         */
         ~Content_View();
-        Content_Controller* content_controller;
+
+        /**
+         * method run()
+         * Starts an infinite loop which flicks between device statuses. Calls the main function for those that have actions
+         */
         void run();
 };
 

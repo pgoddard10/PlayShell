@@ -22,10 +22,8 @@ int Visitor_Model::save_visitor_details_as_json() {
     else {
         rc = sqlite3_prepare_v2( conn, "SELECT content_id, time_scanned, visitor_id FROM visitor_history", -1, &stmt, 0 );
 
-        //  Optional, but will most likely increase performance.
         rc = sqlite3_exec( conn, "BEGIN TRANSACTION", 0, 0, 0 );    
 
-        
         Json::Value root;
         int row = 0;
 
@@ -42,7 +40,7 @@ int Visitor_Model::save_visitor_details_as_json() {
             row++;
 
         }
-        char *zErrMsg = 0;  //  Can perhaps display the error message if rc != SQLITE_OK.
+        char *zErrMsg = 0;
         rc = sqlite3_exec( conn, "END TRANSACTION", 0, 0, &zErrMsg );   //  End the transaction.
 
         rc = sqlite3_finalize( stmt );  //  Finalize the prepared statement.
@@ -76,21 +74,26 @@ int Visitor_Model::set_current_visitor() {
     return this->visitor_id;
 }
 
+/**
+ * method save_visitor_interaction()
+ * Saves the visitor_id and content_id into the db with a timestamp.
+ * This data is used for reporting and bookmarking purposes.
+ * @param  int content_id - contains the ID number of the content to insert into the db
+ * @return int 
+ */
 int Visitor_Model::save_visitor_interaction(int content_id) {
 
     sqlite3* conn;
     sqlite3_stmt* stmt = 0;
 
     int rc = sqlite3_open(this->db_name, &conn);
-    //  Good idea to always check the return value of sqlite3 function calls. 
-    //  Only done once in this example:
+    //  Check the return value of sqlite3 function calls. 
     if ( rc != SQLITE_OK ) {
         return -1;
     }
     else {
-        char *zErrMsg = 0;  //  Can perhaps display the error message if rc != SQLITE_OK.
+        char *zErrMsg = 0; 
 
-        //  Optional, but will most likely increase performance.
         rc = sqlite3_exec( conn, "BEGIN TRANSACTION", 0, 0, 0 ); 
         
         //commit to database

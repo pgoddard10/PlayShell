@@ -6,13 +6,25 @@
 #define DEVICE_STATUS_DEVICE_UPDATING 2
 #define DEVICE_STATUS_CMS_UPDATING 3
 
+/**
+ * method Content_View()
+ * default constructor
+ */
 Content_View::Content_View() {
     content_controller = new Content_Controller();
 }
 
+/**
+ * method ~Content_View()
+ * default desstructor
+ */
 Content_View::~Content_View() {
 }
 
+/**
+ * method run()
+ * Starts an infinite loop which flicks between device statuses. Calls the main function for those that have actions
+ */
 void Content_View::run() {
     while(1) {
         int current_status = (*content_controller).get_current_status(); //get the device status from status.json

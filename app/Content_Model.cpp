@@ -1,28 +1,82 @@
+/**
+ * Class Content_Model
+ * Responsible for handling database and JSON data/interaction
+ *
+ * @author	Paul Goddard
+ * 			paul2.goddard@live.uwe.ac.uk
+ * 			https://github.com/pgoddard10/
+ * 			https://www.linkedin.com/in/pgoddard10/
+ * 			https://twitter.com/pgoddard10
+ * @date Spring 2020 
+ */
+
 #include "Content_Model.h"
 
+/**
+ * method Content_Model()
+ * default constructor
+ */
 Content_Model::Content_Model() {
+    this->new_content_json = "cms_data_exchange/published_content.json";
+    this->status_json = "cms_data_exchange/status.json";
+    this->db_name = "audio_culture.db";
 }
 
+/**
+ * method ~Content_Model()
+ * default desstructor
+ */
 Content_Model::~Content_Model() {
 }
 
-
+/**
+ * method get_tag_id()
+ * @return std::string tag_id - the ID of the NFC tag stored in the Model (ultimately from the database)
+ */
 std::string Content_Model::get_tag_id() {
     return this->tag_id;
 }
 
+/**
+ * method get_item_id()
+ * @return int item_id - the ID of the item stored in the Model (ultimately from the database)
+ */
 int Content_Model::get_item_id() {
     return this->item_id;
 }
 
+/**
+ * method get_content_id()
+ * @param  std::string 
+ * @return int content_id - the ID of the content stored in the Model (ultimately from the database)
+ */
 int Content_Model::get_content_id() {
     return this->content_id;
 }
 
+/**
+ * method get_gesture_id()
+ * @param  std::string 
+ * @return int gesture_id - the ID of the gesture stored in the Model (ultimately from the database)
+ */
+int Content_Model::get_gesture_id() {
+    return this->gesture_id;
+}
+
+/**
+ * method get_next_content()
+ * @return int next_content - the ID of the next_content (to be played) stored in the Model (ultimately from the database)
+ */
 int Content_Model::get_next_content() {
     return this->next_content;
 }
 
+/**
+ * method get_current_status()
+ * Gets the current device status from the status JSON
+ * @param  std::string 
+ * @return int 
+ */
 int Content_Model::get_current_status() {
     int status = -1;
     //read the JSON file and get the content ID
@@ -37,7 +91,11 @@ int Content_Model::get_current_status() {
     return status;
 }
 
-
+/**
+ * method get_all_ids_from_db()
+ * Gets all of the content IDs from the database. This is used to populate a vector of models
+ * @return vector vec_content_ids A vector of content_id s
+ */
 std::vector<int> Content_Model::get_all_ids_from_db() {
     sqlite3* db_obj; //database object
     std::vector<int> vec_content_ids;
@@ -66,12 +124,14 @@ std::vector<int> Content_Model::get_all_ids_from_db() {
 		
 		std::string error = sqlite3_errmsg(db_obj);
 		sqlite3_close(db_obj);
-		
-        return vec_content_ids;
 	}
     return vec_content_ids;
 }
 
+/**
+ * method update_device_status()
+ * Overwrites the status JSON file with the status number passed to this method
+ */
 void Content_Model::update_device_status(int status) {
     std::string name;
     if(status==0) name = "Device is ready";
@@ -93,8 +153,13 @@ void Content_Model::update_device_status(int status) {
     }
 }
 
-
-// based heavily on code from https://stackoverflow.com/a/31747742/2747620
+/**
+ * method populate_from_db()
+ * populates this model with the data from the datbase. One model = one content row from the db 
+ *  based heavily on code from https://stackoverflow.com/a/31747742/2747620
+ * @param int content_id 
+ * @return int
+ */
 int Content_Model::populate_from_db(int content_id) {
     sqlite3* conn;
     sqlite3_stmt* stmt = 0;
@@ -108,7 +173,6 @@ int Content_Model::populate_from_db(int content_id) {
     else {
         rc = sqlite3_prepare_v2( conn, "SELECT content_id, tag_id, next_content, gesture_id, content.item_id FROM content LEFT JOIN item ON content.item_id = item.item_id WHERE content.active = 1 AND item.active = 1 AND content_id = ?", -1, &stmt, 0 );
 
-        //  Optional, but will most likely increase performance.
         rc = sqlite3_exec( conn, "BEGIN TRANSACTION", 0, 0, 0 );    
 
         rc = sqlite3_bind_int( stmt, 1, content_id ); // Bind  parameter.
@@ -133,7 +197,12 @@ int Content_Model::populate_from_db(int content_id) {
     return 0;
 }
 
-int Content_Model::save_new_content_json() {
+/**
+ * method save_new_content_from_json()
+ * opens the published_content JSON file and replaces the data in the database with the contents of the file
+ * @return int
+ */
+int Content_Model::save_new_content_from_json() {
     //read the JSON file and get the content ID
     std::ifstream ifs_json(this->new_content_json);
     Json::Value obj;
@@ -244,3 +313,4 @@ int Content_Model::save_new_content_json() {
     }
     return 0;
 }
+
