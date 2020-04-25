@@ -82,6 +82,5 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
         $content_view->delete_content_modal();
         $content_view->new_content_modal();
         $content_view->edit_content_modal();
-        $content_view->show_NFC_tag_modal();
       ?>
 

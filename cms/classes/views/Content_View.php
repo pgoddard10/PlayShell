@@ -31,8 +31,8 @@ class Content_View
 
 	/**
 	 * method XXXXXXXX()
-	 * YYYYYYYY
-	 * @param  int $
+	 * prints the outcome of adding content
+	 * @param int $created_by
 	 */
     public function create_new($created_by)
     {
@@ -79,9 +79,9 @@ class Content_View
     }
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
-	 * @return Integer $
+	 * method edit()
+	 * prints the outcome of editing content
+	 * @param int $modified_by
 	 */
     public function edit($modified_by)
     { 
@@ -109,8 +109,8 @@ class Content_View
     }
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method delete()
+	 * prints the outcome of deleting content
 	 */
     public function delete()
     {
@@ -129,16 +129,16 @@ class Content_View
 
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method print_json()
+	 * prints the JSON from content_controller->JSONify_All_Contents()
 	 */
     public function print_json() {
         echo $this->content_controller->JSONify_All_Contents();
     }
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method new_content_modal()
+	 * prints the modal for new content
 	 */
     public function new_content_modal()
     {
@@ -189,7 +189,7 @@ class Content_View
                                     <option value="1">Gesture 2</option>
                                 </select>
                             </div>
-                            <div class="form-group edit_next_content_options">
+                            <div class="form-group new_next_content_options">
                                 After all of the above has been performed, which content should play next?<br />
                                 <select id="new_next_content" name="next_content" class="form-control-sm form-control-user-sm">
                                     <option value selected>None</option>
@@ -220,8 +220,8 @@ class Content_View
     }
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method edit_content_modal()
+	 * prints the modal for editing content
 	 */
     public function edit_content_modal()
     {
@@ -286,16 +286,22 @@ class Content_View
                                     <option value="0">No</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                NFC Tag <span id="nfc_tag_id_label"></span><br /><span id="nfc_tag_id_label_error"></span>
-                                <input type="hidden" id="tag_id" name="tag_id" />
-                                <a href='#' id='btn_newNFCTag' class='btn_newNFCTag btn-sm btn-success btn-icon-split' data-toggle="modal" data-target="#NFCTagModal"><span class='icon text-white-50'><i class='fas fa-tag'></i></span><span class='text'>Add/Change NFC Tag</span></a>
+                            <input type="hidden" id="tag_id" name="tag_id" />
+                            <div class="form-group" id="NFC_tag_details">
+                                <span id="please_wait" class="d-none">
+                                    <i class="fas fa-exclamation-circle"></i> Please scan the NFC tag on the server device.<br />
+                                    <button type="button" class="btn-sm btn-success" id="btn_confirm_tag_scanned">Tag Scanned</button>
+                                </span>
+                                <span id="id_and_button">
+                                    NFC Tag <span id="nfc_tag_id_label"></span><br /><span id="nfc_tag_id_label_error"></span>
+                                    <a href='#' id='btn_newNFCTag' class='btn_newNFCTag btn-sm btn-success btn-icon-split'><span class='icon text-white-50'><i class='fas fa-tag'></i></span><span class='text'>Add/Change NFC Tag</span></a>
+                                    <a href='#' id='btn_removeNFCTag' class='btn_removeNFCTag btn-sm btn-danger btn-icon-split'><span class='icon text-white-50'><i class='fas fa-tag'></i></span><span class='text'>Remove NFC Tag</span></a>
+                                </span>
                             </div>
                             <input type="hidden" id="edit_content_id" name="content_id" />
                         </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button id="btn_content_edit" type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
@@ -306,8 +312,8 @@ class Content_View
     }
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method delete_content_modal()
+	 * prints the modal for deleting content
 	 */
     public function delete_content_modal()
     {
@@ -337,48 +343,17 @@ class Content_View
 
     
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
-	 */
-    public function show_NFC_tag_modal()
-    {
-        ?>
-        <!-- Prompt to scan NFC tag -->
-        <div class="modal hide fade" id="NFCTagModal" tabindex="-1" role="dialog" aria-labelledby="NFCTagModalTitle" aria-hidden="true" data-focus-on="input:first">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="NFCTagModalLongTitle">Add/Change NFC Tag</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <span id="NFCTagModal_bodytext">Please wait...</span>
-                </div>
-                <div class="modal-footer d-none" id="NFCTagModalFooter">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_confirm_tag_scanned">Tag Scanned</button>
-                </div>
-            </div>
-          </div>
-        </div>
-
-        <?php
-    }
-
-	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method scan_nfc_tag()
+	 * calls content_controller->scan_nfc_tag()
 	 */
     public function scan_nfc_tag() {
-        $success = $this->content_controller->scan_nfc_tag();
+        $this->content_controller->scan_nfc_tag();
     }
 
 
 	/**
-	 * method XXXXXXXX()
-	 * YYYYYYYY
+	 * method get_nfc_id()
+	 * prints the JSON formatted data from the content_controller->get_nfc_id() method
 	 */
     public function get_nfc_id() {
         $tag_id_json = $this->content_controller->get_nfc_id();

@@ -67,10 +67,10 @@ $(document).ready(function() {
   function format_childs_child(d) {
     var to_display = "<div><strong>Last Modified:</strong> " + d.last_modified + " & <strong>Created on:</strong> " + d.created + ".</div><br />";
     if(d.tts_enabled==1) {
-      to_display += '<p>This text, below, was converted to speech. <a download="'+d.name+'.mp3" href="audio/'+d.item_id+'/'+d.content_id+'/sound.mp3">Download a copy</a><br />'+d.written_text+'</p>';
+      to_display += '<p>This text, below, was converted to speech. <a download="'+d.name+'.wav" href="audio/'+d.item_id+'/'+d.content_id+'/sound.wav">Download a copy</a><br />'+d.written_text+'</p>';
     }
     else {
-      to_display += '<p><a download="'+d.name+'.mp3" href="audio/'+d.item_id+'/'+d.content_id+'/sound.mp3">'+d.name+'</a>  was uploaded to play when the tag is scanned.</p>';
+      to_display += '<p><a download="'+d.name+'.wav" href="audio/'+d.item_id+'/'+d.content_id+'/sound.wav">'+d.name+'</a>  was uploaded to play when the tag is scanned.</p>';
     }
     return to_display;
   }
@@ -386,9 +386,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
         data.append("sound_file[]", file_data[i]);
     }
     
-    //Custom data
-    // data.append('key', 'value');
-    
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
         item_table.ajax.reload(); //reload the table with the new data
         set_localstorage();
@@ -438,7 +435,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     }
     else {
       $("#edit_tts_enabled_no").prop("checked", true);
-      $(".modal-body #edit_sound_file_label").html('A <a download="'+$(this).data('id').name+'.mp3" href="audio/'+$(this).data('id').item_id+'/'+$(this).data('id').content_id+'/sound.mp3">sound file</a> has already been uploaded. Replace it: ');
+      $(".modal-body #edit_sound_file_label").html('A <a download="'+$(this).data('id').name+'.wav" href="audio/'+$(this).data('id').item_id+'/'+$(this).data('id').content_id+'/sound.wav">sound file</a> has already been uploaded. Replace it: ');
       $(".modal-body #edit_collapseTwo").addClass("show");
       $(".modal-body #edit_collapseOne").removeClass("show");
     }
@@ -535,6 +532,17 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     }
   });
 
+ /**
+  * 
+  * Remove NFC Tag ID
+  * 
+  */
+
+ $("#btn_removeNFCTag").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+    $(".modal-body #tag_id").val("");
+    $(".modal-body #nfc_tag_id_label").text(": ");
+    $(".modal-body #nfc_tag_id_label_error").html("");
+  });
 
   /**
   * 
@@ -542,11 +550,11 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   * 
   */
 
- $("#btn_newNFCTag").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+ $("#btn_newNFCTag").click(function(){ //on click of Add/Change NFC Tag button
   //send the data as a GET request to the PHP page specified in direct_to_url
   $.ajax({url: "ajax.content_actions.php?action=scan_nfc_tag&content_id="+content_id, success: function(result){
-       $(".modal-body #NFCTagModal_bodytext").text("Please scan the NFC tag on the server device.");
-       $(".modal-content #NFCTagModalFooter").removeClass("d-none");
+    $(".modal-body #NFC_tag_details #please_wait").removeClass('d-none');
+    $(".modal-body #NFC_tag_details #id_and_button").addClass('d-none');
     }});
 });
 
@@ -555,8 +563,10 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
 * Scan NFC Tag -> Scanning of tag confirmed by user
 * 
 */
-$("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation delete button (AKA submit the form)
+$("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation of user scanning the tag
  //send the data as a GET request to the PHP page specified in direct_to_url
+  $(".modal-body #NFC_tag_details #please_wait").addClass('d-none');
+  $(".modal-body #NFC_tag_details #id_and_button").removeClass('d-none');
  $.ajax({
    url: "ajax.content_actions.php?action=get_nfc_id&content_id="+content_id,
    success: function(result){
@@ -588,6 +598,7 @@ $("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation d
            msg = 'Uncaught Error.\n' + jqXHR.responseText;
        }
        console.log(msg);
+       $(".modal-body #nfc_tag_id_label_error").html("Something went wrong. Please try again.<br />"+msg+"<br />");
    }
   });
 });

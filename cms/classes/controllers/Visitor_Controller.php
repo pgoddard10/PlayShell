@@ -115,9 +115,9 @@ class Visitor_Controller
             $myvisitor['email'] = $details->email;
             $myvisitor['address'] = $details->address;
             $visitor_as_json = json_encode($details, JSON_HEX_APOS);
-            $myvisitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$visitor_as_json' class='editModalBox' data-target='#editModalCenter'><i class='.btn-circle .btn-sm fas fa-edit'></i></a>";
-            $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='deleteModalBox' data-target='#deleteModalCenter'><i class='.btn-circle .btn-sm fas fa-trash'></i></a>";
-            $myvisitor['buttons'] = $myvisitor['buttons'] . " | <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='btn_checkOutModal' data-target='#checkOutModalCenter'><i class='.btn-circle .btn-sm fas fa-sign-out-alt'></i></a>";
+            $myvisitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$visitor_as_json' class='editModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
+            $myvisitor['buttons'] = $myvisitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
+            $myvisitor['buttons'] = $myvisitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='btn_checkOutModal btn-circle btn-sm btn-primary' data-target='#checkOutModalCenter'><i class='fas fa-sign-out-alt'></i></a>";
             $data["data"][] = $myvisitor;
         }
         return json_encode($data, JSON_HEX_APOS);

@@ -225,7 +225,7 @@ class Content_Model
                         $complete_file_path = $dir_name."sound.wav";
                         $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
                         // Allow certain file formats
-                        if($file_type != "mp3") {
+                        if($file_type != "wav") {
                             $returnValue = -4; //file is of non-accepted filetype
                         }
                         else {

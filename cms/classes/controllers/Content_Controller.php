@@ -208,7 +208,6 @@ class Content_Controller
         $fp = fopen($filename, 'w');
         fwrite($fp, "");
         fclose($fp);
-        chmod($filename,0666); //set permissions to allow both the C++ app and PHP system to write to the files
     }
 
 

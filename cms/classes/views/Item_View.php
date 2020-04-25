@@ -214,8 +214,7 @@ class Item_View
                             </div>
                         </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button id="btn_item_edit" type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
