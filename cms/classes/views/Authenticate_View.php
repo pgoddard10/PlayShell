@@ -170,7 +170,35 @@ class Authenticate_View
          </li>
          <?php
        }
- 
+       ?>
+       
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+      <div class="sidebar-heading">
+        System
+      </div>
+
+      <?php
+        if($this->authenticate_controller->has_role(TBC)) { 
+        ?>
+        <!-- Nav Item - System Settings -->
+        <li class="nav-item active">
+          <a class="nav-link" href="?page=manage_settings">
+            <i class="fas fa-cogs"></i>
+            <span>Global Settings</span></a>
+        </li>
+        <?php
+       }
+      ?>
+      
+        <!-- Nav Item - About -->
+        <li class="nav-item active">
+          <a class="nav-link" href="?page=about">
+            <i class="fas fa-fw fa-info-circle"></i>
+            <span>About</span></a>
+        </li>
+
+      <?php
     }
 }
 ?>

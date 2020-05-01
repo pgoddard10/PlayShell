@@ -62,7 +62,6 @@ class Content_Model
         return $returnValue;
     }
 
-
 	/**
 	 * method populate_from_db()
 	 * takes the id provided populates this model from the database with it's details
@@ -161,7 +160,7 @@ class Content_Model
                         if($file_type != "wav") {
                             $returnValue = -4; //file is of non-accepted filetype
                         }
-                        else if (move_uploaded_file($_FILES["sound_file"]["tmp_name"][0], $complete_file_path)) {
+                        else if (move_uploaded_file($_FILES["sound_file"]["tmp_name"], $complete_file_path)) {
                             $returnValue = 0; //everything successful
                         }
                         else {
@@ -229,17 +228,16 @@ class Content_Model
                             $returnValue = -4; //file is of non-accepted filetype
                         }
                         else {
-                            if (move_uploaded_file($_FILES["sound_file"]["tmp_name"][0], $complete_file_path)) {
+                            if (move_uploaded_file($_FILES["sound_file"]["tmp_name"], $complete_file_path)) {
                                 $returnValue = 0; //everything successful
                             } else {
-                                $returnValue = -5; //could save file
+                                $returnValue = -5; //could not save file
                             }
                         }
                     }
                     else $returnValue = 0; //file has not been changed on the edit form
                 }
                 else $returnValue = 0; //saved to db and no requirement for soundfile
-
             }
             else $returnValue = -2;
 		}
@@ -258,11 +256,8 @@ class Content_Model
 			$stm = $db->prepare("DELETE FROM content WHERE content_id = ?");
 			$stm->bindParam(1, $this->content_id);
 			if($stm->execute()) {
-                if($this->tts_enabled==1) {
-                    if($this->delete_soundfile()==0) $returnValue = 0;
-                    else $returnValue = -3; //deleted from db but unable to delete from filesystem
-                }
-                else $returnValue = 0;
+                $this->delete_soundfile();
+                $returnValue = 0;
             }
             else $returnValue = -2; //unable to delete from db
 		}
@@ -309,7 +304,11 @@ class Content_Model
         if (file_exists($file_name)) {
             if(unlink($file_name)) $returnValue = 0;
         }
-        else $returnValue = 0;
+        $file_name = AUDIO_FOLDER.$this->item_id.'/'. $this->content_id;
+        if (file_exists($file_name)) {
+            if(rmdir($file_name)) $returnValue = 0;
+        }
+        
         return $returnValue;
     }
 

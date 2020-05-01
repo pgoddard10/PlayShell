@@ -77,9 +77,7 @@ class Staff_Controller
                 $mystaff['active'] = 'No';
             $staff_as_json = json_encode($details, JSON_HEX_APOS);
             $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
-            if($details->active==1) {
-                $mystaff['buttons'] = $mystaff['buttons'] . " <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deactivateModalBox btn-circle btn-sm btn-primary' data-target='#deactivateModalCenter'><i class='fas fa-pause-circle'></i></a>";
-            }
+            $mystaff['buttons'] = $mystaff['buttons'] . " <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
             $data["data"][] = $mystaff;
         }
         return json_encode($data, JSON_HEX_APOS);
@@ -175,13 +173,15 @@ class Staff_Controller
     }
 
 	/**
-	 * method deactivate()
-	 * Deactivates the Staff with the referenced ID from the database (via the model)
+	 * method delete()
+	 * deletes the Staff with the referenced ID from the database (via the model)
 	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
 	 */
-    public function deactivate()
+    public function delete()
     {
         $returnValue = -1;
+        
+        $staff_id = filter_var($_GET['staff_id'], FILTER_VALIDATE_INT);
         //check to see if this person is staff DB manager in DB
         $staff_db_mgr = false;
         if($this->staff_model->roles) { //if this person has any roles
@@ -195,7 +195,7 @@ class Staff_Controller
         if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1) && (!in_array(STAFF_DB_MANAGER,$roles))) { //check how many staffDBmanagers exist in total
             $returnValue = -3; //cannot remove the role for last DB manager
         }
-        else if($this->staff_model->deactivate()==0) {
+        else if($this->staff_model->delete($staff_id)==0) {
             $returnValue = 0;
         }
         return $returnValue;

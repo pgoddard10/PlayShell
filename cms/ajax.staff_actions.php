@@ -23,8 +23,8 @@ switch($_GET['action']) {
     case 'edit':
         $staff_view->edit();
         break;
-    case 'deactivate':
-        $staff_view->deactivate();
+    case 'delete':
+        $staff_view->delete();
         break;
 }
 ?>

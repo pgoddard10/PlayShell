@@ -136,24 +136,24 @@ $(document).ready(function() {
 
   /**
    * 
-   * Deactivate staff
+   * Delete staff
    * 
    */
   var display_name;
-  $(document).on("click", ".deactivateModalBox", function () {//onclick of the Deactivate icon/button
-    //grab the data provided via JSON on the Deactivate icon/button
+  $(document).on("click", ".deleteModalBox", function () {//onclick of the Delete icon/button
+    //grab the data provided via JSON on the Delete icon/button
     display_name = $(this).data('id').display_name;
     staff_id = $(this).data('id').staff_id;
     $(".modal-body #span_name").text(display_name);
   });
 
-  $("#btn_staff_deactivate").click(function(){ //on click of the confirmation deactivate button (AKA submit the form)
+  $("#btn_staff_delete").click(function(){ //on click of the confirmation delete button (AKA submit the form)
       //send the data as a GET request to the PHP page specified in direct_to_url
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
         staff_table.ajax.reload(); //reload the table with the new data
       });
       function save_to_database(){ //call the ajax for saving the changes
-        return $.ajax({url: "ajax.staff_actions.php?action=deactivate&staff_id="+staff_id, success: function(result){
+        return $.ajax({url: "ajax.staff_actions.php?action=delete&staff_id="+staff_id, success: function(result){
             $("#div1").html(result);
         }});
       }

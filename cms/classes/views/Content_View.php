@@ -30,7 +30,7 @@ class Content_View
     }
 
 	/**
-	 * method XXXXXXXX()
+	 * method create_new()
 	 * prints the outcome of adding content
 	 * @param int $created_by
 	 */
@@ -95,14 +95,14 @@ class Content_View
                 break;
             case -1:
             default:
-                $msg = "Changes for '".$_POST['name']."' were not saved. An unknown error occurred.";
+                $msg = "Changes for '".$_POST['name']."' were not saved. An unknown error occurred. Error number $success";
                 break;
         }
         ?>
                 <!-- Edit Message Card -->
                 <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
                     <div class="card-body">
-                    <?php echo $msg; //print success/fail message ?>
+                    <?php echo $msg; //print success/fail message  ?>
                     </div>
                     </div>
         <?php

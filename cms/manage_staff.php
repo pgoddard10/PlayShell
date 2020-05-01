@@ -56,7 +56,7 @@ $authenticate_view->page_permissions(STAFF_DB_MANAGER);
       <!-- /.container-fluid -->
 
       <?php
-        $staff_view->deactivate_modal();
+        $staff_view->delete_modal();
         $staff_view->new_modal();
         $staff_view->edit_modal();
       ?>

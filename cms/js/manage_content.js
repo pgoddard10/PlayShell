@@ -383,7 +383,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     //File data
     var file_data = $('input[name="new_sound_file"]')[0].files;
     for (var i = 0; i < file_data.length; i++) {
-        data.append("sound_file[]", file_data[i]);
+        data.append("sound_file", file_data[i]);
     }
     
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
@@ -442,6 +442,10 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     
     $(".edit_gesture_options select").val($(this).data('id').gesture_id);
 
+    //ensure the NFC tag scanning buttons are shown for adding a new tag
+    $(".modal-body #NFC_tag_details #please_wait").addClass('d-none');
+    $(".modal-body #NFC_tag_details #id_and_button").removeClass('d-none');
+
 
     var db = JSON.parse(localStorage.getItem('db')); 
     $.each(db.data[0].content, function (key, c) {
@@ -462,9 +466,6 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
   $('#edit_content_form').submit(function(event){
     event.preventDefault(); //cancels the form submission
     $('#editContentModalCenter').modal('toggle'); //closes the modal box
-    // var roles = [];
-    // var direct_to_url = "ajax.content_actions.php?action=edit_content&content_id="+content_id+"&";
-    // direct_to_url += $('#edit_content_form').serialize(); //grab all input boxes
 
     var data = new FormData();
 
@@ -477,11 +478,8 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     //File data
     var file_data = $('input[name="edit_sound_file"]')[0].files;
     for (var i = 0; i < file_data.length; i++) {
-        data.append("sound_file[]", file_data[i]);
+        data.append("sound_file", file_data[i]);
     }
-    
-    console.log(form_data);
-
 
     //send the data as a GET request to the PHP page specified in direct_to_url
     $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
@@ -491,7 +489,7 @@ $("#btn_item_delete").click(function(){ //on click of the confirmation delete bu
     function save_to_database(){ //call the ajax for saving the changes
       return $.ajax({
         url: 'ajax.content_actions.php?action=edit_content',
-        method: "post",
+        method: "POST",
         processData: false,
         contentType: false,
         data: data,
@@ -597,7 +595,6 @@ $("#btn_confirm_tag_scanned").click(function(){ //on click of the confirmation o
        } else {
            msg = 'Uncaught Error.\n' + jqXHR.responseText;
        }
-       console.log(msg);
        $(".modal-body #nfc_tag_id_label_error").html("Something went wrong. Please try again.<br />"+msg+"<br />");
    }
   });

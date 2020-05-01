@@ -147,7 +147,7 @@ class Content_Controller
             $written_text = $this->sanitise_string($_POST['written_text']);
         }
         if(isset($_POST['gesture'])) $gesture = filter_var($_POST['gesture'], FILTER_VALIDATE_INT);
-
+        
         $name = $this->sanitise_string($_POST['name']);
         $next_content = filter_var($_POST['next_content'], FILTER_VALIDATE_INT);
         $active = filter_var($_POST['active'], FILTER_VALIDATE_INT);
@@ -156,12 +156,10 @@ class Content_Controller
         //now that everything has been checked and filter, pass data to the model for database interaction
         $returnValue = $this->content_model->edit($modified_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture, $tag_id);
         if($returnValue==0) { //if successfully saved
-            if($tts_enabled==1) { //and TTS was requested
-                $result = $this->content_model->convert_text_to_speech($written_text_for_tts); //convert the provided text to a sound file
+            if(($tts_enabled==1) && ($this->content_model->convert_text_to_speech($written_text_for_tts)!=0)) { //convert the provided text to a sound file
+                $returnValue = -6; //saved in database but TTS failed
             }
-            else $returnValue = -2; //created in database successfully but TTS failed
         }
-        else $returnValue = -3; //error saving in the database
         return $returnValue;
     }
 
@@ -239,11 +237,12 @@ class Content_Controller
 	 */
     public function get_nfc_id() {
         $returnValue = -1; //unknown error
+
         if($tag_data = file_get_contents(NFC_ID_FILE)) { //onclick of [I've scanned the tag] button send ajax request to perform the below
             //if the NFC details have been provided from the C++ app
             //open the file, get the JSON
             $tag_data_json = json_decode($tag_data, true);
-            
+
             //check that the content_id in the file matches the one provided in the PHP (to ensure no accidental cross-over)
             if($tag_data_json['content_id']==filter_var($_GET['content_id'], FILTER_VALIDATE_INT)) {
                 $returnValue = json_encode(array("tag_id"=>$tag_data_json['nfc_tag'],JSON_HEX_APOS));

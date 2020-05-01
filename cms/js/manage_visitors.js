@@ -1,4 +1,4 @@
-//Call the dataTables jQuery plugin
+
 
 $(document).ready(function() {
 
@@ -26,7 +26,6 @@ $(document).ready(function() {
         $('#form_new_visitor').submit(function(event){
             event.preventDefault(); //cancels the form submission
             $('#addNewModal').modal('toggle'); //closes the modal box
-  
             //build the URL to include GET request data from the form
             var roles = [];
             var direct_to_url = "ajax.visitor_actions.php?action=new&";
@@ -51,7 +50,6 @@ $(document).ready(function() {
     //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
     //data is passed in the form of a JSON string.
     $(document).on("click", ".editModalBox", function () { //onclick of the Edit icon/button
-  
       //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
       visitor_id = $(this).data('id').visitor_id;
       $(".modal-body #edit_first_name").val($(this).data('id').first_name);
@@ -104,7 +102,7 @@ $(document).ready(function() {
       visitor_id = $(this).data('id').visitor_id;
       $(".modal-body #span_name").text(name);
     });
-  
+
     $("#btn_visitor_delete").click(function(){ //on click of the confirmation delete button (AKA submit the form)
         //send the data as a GET request to the PHP page specified in direct_to_url
         $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
@@ -125,12 +123,9 @@ $(document).ready(function() {
   */
 
   $(document).on("click", ".btn_checkOutModal", function () {//on click of the "check out" button
-
   //Set the "please wait" message
   $(".modal-body #checkOutModal_bodytext").html("<i class='fas fa-spinner fa-spin'></i> Finding an available device, please wait...");
   $(".modal-content #checkOutModalFooter").addClass("d-none");
-
-
   //trigger an ajax request to create the relevant JSON file.
     visitor_id = $(this).data('id').visitor_id;
     $.ajax({url: "ajax.visitor_actions.php?action=check_out_device&visitor_id="+visitor_id, success: function(r){

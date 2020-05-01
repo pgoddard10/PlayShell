@@ -208,20 +208,20 @@ class Staff_Model
     }
 
 	/**
-	 * method deactivate()
+	 * method delete()
 	 * marks the specified staff as inactive from the database
 	 * @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers, default unknown error is -1
 	 */
-    public function deactivate()
+    public function delete($staff_id)
     {
         $returnValue = -1; //unknown error
-        $staff_id = $_GET['staff_id'];
 		if($db = new SQLite3($this->db_file)){
-			$stm = $db->prepare("UPDATE staff SET active = 0 WHERE staff_id = ?");
+			$stm = $db->prepare("DELETE FROM staff WHERE staff_id = ?");
 			$stm->bindParam(1, $staff_id);
-			if($stm->execute())
-				$returnValue = 0;
-		}
+			if($stm->execute()) {
+                $returnValue = 0;
+            }
+        }
         return $returnValue;
     }
 

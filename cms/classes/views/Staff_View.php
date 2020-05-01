@@ -91,16 +91,16 @@ class Staff_View
     }
 
 	/**
-	 * method deactivate()
-	 * prints the outcome of the call to deactivate the staff
+	 * method delete()
+	 * prints the outcome of the call to delete the staff
 	 */
-    public function deactivate()
+    public function delete()
     {
-        $success = $this->staff_controller->deactivate();
-        if($success==0) $msg = "Successfully deactivated the member of staff.";
+        $success = $this->staff_controller->delete();
+        if($success==0) $msg = "Successfully deleted the member of staff.";
         if($success==-1) $msg = "An unknown error occurred.";
         ?>
-              <!-- Deactivate Message Card -->
+              <!-- delete Message Card -->
                 <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
                     <div class="card-body">
                     <?php echo $msg; //print success/fail message ?>
@@ -266,28 +266,28 @@ class Staff_View
     }
 
 	/**
-	 * method deactivate_modal()
-	 * prints the modal & form used for deactivate_modal()
+	 * method delete_modal()
+	 * prints the modal & form used for delete_modal()
 	 */
-    public function deactivate_modal()
+    public function delete_modal()
     {
         ?>
-        <!-- Deactivate Staff - Confirmation Modal -->
-        <div class="modal fade" id="deactivateModalCenter" tabindex="-1" role="dialog" aria-labelledby="deactivateModalCenterTitle" aria-hidden="true">
+        <!-- delete Staff - Confirmation Modal -->
+        <div class="modal fade" id="deleteModalCenter" tabindex="-1" role="dialog" aria-labelledby="deleteModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="deactivateModalLongTitle">Confirm Deactivation</h5>
+                <h5 class="modal-title" id="deleteModalLongTitle">Confirm Deletion</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
                 <div class="modal-body">
-                    Are you sure you wish to deactivate <span id="span_name">this member of staff</span>?<br />
+                    Are you sure you wish to delete <span id="span_name">this member of staff</span>?<br />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn_staff_deactivate">Deactivate Account</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn_staff_delete">Delete Account</button>
                 </div>
             </div>
           </div>

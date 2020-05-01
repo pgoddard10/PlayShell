@@ -73,7 +73,8 @@ $authenticate_view->has_session(); //check that the user is logged in
         Main
       </div>
       <?php $authenticate_view->display_menu(); ?>
-    
+
+
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
 
