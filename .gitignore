@@ -1,4 +1,2 @@
 # Ignore the audio files
-cms/audio/*/*
-cms/json/device_data_exchange/audio/*/
 **.wav
