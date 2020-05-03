@@ -101,6 +101,7 @@ class Item_View
 	 */
     public function print_json()
     {
+        header('Content-Type: application/json');
         echo $this->item_controller->JSONify_All_Items();
     }
 

@@ -41,7 +41,7 @@ class Authenticate_View
                   You are successfully logged in.
                 </div>
               </div>
-        <script>window.location.replace("index.php");</script>
+        <script>window.location.replace("index.php?page=home");</script>
         <?php
         }
         else {

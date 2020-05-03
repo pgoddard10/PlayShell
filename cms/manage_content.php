@@ -20,15 +20,6 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
 
 ?>
 <!-- Custom styles for this page -->
-<style>
-/* To allow Modal boxes to stack - used when adding NFC tags */
-.modal:nth-of-type(even) {
-    z-index: 1052 !important;
-}
-.modal-backdrop.show:nth-of-type(even) {
-    z-index: 1051 !important;
-}
-</style>
       <!-- Begin Page Content -->
       <div class="container-fluid">
 

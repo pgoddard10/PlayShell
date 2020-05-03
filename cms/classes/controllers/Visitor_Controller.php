@@ -40,6 +40,37 @@ class Visitor_Controller
         return $data;
     }
 
+    /**
+     * method check_for_duplicate()
+     * Checks that the submitted data from the form doesn't already exist.
+     * The purpose is to minimise duplicate visitors being created
+     * 
+     *  @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers
+     */
+    public function check_for_duplicate() {
+        $returnValue = 0;// no duplicate found
+        
+        if(isset($_GET['visitor_id'])) $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
+        $email = $this->sanitise_string($_GET['email'],true);
+        $address_1 = $this->sanitise_string($_GET['address_1']);
+        $address_postcode = $this->sanitise_string($_GET['address_postcode']);
+        $first_name = $this->sanitise_string($_GET['first_name']);
+        $last_name = $this->sanitise_string($_GET['last_name']);
+
+        foreach($this->all_visitors as $visitor=>$details) {
+            if((!isset($_GET['visitor_id']) || ($visitor_id != $details->visitor_id))) {
+                if($email == $details->email) return -2;
+                if(($address_1 == $details->address_1) && ($address_postcode == $details->address_postcode)) {
+                    if(($first_name == $details->first_name) && ($last_name == $details->last_name)) {
+                        return -3;
+                    }
+                }
+            }
+        }
+
+        return $returnValue;
+    }
+
 	/**
 	 * method create_new()
 	 * Sanitises the form data and calls the model, which creates a new Visitor in the database
@@ -48,16 +79,19 @@ class Visitor_Controller
     public function create_new()
     {
         $returnValue = -1;//unknown error
-        $first_name = $this->sanitise_string($_GET['first_name']);
-        $last_name = $this->sanitise_string($_GET['last_name']);
-        $email = $this->sanitise_string($_GET['email'],true);
-        $address_1 = $this->sanitise_string($_GET['address_1']);
-        $address_2 = $this->sanitise_string($_GET['address_2']);
-        $address_3 = $this->sanitise_string($_GET['address_3']);
-        $address_4 = $this->sanitise_string($_GET['address_4']);
-        $address_postcode = $this->sanitise_string($_GET['address_postcode']);
-        //now that everything has been checked and filter, pass data to the model for database interaction
-        if($this->visitor_model->create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0;
+        $returnValue = $this->check_for_duplicate();
+        if($returnValue==0) {
+            $first_name = $this->sanitise_string($_GET['first_name']);
+            $last_name = $this->sanitise_string($_GET['last_name']);
+            $email = $this->sanitise_string($_GET['email'],true);
+            $address_1 = $this->sanitise_string($_GET['address_1']);
+            $address_2 = $this->sanitise_string($_GET['address_2']);
+            $address_3 = $this->sanitise_string($_GET['address_3']);
+            $address_4 = $this->sanitise_string($_GET['address_4']);
+            $address_postcode = $this->sanitise_string($_GET['address_postcode']);
+            //now that everything has been checked and filter, pass data to the model for database interaction
+            if($this->visitor_model->create_new($first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0;
+        }
         return $returnValue;
     }
 
@@ -69,19 +103,24 @@ class Visitor_Controller
     public function edit()
     {
         $returnValue = -1; //unknown error
-        $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
-        $first_name = $this->sanitise_string($_GET['first_name']);
-        $last_name = $this->sanitise_string($_GET['last_name']);
-        $email = $this->sanitise_string($_GET['email'],true);
-        $address_1 = $this->sanitise_string($_GET['address_1']);
-        $address_2 = $this->sanitise_string($_GET['address_2']);
-        $address_3 = $this->sanitise_string($_GET['address_3']);
-        $address_4 = $this->sanitise_string($_GET['address_4']);
-        $address_postcode = $this->sanitise_string($_GET['address_postcode']);
-        $this->visitor_model->populate_from_db($visitor_id);
-        //now that everything has been checked and filter, pass data to the model for database interaction
-        if($this->visitor_model->edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) $returnValue = 0; //successfully edited visitor
-        else $returnValue = -2; //error with query
+        $returnValue = $this->check_for_duplicate();
+        if($returnValue==0) {
+            $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
+            $first_name = $this->sanitise_string($_GET['first_name']);
+            $last_name = $this->sanitise_string($_GET['last_name']);
+            $email = $this->sanitise_string($_GET['email'],true);
+            $address_1 = $this->sanitise_string($_GET['address_1']);
+            $address_2 = $this->sanitise_string($_GET['address_2']);
+            $address_3 = $this->sanitise_string($_GET['address_3']);
+            $address_4 = $this->sanitise_string($_GET['address_4']);
+            $address_postcode = $this->sanitise_string($_GET['address_postcode']);
+            $this->visitor_model->populate_from_db($visitor_id);
+            //now that everything has been checked and filter, pass data to the model for database interaction
+            if($this->visitor_model->edit($visitor_id, $first_name, $last_name, $email, $address_1, $address_2, $address_3, $address_4, $address_postcode)==0) {
+                $returnValue = 0; //successfully edited visitor
+            }
+            else $returnValue = -4; //error with query
+        }
         return $returnValue;
     }
 
@@ -105,23 +144,42 @@ class Visitor_Controller
 	 * Loops through the $all_visitors array (which contains Visitor_Model objects) and turns into an array. The json_encode function turns the array into a JSON object
      * @return JSON String $data - all Item data as JSON obj
 	 */
-    public function JSONify_All_Visitors()
+    public function JSONify_all_visitors()
     {
         $data = array();
         if(count($this->all_visitors)<=0) return '{"data": []}'; //empty JSON for datatables to read correctly.
         foreach($this->all_visitors as $visitor=>$details) {
-            $myvisitor = array();
-            $myvisitor['name'] = $details->first_name.' '.$details->last_name;
-            $myvisitor['email'] = $details->email;
-            $myvisitor['address'] = $details->address;
-            $visitor_as_json = json_encode($details, JSON_HEX_APOS);
-            $myvisitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$visitor_as_json' class='editModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
-            $myvisitor['buttons'] = $myvisitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
-            $myvisitor['buttons'] = $myvisitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$visitor_as_json' class='btn_checkOutModal btn-circle btn-sm btn-primary' data-target='#checkOutModalCenter'><i class='fas fa-sign-out-alt'></i></a>";
-            $data["data"][] = $myvisitor;
+            $this_visitor = array();
+            $this_visitor['name'] = $details->first_name.' '.$details->last_name;
+            $this_visitor['email'] = $details->email;
+            $this_visitor['address'] = $details->address;
+            $this_visitor['buttons'] = "<a href='#' data-toggle='modal' data-id='$details->visitor_id' class='editModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
+            $this_visitor['buttons'] = $this_visitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->visitor_id' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
+            $this_visitor['buttons'] = $this_visitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->visitor_id' class='btn_checkOutModal btn-circle btn-sm btn-primary' data-target='#checkOutModalCenter'><i class='fas fa-sign-out-alt'></i></a>";
+            $data["data"][] = $this_visitor;
         }
         return json_encode($data, JSON_HEX_APOS);
     }
+
+
+
+    public function JSONify_visitor_details() {
+        $visitor_id = filter_var($_GET['visitor_id'], FILTER_VALIDATE_INT);
+        $this->visitor_model->populate_from_db($visitor_id);
+        $this_visitor = array();
+        $this_visitor['visitor_id'] = $this->visitor_model->visitor_id;
+        $this_visitor['first_name'] = $this->visitor_model->first_name;
+        $this_visitor['last_name'] = $this->visitor_model->last_name;
+        $this_visitor['email'] = $this->visitor_model->email;
+        $this_visitor['address_1'] =  $this->visitor_model->address_1;
+        $this_visitor['address_2'] =  $this->visitor_model->address_2;
+        $this_visitor['address_3'] =  $this->visitor_model->address_3;
+        $this_visitor['address_4'] =  $this->visitor_model->address_4;
+        $this_visitor['address_postcode'] =  $this->visitor_model->address_postcode;
+        $data["data"][] = $this_visitor;
+        return json_encode($data, JSON_HEX_APOS);
+    }
+
 
 	/**
 	 * method populate_all_visitors()

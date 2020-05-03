@@ -6,6 +6,7 @@
  * @date Spring 2020 
  * 
  */
+require_once('config.php');
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +20,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Audio Culture Admin</title>
+  <title><?php echo SITE_NAME; ?></title>
 
   <!-- Custom fonts for this template-->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">

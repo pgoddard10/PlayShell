@@ -140,35 +140,7 @@ class Content_Model
                 if($stm->execute()) {
                     $this->content_id = $db->lastInsertRowID();
                     $this->populate_from_db($this->content_id);
-                    $returnValue = -3; //saved to db but unable to upload soundfile
-
-                    if($tts_enabled==0){
-                        $sound_file = $_FILES['sound_file'];
-                        $dir_name = AUDIO_FOLDER.$this->item_id.'/';
-                        if (!is_dir($dir_name)) {
-                            //Create our directory if it does not exist
-                            mkdir($dir_name);
-                        }
-                        $dir_name = $dir_name . $this->content_id.'/';
-                        if (!is_dir($dir_name)) {
-                            //Create our directory if it does not exist
-                            mkdir($dir_name);
-                        }
-                        $complete_file_path = $dir_name."sound.wav";
-                        $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
-                        // Allow certain file formats
-                        if($file_type != "wav") {
-                            $returnValue = -4; //file is of non-accepted filetype
-                        }
-                        else if (move_uploaded_file($_FILES["sound_file"]["tmp_name"], $complete_file_path)) {
-                            $returnValue = 0; //everything successful
-                        }
-                        else {
-                            $returnValue = -5; //could save file
-                        }
-                    }
-                    else $returnValue = 0; //saved to db and no requirement for soundfile
-
+                    $returnValue = 0; //saved to db
                 }
                 else $returnValue = -2; //unable to execute query
             }
@@ -206,38 +178,7 @@ class Content_Model
 			$stm->bindParam(':content_id', $this->content_id);
 			if($stm->execute()) {
                 $this->populate_from_db($this->content_id);
-                $returnValue = -3; //saved to db but unable to upload soundfile
-
-                if($tts_enabled==0){
-                    if(isset($_FILES['sound_file'])) {
-                        $sound_file = $_FILES['sound_file'];
-                        $dir_name = AUDIO_FOLDER.$this->item_id.'/';
-                        if (!is_dir($dir_name)) {
-                            //Create our directory if it does not exist
-                            mkdir($dir_name);
-                        }
-                        $dir_name = $dir_name . $this->content_id.'/';
-                        if (!is_dir($dir_name)) {
-                            //Create our directory if it does not exist
-                            mkdir($dir_name);
-                        }
-                        $complete_file_path = $dir_name."sound.wav";
-                        $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
-                        // Allow certain file formats
-                        if($file_type != "wav") {
-                            $returnValue = -4; //file is of non-accepted filetype
-                        }
-                        else {
-                            if (move_uploaded_file($_FILES["sound_file"]["tmp_name"], $complete_file_path)) {
-                                $returnValue = 0; //everything successful
-                            } else {
-                                $returnValue = -5; //could not save file
-                            }
-                        }
-                    }
-                    else $returnValue = 0; //file has not been changed on the edit form
-                }
-                else $returnValue = 0; //saved to db and no requirement for soundfile
+                $returnValue = 0; //saved to db
             }
             else $returnValue = -2;
 		}
@@ -261,6 +202,39 @@ class Content_Model
             }
             else $returnValue = -2; //unable to delete from db
 		}
+        return $returnValue;
+    }
+
+
+    public function upload_file() {
+        $returnValue = -1;
+        if(isset($_FILES['sound_file'])) {
+            $sound_file = $_FILES['sound_file'];
+            $dir_name = AUDIO_FOLDER.$this->item_id.'/';
+            if (!is_dir($dir_name)) {
+                //Create our directory if it does not exist
+                mkdir($dir_name);
+            }
+            $dir_name = $dir_name . $this->content_id.'/';
+            if (!is_dir($dir_name)) {
+                //Create our directory if it does not exist
+                mkdir($dir_name);
+            }
+            $complete_file_path = $dir_name."sound.wav";
+            $file_type = strtolower(pathinfo($complete_file_path,PATHINFO_EXTENSION));
+            // Allow certain file formats
+            if($file_type != "wav") {
+                $returnValue = -3; //file is of non-accepted filetype
+            }
+            else {
+                if (move_uploaded_file($_FILES["sound_file"]["tmp_name"], $complete_file_path)) {
+                    $returnValue = 0; //everything successful
+                } else {
+                    $returnValue = -4; //could not save file
+                }
+            }
+        }
+        else $returnValue = -2;
         return $returnValue;
     }
 

@@ -33,8 +33,17 @@ class Visitor_View
     public function create_new()
     {
         $success = $this->visitor_controller->create_new();
-        if($success==0) $msg = "Successfully created the visitor.";
-        else $msg = "An unknown error occurred.";
+        switch($success) {
+            case 0:
+                $msg = "Successfully created the visitor.";
+                break;
+            case -2:
+                $msg = "The visitor details were not saved. The provided email address already exists.";
+                break;
+            case -3:
+                $msg = "The visitor details were not saved. The name and provided postal address already exists.";
+                break;
+        }
         ?>
               <!-- Add Message Card -->
                 <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
@@ -57,6 +66,12 @@ class Visitor_View
                 $msg = "Successfully edited the visitor.";
                 break;
             case -2:
+                $msg = "The visitor details were not saved. The provided email address already exists against someone else.";
+                break;
+            case -3:
+                $msg = "The visitor details were not saved. The name and provided postal address already exists against someone else.";
+                break;
+            case -4:
                 $msg = "Changes for the visitor were not saved. There was a database error editing the visitor details.";
                 break;
             case -1:
@@ -95,14 +110,25 @@ class Visitor_View
 
 
 	/**
-	 * method print_json()
+	 * method print_table_json()
 	 * prints the returned json
 	 */
-    public function print_json()
+    public function print_table_json()
     {
-        echo $this->visitor_controller->JSONify_All_Visitors();
+        header('Content-Type: application/json');
+        echo $this->visitor_controller->JSONify_all_visitors();
     }
 
+
+	/**
+	 * method print_visitor_json()
+	 * prints the returned json
+	 */
+    public function print_visitor_json()
+    {
+        header('Content-Type: application/json');
+        echo $this->visitor_controller->JSONify_visitor_details();
+    }
 
 	/**
 	 * method check_out_device()

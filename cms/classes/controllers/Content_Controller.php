@@ -119,9 +119,11 @@ class Content_Controller
         $returnValue = $this->content_model->create_new($item_id, $created_by, $name, $tts_enabled, $next_content, $active, $written_text, $gesture);
         if($returnValue==0) { //if successfully saved
             if($tts_enabled==1) { //and TTS was requested
-                $result = $this->content_model->convert_text_to_speech($written_text_for_tts); //convert the provided text to a sound file
+                $returnValue = $this->content_model->convert_text_to_speech($written_text_for_tts); //convert the provided text to a sound file
             }
-            $returnValue = 0;
+            else {
+                $returnValue = $this->content_model->upload_file();
+            }
         }
         return $returnValue;
     }
@@ -158,6 +160,9 @@ class Content_Controller
         if($returnValue==0) { //if successfully saved
             if(($tts_enabled==1) && ($this->content_model->convert_text_to_speech($written_text_for_tts)!=0)) { //convert the provided text to a sound file
                 $returnValue = -6; //saved in database but TTS failed
+            }
+            else {
+                $result = $this->content_model->upload_file();
             }
         }
         return $returnValue;

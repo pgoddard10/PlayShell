@@ -10,6 +10,30 @@
         Details of licenses for the Central Management System and the system running on individual visitor devices can be found below. This includes copyright notices and information on system creation and maintenance.
         </p>
 
+
+        <div class="row">
+            <div class="col">
+                <!-- Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        to do
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Put list of both in the GitHub repo.                             
+
+                            (only required on the visitor device)
+                            polarpiberry-MPU6050-C-CPP-Library-for-Raspberry-Pi - https://github.com/polarpiberry/MPU6050-C-CPP-Library-for-Raspberry-Pi/blob/master/License
+                            SFML - https://www.sfml-dev.org/license.php
+
+                            (both)
+                            Nigh/RC522-raspberrypi - https://github.com/Nigh/RC522-raspberrypi/blob/master/LICENSE
+                            JSONCPP https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 <!-- Card -->
@@ -18,8 +42,12 @@
                         General Information
                     </div>
                     <div class="card-body">
-                        <p>This system was written and build by Paul Goddard <<a href="mailto:paul2.goddard@uwe.ac.uk">paul2.goddard@uwe.ac.uk</a>>, a Computing BSc student at the University of the West of England (UWE, Bristol), as part of his final year project.</p>
-                        <p>PURPOSE OF THE SYSTEM!!!!!</p>
+                        <p>Cultural and heritage centres can provide multisensory learning experiences for everyone. However, many blind and visually impaired people avoid such centres due to various barriers. These barriers include large bodies of text and items in glass cases that can be difficult to see. </p>
+                        <p>Many centres improve accessibility through events like guided tours. However, feedback from the blind community reflects poorly upon the rigid, sequential nature of the tours, leaving little flexibility to cater to individual needs. Tours can also be an expense smaller centres cannot afford. Technology-based solutions are often laden with visually heavy interfaces or cumbersome systems which require space at each exhibit to be stored - something which is not so easy in a preserved historic home, for instance. </p>
+                        <p>A hand-held computer system provides pre-recorded audio to visitors as they explore the centre. Sound is triggered via a simple tap onto coin-sized contactless Near-Field Communication (NFC) tags which have been carefully placed by the curator or artist. Content is updated via a central computer system which replicates to each device. A storytelling process can be created through the addition of motion gestures (e.g. shake) which enhances the experience for all visitors, rather than the system being a tool for a single purpose.</p>
+                        <p>This system manages the content for a low-cost digital audio guide which can be combined with existing 2D and 3D systems, as well as 3D printed reliefs and replicas. The technology aims to work in a variety of environments, allowing curators to retrofit it into centres with limited space easily.</p>
+                        <br />
+                        <p>This system was written and built by Paul Goddard <<a href="mailto:paul2.goddard@uwe.ac.uk">paul2.goddard@uwe.ac.uk</a>>, a Computing BSc student at the University of the West of England (UWE, Bristol), as part of his final year project.</p>
                     </div>
                     <div class="card-footer">
                         <div class="row">
@@ -55,7 +83,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                    BlackrockDigital-startbootstrap-sb-admin-2
+                    <a href="https://github.com/BlackrockDigital/startbootstrap-sb-admin-2" target="_blank">BlackrockDigital-startbootstrap-sb-admin-2</a>
                     </div>
                     <div class="card-body">
                         <p>The MIT License (MIT)</p>
@@ -85,7 +113,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        DataTables
+                        <a href="https://github.com/DataTables/DataTables" target="_blank">DataTables</a>
                     </div>
                     <div class="card-body">
                         <p>MIT license</p>
@@ -102,7 +130,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        jQuery
+                        <a href="https://github.com/jquery/jquery" target="_blank">jQuery</a>
                     </div>
                     <div class="card-body">
                         <p>Copyright JS Foundation and other contributors, https://js.foundation/</p>
@@ -131,7 +159,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        BootStrap
+                        <a href="https://getbootstrap.com/" target="_blank">BootStrap</a>
                     </div>
                     <div class="card-body">
                         <p>The MIT License (MIT)</p>
@@ -161,7 +189,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        composer
+                        <a href="https://github.com/composer/composer" target="_blank">composer</a>
                     </div>
                     <div class="card-body">
                         <p>Copyright (c) Nils Adermann, Jordi Boggiano</p>
@@ -189,7 +217,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        guzzle
+                        <a href="https://github.com/guzzle/guzzle" target="_blank">guzzle</a>
                     </div>
                     <div class="card-body">
                         <p>Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com></p>
@@ -217,7 +245,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                    thephpleague-climate 
+                        <a href="https://github.com/thephpleague/climate" target="_blank">thephpleague-climate</a>
                     </div>
                     <div class="card-body">
                         <p>The MIT License (MIT)</p>
@@ -234,7 +262,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                    container-interop
+                        <a href="https://github.com/container-interop/container-interop" target="_blank">container-interop</a>
                     </div>
                     <div class="card-body">
                     <p>The MIT License (MIT)</p>
@@ -262,7 +290,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                    ralouphie-getallheaders
+                        <a href="https://github.com/ralouphie/getallheaders" target="_blank">ralouphie-getallheaders</a>
                     </div>
                     <div class="card-body">
                     <p>The MIT License (MIT)</p>
@@ -291,7 +319,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        Seldaek-cli-prompt
+                        <a href="https://github.com/Seldaek/cli-prompt" target="_blank">Seldaek-cli-prompt</a>
                     </div>
                     <div class="card-body">
                     <p>Copyright (c) 2015 Jordi Boggiano</p>
@@ -319,7 +347,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        Symfony
+                        <a href="https://github.com/symfony/symfony" target="_blank">Symfony</a>
                     </div>
                     <div class="card-body"><p>
                         <p>Copyright (c) 2004-2020 Fabien Potencier</p>
@@ -335,7 +363,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                    PHPMailer
+                        <a href="https://github.com/PHPMailer/PHPMailer" target="_blank">PHPMailer</a>
                     </div>
                     <div class="card-body">
                     <p>GNU LESSER GENERAL PUBLIC LICENSE</p>
@@ -849,7 +877,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        duncan3dc-speaker
+                        <a href="https://github.com/duncan3dc/speaker" target="_blank">duncan3dc-speaker</a>
                     </div>
                     <div class="card-body">
                                             <p>Apache License
@@ -1062,7 +1090,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        Nigh/RC522-raspberrypi
+                        <a href="https://github.com/Nigh/RC522-raspberrypi" target="_blank">Nigh-RC522-raspberrypi</a>
                     </div>
                     <div class="card-body">
                     <p>MIT License</p>
@@ -1091,7 +1119,7 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        License
+                        <a href="https://github.com/open-source-parsers/jsoncpp" target="_blank">JsonCpp</a>
                     </div>
                     <div class="card-body">
                     <p>The JsonCpp library's source code, including accompanying documentation, 
@@ -1158,44 +1186,34 @@
                 <!-- Card -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        Font Awesome
+                        <a href="https://fontawesome.com/" target="_blank">Font Awesome</a>
                     </div>
                     <div class="card-body">
-                        https://fontawesome.com/license/free
+                    <p>Font Awesome Free License</p>
+
+                    <p>Last updated on July 12, 2018</p>
+
+                    <p>Font Awesome Free is free, open source, and GPL friendly. You can use it for commercial projects, open source projects, or really almost whatever you want.</p>
+                    <p>Icons — CC BY 4.0 License</p>
+
+                    <p>In the Font Awesome Free download, the CC BY 4.0 license applies to all icons packaged as .svg and .js files types.</p>
+
+                    <p>Fonts — SIL OFL 1.1 License</p>
+
+                    <p>In the Font Awesome Free download, the SIL OFL license applies to all icons packaged as web and desktop font files.</p>
+                    <p>Code — MIT License</p>
+
+                    <p>In the Font Awesome Free download, the MIT license applies to all non-font and non-icon files.</p>
+                    <p>Attribution</p>
+
+                    <p>Attribution is required by MIT, SIL OFL, and CC BY licenses. Downloaded Font Awesome Free files already contain embedded comments with sufficient attribution, so you shouldn't need to do anything additional when using these files normally.</p>
+
+                    <p>We've kept attribution comments terse, so we ask that you do not actively work to remove them from files, especially code. They're a great way for folks to learn about Font Awesome. </p>
                     </div>
                 </div>
             </div>
         </div>
 
-
-
-        <div class="row">
-            <div class="col">
-                <!-- Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        License 1
-                    </div>
-                    <div class="card-body">
-                        <p>
-                            Put list of both in the GitHub repo.
-
-                            (only required on the CMS device)
-                            Font Awesome https://fontawesome.com/license/free
-                             
-
-                            (only required on the visitor device)
-                            polarpiberry-MPU6050-C-CPP-Library-for-Raspberry-Pi - https://github.com/polarpiberry/MPU6050-C-CPP-Library-for-Raspberry-Pi/blob/master/License
-                            SFML - https://www.sfml-dev.org/license.php
-
-                            (both)
-                            Nigh/RC522-raspberrypi - https://github.com/Nigh/RC522-raspberrypi/blob/master/LICENSE
-                            JSONCPP https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         </div>
         <!-- /.container-fluid -->

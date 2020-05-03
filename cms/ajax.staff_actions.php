@@ -26,5 +26,8 @@ switch($_GET['action']) {
     case 'delete':
         $staff_view->delete();
         break;
+    case 'get_staff_json':
+        $staff_view->print_staff_json();
+        break;
 }
 ?>

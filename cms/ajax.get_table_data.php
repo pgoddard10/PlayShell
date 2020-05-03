@@ -15,7 +15,6 @@ require_once('classes/views/Authenticate_View.php');
 $authenticate_view = new Authenticate_View();
 $authenticate_view->has_session();
 
-header('Content-Type: application/json');
 require_once('config.php');
 require_once('classes/views/Visitor_View.php');
 require_once('classes/views/Item_View.php');
@@ -25,12 +24,12 @@ switch($_GET['page']) {
     case 'visitor':
         $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
         $visitor_view = new Visitor_View();
-        $visitor_view->print_json();
+        $visitor_view->print_table_json();
         break;
     case 'staff':
         $authenticate_view->page_permissions(STAFF_DB_MANAGER);
         $staff_view = new Staff_View();
-        $staff_view->print_json();
+        $staff_view->print_table_json();
         break;
     case 'item':
         $authenticate_view->page_permissions(CONTENT_MANAGER);

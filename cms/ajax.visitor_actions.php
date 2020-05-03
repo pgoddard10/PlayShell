@@ -29,5 +29,8 @@ switch($_GET['action']) {
     case 'check_out_device':
         $visitor_view->check_out_device();
         break;
+    case 'get_visitor_json':
+        $visitor_view->print_visitor_json();
+        break;
 }
 ?>

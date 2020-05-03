@@ -34,10 +34,11 @@ $authenticate_view->has_session(); //check that the user is logged in
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Audio Culture Admin</title>
+  <title><?php echo SITE_NAME; ?></title>
 
   <!-- Custom styles for this template-->
   <link href="css/sb-admin-2.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
 
 </head>
 
@@ -50,11 +51,11 @@ $authenticate_view->has_session(); //check that the user is logged in
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="?page=home">
         <div class="sidebar-brand-icon rotate-n-15">
-          <i class="fas fa-unlock-alt"></i>
+          <i class="fas fa-headphones-alt"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">Admin</div>
+        <div class="sidebar-brand-text mx-3"><?php echo SITE_NAME; ?></div>
       </a>
 
       <!-- Divider -->
@@ -62,7 +63,7 @@ $authenticate_view->has_session(); //check that the user is logged in
 
       <!-- Nav Item - Home -->
       <li class="nav-item active">
-        <a class="nav-link" href="index.php">
+        <a class="nav-link" href="?page=home">
           <i class="fas fa-fw fa-home"></i>
           <span>Home</span></a>
       </li>
@@ -124,27 +125,11 @@ $authenticate_view->has_session(); //check that the user is logged in
 
       <!-- Begin Page Content -->
       <?php
-        switch(PAGE){
-          case 'manage_staff':
-            require_once('manage_staff.php');
-            break;
-          case 'manage_content':
-            require_once('manage_content.php');
-            break;
-          case 'manage_visitors':
-            require_once('manage_visitors.php');
-            break;
-          case 'manage_devices':
-            require_once('manage_devices.php');
-            break;
-          case 'home':
-            require_once('home.php');
-            break;
-          case 'about':
-            require_once('about.php');
-            break;
-          default:
-            require_once('404.html');
+        if (file_exists(PAGE.'.php')) {
+          require_once(PAGE.'.php');
+        }
+        else {
+          require_once('404.html');
         }
         $device_view->device_interaction_modal();
       ?>
@@ -261,7 +246,7 @@ $authenticate_view->has_session(); //check that the user is logged in
   $(document).ready(function() {
     $("#btn_logout").click(function(){ 
       $.when(logout()).done(function(a1){ //when the ajax request is complete
-        window.location.replace("login.php?logged_out"); //redirect to the login page
+        window.location.replace("login.php?page=logout"); //redirect to the login page
       });
       function logout(){ //call the ajax for saving the changes
         return $.ajax({url: "ajax.auth.php?action=logout", success: function(result){

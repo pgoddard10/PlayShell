@@ -133,6 +133,7 @@ class Content_View
 	 * prints the JSON from content_controller->JSONify_All_Contents()
 	 */
     public function print_json() {
+        header('Content-Type: application/json');
         echo $this->content_controller->JSONify_All_Contents();
     }
 

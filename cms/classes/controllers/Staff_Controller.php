@@ -44,7 +44,10 @@ class Staff_Controller
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
-        if($isemail) $data = filter_var($data, FILTER_VALIDATE_EMAIL); //if the email address is not valid, just don't save it as it's not a required field
+        if($isemail) {
+            $data = filter_var($data, FILTER_VALIDATE_EMAIL); //if the email address is not valid, just don't save it as it's not a required field
+            $data = strtolower($data); //convert all emails to lowercase because emails are not case sensitive
+        }
         return $data;
     }
 
@@ -58,29 +61,69 @@ class Staff_Controller
         $data = array();
         if(count($this->all_staff)<=0) return '{"data": []}'; //empty JSON for datatables to read correctly.
         foreach($this->all_staff as $staff_member=>$details) {
-            $mystaff = array();
-            $mystaff['name'] = $details->display_name;
-            $mystaff['username'] = $details->username;
-            $mystaff['email'] = $details->email;
-            $mystaff['roles'] = null;
+            $this_staff = array();
+            $this_staff['name'] = $details->display_name;
+            $this_staff['username'] = $details->username;
+            $this_staff['email'] = $details->email;
+            $this_staff['roles'] = null;
             if($details->roles) {
                 foreach($details->roles as $role) {
-                    $mystaff['roles'] = $mystaff['roles'].$role['name'].'<br />';
+                    $this_staff['roles'] = $this_staff['roles'].$role['name'].'<br />';
                 }
             }
             else {
-                $mystaff['roles'] = "[No assigned roles]";
+                $this_staff['roles'] = "[No assigned roles]";
             }
             if($details->active==1)
-                $mystaff['active'] = 'Yes';
+                $this_staff['active'] = 'Yes';
             else
-                $mystaff['active'] = 'No';
-            $staff_as_json = json_encode($details, JSON_HEX_APOS);
-            $mystaff['buttons'] = "<a href='#' data-toggle='modal' data-id='$staff_as_json' class='editModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
-            $mystaff['buttons'] = $mystaff['buttons'] . " <a href='#' data-toggle='modal' data-id='$staff_as_json' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
-            $data["data"][] = $mystaff;
+                $this_staff['active'] = 'No';
+            $this_staff['buttons'] = "<a href='#' data-toggle='modal' data-id='$details->staff_id' class='editModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
+            $this_staff['buttons'] = $this_staff['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->staff_id' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
+            $data["data"][] = $this_staff;
         }
         return json_encode($data, JSON_HEX_APOS);
+    }
+
+    
+    public function JSONify_staff_details() {
+        $staff_id = filter_var($_GET['staff_id'], FILTER_VALIDATE_INT);
+        $this->staff_model->populate_from_db($staff_id);
+        $this_staff = array();
+        $this_staff['display_name'] = $this->staff_model->display_name;
+        $this_staff['first_name'] = $this->staff_model->first_name;
+        $this_staff['last_name'] = $this->staff_model->last_name;
+        $this_staff['username'] = $this->staff_model->username;
+        $this_staff['email'] = $this->staff_model->email;
+        $this_staff['roles'] = $this->staff_model->roles;
+        $this_staff['active'] = $this->staff_model->active;
+        $data["data"][] = $this_staff;
+        return json_encode($data, JSON_HEX_APOS);
+    }
+
+    
+    /**
+     * method check_for_duplicate()
+     * Checks that the submitted data from the form doesn't already exist.
+     * The purpose is to minimise duplicate staff being created
+     * 
+     *  @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers
+     */
+    public function check_for_duplicate() {
+        $returnValue = 0;// no duplicate found
+        
+        if(isset($_GET['staff_id'])) $staff_id = filter_var($_GET['staff_id'], FILTER_VALIDATE_INT);
+        $email = $this->sanitise_string($_GET['email'],true);
+        if(isset($_GET['username'])) $username = $this->sanitise_string($_GET['username']);
+
+        foreach($this->all_staff as $staff_member=>$details) {
+            if((!isset($_GET['staff_id']) || ($staff_id != $details->staff_id))) {
+                if($email == $details->email) return -6;
+                if(isset($_GET['username'])) {
+                    if($username == $details->username) return -7;
+                }
+            }
+        }
     }
 
 	/**
@@ -91,25 +134,28 @@ class Staff_Controller
     public function create_new()
     {
         $returnValue = -1;
-        if(isset($_GET['roles'])){
-            $roles = $_GET['roles'];
-        }
-        else {
-            $roles = array();
-        }
-        $first_name = $this->sanitise_string($_GET['first_name']);
-        $last_name = $this->sanitise_string($_GET['last_name']);
-        $username = $this->sanitise_string($_GET['username']);
-        $password  = $_GET['password'];
-        $repeat_password  = $_GET['repeat_password'];
-        $email = $this->sanitise_string($_GET['email'],true);
+        $returnValue = $this->check_for_duplicate();
+        if($returnValue==0) {
+            if(isset($_GET['roles'])){
+                $roles = $_GET['roles'];
+            }
+            else {
+                $roles = array();
+            }
+            $first_name = $this->sanitise_string($_GET['first_name']);
+            $last_name = $this->sanitise_string($_GET['last_name']);
+            $username = $this->sanitise_string($_GET['username']);
+            $password  = $_GET['password'];
+            $repeat_password  = $_GET['repeat_password'];
+            $email = $this->sanitise_string($_GET['email'],true);
 
-        $username = strtolower($username);
-        if($password != $repeat_password) $returnValue =-2; //password mis-match
-        else {
-            $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
-            //now that everything has been checked and filter, pass data to the model for database interaction
-            if($this->staff_model->create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)==0) $returnValue = 0;
+            $username = strtolower($username);
+            if($password != $repeat_password) $returnValue =-2; //password mis-match
+            else {
+                $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+                //now that everything has been checked and filter, pass data to the model for database interaction
+                if($this->staff_model->create_new($first_name, $last_name, $username, $password, $repeat_password, $email, $roles)==0) $returnValue = 0;
+            }
         }
         return $returnValue;
     }
@@ -123,50 +169,53 @@ class Staff_Controller
     {
         $returnValue = -1; //unknown error
 
-        if(isset($_GET['roles'])){
-            $roles = $_GET['roles'];
-        }
-        else {
-            $roles = array();
-        }
-        $staff_id = filter_var($_GET['staff_id'], FILTER_VALIDATE_INT);
-        $first_name = $this->sanitise_string($_GET['first_name']);
-        $last_name = $this->sanitise_string($_GET['last_name']);
-        $password  = $_GET['password'];
-        $repeat_password  = $_GET['repeat_password'];
-        $email = $this->sanitise_string($_GET['email'],true);
-        $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
-
-        $this->staff_model->populate_from_db($staff_id);
-        if($password != $repeat_password) $returnValue =-2; //password mis-match
-        else {
-			if(strlen($password)>8) { //only replace password if one was provided
-                $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+        $returnValue = $this->check_for_duplicate();
+        if($returnValue==0) {
+            if(isset($_GET['roles'])){
+                $roles = $_GET['roles'];
             }
             else {
-                $password = null;
+                $roles = array();
             }
-            //check to see if this person is staff DB manager in DB
-            $staff_db_mgr = false;
-            if($this->staff_model->roles) { //if this person has any roles
-                foreach($this->staff_model->roles as $role) { //loop through each of the existing roles
-                    if($role['role_id']==STAFF_DB_MANAGER) { //check if any are the staff DB manager
-                        $staff_db_mgr = true;
-                        break;
+            $staff_id = filter_var($_GET['staff_id'], FILTER_VALIDATE_INT);
+            $first_name = $this->sanitise_string($_GET['first_name']);
+            $last_name = $this->sanitise_string($_GET['last_name']);
+            $password  = $_GET['password'];
+            $repeat_password  = $_GET['repeat_password'];
+            $email = $this->sanitise_string($_GET['email'],true);
+            $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
+
+            $this->staff_model->populate_from_db($staff_id);
+            if($password != $repeat_password) $returnValue =-2; //password mis-match
+            else {
+                if(strlen($password)>8) { //only replace password if one was provided
+                    $password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+                }
+                else {
+                    $password = null;
+                }
+                //check to see if this person is staff DB manager in DB
+                $staff_db_mgr = false;
+                if($this->staff_model->roles) { //if this person has any roles
+                    foreach($this->staff_model->roles as $role) { //loop through each of the existing roles
+                        if($role['role_id']==STAFF_DB_MANAGER) { //check if any are the staff DB manager
+                            $staff_db_mgr = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1) && (!in_array(STAFF_DB_MANAGER,$roles))) { //check how many staffDBmanagers exist in total
-                $returnValue = -3; //cannot remove the role for last DB manager
-            }
-            else {
-                //now that everything has been checked and filter, pass data to the model for database interaction
-                if($this->staff_model->edit($staff_id, $first_name, $last_name, $password, $email, $active)==0) {
-                    if($this->staff_model->edit_roles($roles)==0)
-                        $returnValue = 0;
-                    else $returnValue = -5; //unable to edit roles
+                if(($staff_db_mgr) && ($this->staff_model->total_num_active_staff_with_role(STAFF_DB_MANAGER)==1) && (!in_array(STAFF_DB_MANAGER,$roles))) { //check how many staffDBmanagers exist in total
+                    $returnValue = -3; //cannot remove the role for last DB manager
                 }
-                else $returnValue = -4; //unable to edit staff details
+                else {
+                    //now that everything has been checked and filter, pass data to the model for database interaction
+                    if($this->staff_model->edit($staff_id, $first_name, $last_name, $password, $email, $active)==0) {
+                        if($this->staff_model->edit_roles($roles)==0)
+                            $returnValue = 0;
+                        else $returnValue = -5; //unable to edit roles
+                    }
+                    else $returnValue = -4; //unable to edit staff details
+                }
             }
         }
         return $returnValue;

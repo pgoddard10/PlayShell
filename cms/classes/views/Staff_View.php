@@ -39,9 +39,11 @@ class Staff_View
     public function create_new()
     {
         $success = $this->staff_controller->create_new();
-        if($success==0) $msg = "Successfully created 'staff member'.";
-        if($success==-1) $msg = "An unknown error occurred.";
-        if($success==-2) $msg = "Password mis-match";
+        if($success==0) $msg = "Successfully created the staff member.";
+        else if($success==-2) $msg = "Staff member not saved. Password mis-match";
+        else if($success==-6) $msg = "Staff member not saved. The specified email address already exists.";
+        else if($success==-7) $msg = "Staff member not saved. The specified username already exists.";
+        else $msg = "An unknown error occurred.";
         ?>
               <!-- Add Message Card -->
                 <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
@@ -74,6 +76,12 @@ class Staff_View
                 break;
             case -5:
                 $msg = "Changes for staff member were not saved. There was a database error editing the roles.";
+                break;
+            case -6:
+                $msg = "Changes for staff member were not saved. The specified email address already exists against someone else.";
+                break;
+            case -7:
+                $msg = "Changes for staff member were not saved. The specified username already exists against someone else.";
                 break;
             case -1:
             default:
@@ -110,12 +118,23 @@ class Staff_View
     }
 
 	/**
-	 * method print_json()
+	 * method print_table_json()
 	 * prints the returned json
 	 */
-    public function print_json()
+    public function print_table_json()
     {
+        header('Content-Type: application/json');
         echo $this->staff_controller->JSONify_All_Staff();
+    }
+
+	/**
+	 * method print_staff_json()
+	 * prints the returned json
+	 */
+    public function print_staff_json()
+    {
+        header('Content-Type: application/json');
+        echo $this->staff_controller->JSONify_staff_details();
     }
 
 	/**

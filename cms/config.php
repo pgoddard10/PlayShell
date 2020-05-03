@@ -8,7 +8,14 @@
  * 
  */
 
+//system settings
 define("DATABASE_FILE","audio_culture.db");
+define("SITE_NAME","Audio Culture Admin");
+
+//display PHP errors (i.e. PHP debugging = on)
+if (!ini_get('display_errors')) {
+    ini_set('display_errors', '1');
+}
 
 //staff roles for access to parts of the CMS
 define("STAFF_DB_MANAGER",1);
@@ -16,6 +23,7 @@ define("CONTENT_MANAGER",2);
 define("REPORT_MANAGER",3);
 define("VISITOR_DB_MANAGER",4);
 define("DEVICE_MANAGER",5);
+define("TBC",6);
 
 define("CONTENT_ID_FILE","json/tag_setup/content.json");//contains the outgoing content id (i.e. from the PHP script to the C++ app)
 define("NFC_ID_FILE","json/tag_setup/tag_data.json");//contains the returning NFC tag id (i.e. from the C++ app to the PHP page)
