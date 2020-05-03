@@ -226,6 +226,8 @@ $authenticate_view->has_session(); //check that the user is logged in
                 <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
                 <!-- Page level custom scripts -->
+                <script src="js/datatables/manage_content.js"></script>
+                <script src="js/manage_item.js"></script>
                 <script src="js/manage_content.js"></script>
 
                 <!-- Page level custom style -->

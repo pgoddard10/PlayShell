@@ -11,11 +11,20 @@
 //system settings
 define("DATABASE_FILE","audio_culture.db");
 define("SITE_NAME","Audio Culture Admin");
+define("CHECK_OUT_TAG_ID","88042199");
 
 //display PHP errors (i.e. PHP debugging = on)
 if (!ini_get('display_errors')) {
     ini_set('display_errors', '1');
 }
+
+//Email handling details
+define("SMTP_HOST","smtp-mail.outlook.com");
+define("SMTP_USERNAME","xxx");
+define("SMTP_PASSWORD","xxx");
+define("SMTP_FROM_ADDRESS","xxx");
+define("SMTP_FROM_NAME","xxx");
+define("SMTP_PORT",587);
 
 //staff roles for access to parts of the CMS
 define("STAFF_DB_MANAGER",1);

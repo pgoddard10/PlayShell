@@ -44,6 +44,31 @@ class Item_Controller
         return $data;
     }
 
+    
+    /**
+     * method check_for_duplicate()
+     * Checks that the submitted data from the form doesn't already exist.
+     * The purpose is to minimise duplicate visitors being created
+     * 
+     *  @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers
+     */
+    public function check_for_duplicate() {
+        $returnValue = 0;// no duplicate found
+        
+        if(isset($_GET['item_id'])) $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
+        $name = $this->sanitise_string($_GET['name']);
+        $heritage_id = $this->sanitise_string($_GET['heritage_id']);
+
+        foreach($this->all_items as $item=>$details) {
+            if((!isset($_GET['item_id']) || ($item_id != $details->item_id))) {
+                if($name == $details->name) return -3;
+                if($heritage_id == $details->heritage_id) return -4;
+            }
+        }
+
+        return $returnValue;
+    }
+
 	/**
 	 * method create_new()
 	 * Sanitises the form data and calls the model, which creates a new Item in the database
@@ -53,14 +78,18 @@ class Item_Controller
     public function create_new($modified_by)
     {
         $returnValue = -1;//unknown error
-        $heritage_id = $this->sanitise_string($_GET['heritage_id']);
-        $name = $this->sanitise_string($_GET['name']);
-        $location = $this->sanitise_string($_GET['location']);
-        $url = $this->sanitise_string($_GET['url'],true);
-        $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
-        $modified_by = filter_var($modified_by, FILTER_VALIDATE_INT);
-        //now that everything has been checked and filter, pass data to the model for database interaction
-        if($this->item_model->create_new($heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0;
+        $returnValue = $this->check_for_duplicate();
+        if($returnValue==0){
+            $heritage_id = $this->sanitise_string($_GET['heritage_id']);
+            $name = $this->sanitise_string($_GET['name']);
+            $location = $this->sanitise_string($_GET['location']);
+            $url = $this->sanitise_string($_GET['url'],true);
+            $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
+            $modified_by = filter_var($modified_by, FILTER_VALIDATE_INT);
+            //now that everything has been checked and filter, pass data to the model for database interaction
+            if($this->item_model->create_new($heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0;
+            else $returnValue = -2;
+        }
         return $returnValue;
     }
 
@@ -73,16 +102,19 @@ class Item_Controller
     public function edit($modified_by)
     {
         $returnValue = -1; //unknown error
-        $heritage_id = $this->sanitise_string($_GET['heritage_id']);
-        $name = $this->sanitise_string($_GET['name']);
-        $location = $this->sanitise_string($_GET['location']);
-        $url = $this->sanitise_string($_GET['url'],true);
-        $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
-        $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
-        $this->item_model->populate_from_db($item_id);
-        //now that everything has been checked and filter, pass data to the model for database interaction
-        if($this->item_model->edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0; //successfully edited visitor
-        else $returnValue = -2; //error with query
+        $returnValue = $this->check_for_duplicate();
+        if($returnValue==0) {
+            $heritage_id = $this->sanitise_string($_GET['heritage_id']);
+            $name = $this->sanitise_string($_GET['name']);
+            $location = $this->sanitise_string($_GET['location']);
+            $url = $this->sanitise_string($_GET['url'],true);
+            $active = filter_var($_GET['active'], FILTER_VALIDATE_INT);
+            $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
+            $this->item_model->populate_from_db($item_id);
+            //now that everything has been checked and filter, pass data to the model for database interaction
+            if($this->item_model->edit($item_id, $heritage_id, $name, $location, $url, $active, $modified_by)==0) $returnValue = 0; //successfully edited visitor
+            else $returnValue = -2; //error with query
+        }
         return $returnValue;
     }
 
@@ -201,14 +233,26 @@ class Item_Controller
                     $individual_item['active'] = 'No';
 
                 $individual_item['content'] = $details->content;
-                    
-                $items_as_json = json_encode($details, JSON_HEX_APOS);
-                $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$items_as_json' class='editItemModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
-                $individual_item['buttons'] = $individual_item['buttons'] . " <a href='#' data-toggle='modal' data-id='$items_as_json' class='deleteItemModalBox btn-circle btn-sm btn-primary' data-target='#deleteItemModalCenter'><i class='fas fa-trash'></i></a>";
+
+                $individual_item['buttons'] = "<a href='#' data-toggle='modal' data-id='$details->item_id' class='editItemModalBox btn-circle btn-sm btn-primary' data-target='#editModalCenter'><i class='fas fa-edit'></i></a>";
+                $individual_item['buttons'] = $individual_item['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->item_id' class='deleteItemModalBox btn-circle btn-sm btn-primary' data-target='#deleteItemModalCenter'><i class='fas fa-trash'></i></a>";
                 $data["data"][] = $individual_item;
             }
             return json_encode($data, JSON_HEX_APOS);
         }
+    }
+
+    public function JSONify_item_details() {
+        $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
+        $this->item_model->populate_from_db($item_id);
+        $this_item = array();
+        $this_item['name'] = $this->item_model->name;
+        $this_item['url'] = $this->item_model->url;
+        $this_item['heritage_id'] = $this->item_model->heritage_id;
+        $this_item['location'] = $this->item_model->location;
+        $this_item['active'] = $this->item_model->active;
+        $data["data"][] = $this_item;
+        return json_encode($data, JSON_HEX_APOS);
     }
 
 	/**

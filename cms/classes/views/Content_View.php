@@ -127,14 +127,24 @@ class Content_View
         <?php
     }
 
-
 	/**
-	 * method print_json()
-	 * prints the JSON from content_controller->JSONify_All_Contents()
+	 * method print_table_json()
+	 * prints the called json
 	 */
-    public function print_json() {
+    public function print_table_json()
+    {
         header('Content-Type: application/json');
         echo $this->content_controller->JSONify_All_Contents();
+    }
+
+	/**
+	 * method print_content_json()
+	 * prints the called json
+	 */
+    public function print_content_json()
+    {
+        header('Content-Type: application/json');
+        echo $this->content_controller->JSONify_content_details();
     }
 
 	/**
@@ -186,8 +196,8 @@ class Content_View
                                 Once the audio has finished, which physical gesture needs to be performed?<br />
                                 <select id="new_gesture" name="gesture" class="form-control-sm form-control-user-sm">
                                     <option value selected>None</option>
-                                    <option value="0">Gesture 1</option>
-                                    <option value="1">Gesture 2</option>
+                                    <option value="1">Gesture 1</option>
+                                    <option value="2">Gesture 2</option>
                                 </select>
                             </div>
                             <div class="form-group new_next_content_options">
@@ -270,8 +280,8 @@ class Content_View
                                 Once the audio has finished, which physical gesture needs to be performed?<br />
                                 <select id="edit_gesture" name="gesture" class="form-control-sm form-control-user-sm">
                                     <option value selected>None</option>
-                                    <option value="0">Gesture 1</option>
-                                    <option value="1">Gesture 2</option>
+                                    <option value="1">Gesture 1</option>
+                                    <option value="2">Gesture 2</option>
                                 </select>
                             </div>
                             <div class="form-group edit_next_content_options">

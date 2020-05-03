@@ -30,14 +30,20 @@ switch($_GET['action']) {
     case 'delete_item':
         $item_view->delete();
         break;
+    case 'get_item_json':
+        $item_view->print_item_json();
+        break;
     case 'new_content':
         $content_view->create_new($logged_in_staff_id);
+        break;
+    case 'edit_content':
+        $content_view->edit($logged_in_staff_id);
         break;
     case 'delete_content':
         $content_view->delete();
         break;
-    case 'edit_content':
-        $content_view->edit($logged_in_staff_id);
+    case 'get_content_json':
+        $content_view->print_content_json();
         break;
     case 'scan_nfc_tag':
         $content_view->scan_nfc_tag();

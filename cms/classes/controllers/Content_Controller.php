@@ -81,14 +81,59 @@ class Content_Controller
                 $content_details_array['next_content_id'] = $contents->next_content_id;
                 $content_details_array['next_content_name'] = $contents->next_content_name;
 
-                $content_as_json = json_encode($contents, JSON_HEX_APOS);
-                $content_details_array['buttons'] = "<a href='#' data-toggle='modal' data-id='$content_as_json' class='editContentModalBox btn-success btn-circle btn-sm' data-target='#editContentModalCenter'><i class='fas fa-edit bg-success'></i></a>";
-                $content_details_array['buttons'] = $content_details_array['buttons'] . " <a href='#' data-toggle='modal' data-id='$content_as_json' class='deleteContentModalBox btn-success btn-circle btn-sm' data-target='#deleteContentModalCenter'><i class='fas fa-trash'></i></a>";
+                $content_details_array['buttons'] = "<a href='#' data-toggle='modal' data-id='$contents->content_id' class='editContentModalBox btn-success btn-circle btn-sm' data-target='#editContentModalCenter'><i class='fas fa-edit bg-success'></i></a>";
+                $content_details_array['buttons'] = $content_details_array['buttons'] . " <a href='#' data-toggle='modal' data-id='$contents->content_id' class='deleteContentModalBox btn-success btn-circle btn-sm' data-target='#deleteContentModalCenter'><i class='fas fa-trash'></i></a>";
 
                 $individual_content["data"][] = $content_details_array;
             }
             return json_encode($individual_content, JSON_HEX_APOS);
         }
+    }
+
+    
+    public function JSONify_content_details() {
+        $content_id = filter_var($_GET['content_id'], FILTER_VALIDATE_INT);
+        $this->content_model->populate_from_db($content_id);
+        $this_content = array();
+        $this_content['name'] = $this->content_model->name;
+        $this_content['tag_id'] = $this->content_model->tag_id;
+        $this_content['item_id'] = $this->content_model->item_id;
+        $this_content['active'] = $this->content_model->active;
+        $this_content['tts_enabled'] = $this->content_model->tts_enabled;
+        $this_content['written_text'] = $this->content_model->written_text;
+        $this_content['gesture_id'] = $this->content_model->gesture_id;
+        $this_content['next_content_id'] = $this->content_model->next_content_id;
+        $data["data"][] = $this_content;
+        return json_encode($data, JSON_HEX_APOS);
+    }
+    
+    /**
+     * method check_for_duplicate()
+     * Checks that the submitted data from the form doesn't already exist.
+     * The purpose is to minimise duplicate visitors being created
+     * 
+     *  @return Integer $returnValue - confirms whether successful or not. Errors are negative numbers
+     */
+    public function check_for_duplicate() {
+        $returnValue = 0;// no duplicate found
+        
+        if(isset($_GET['item_id'])) $item_id = filter_var($_GET['item_id'], FILTER_VALIDATE_INT);
+        $name = $this->sanitise_string($_GET['name']);
+        $heritage_id = $this->sanitise_string($_GET['heritage_id']);
+
+
+        //need to check content PER ITEM - same name is allowed across items
+        //HOWEVER need to check NFC tags across the entire item list
+        //Also check NFC tag against the CHECK_OUT_TAG_ID
+        //so should this be done in the Item Controller instead? Or partial, check here and Item?
+        // foreach($this->all_items as $item=>$details) {
+        //     if((!isset($_GET['item_id']) || ($item_id != $details->item_id))) {
+        //         if($name == $details->name) return -3;
+        //         if($heritage_id == $details->heritage_id) return -4;
+        //     }
+        // }
+
+        return $returnValue;
     }
 
 	/**

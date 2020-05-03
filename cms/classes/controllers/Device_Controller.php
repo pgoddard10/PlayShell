@@ -189,17 +189,20 @@ class Device_Controller
         $mail = new PHPMailer();
         try {
             //Server settings
-            $mail->SMTPDebug = SMTP::DEBUG_OFF;                      // Enable verbose debug output
+            $mail->SMTPDebug = SMTP::DEBUG_OFF;                         // Enable verbose debug output
             $mail->isSMTP();                                            // Send using SMTP
-            $mail->Host       = 'smtp-mail.outlook.com';                    // Set the SMTP server to send through
+            $mail->Host       = SMTP_HOST;                              // Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = 'yyyyy';                     // SMTP username
-            $mail->Password   = 'xxxxx';                               // SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-            $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+            $mail->Username   = SMTP_USERNAME;                          // SMTP username
+            $mail->Password   = SMTP_PASSWORD;                          // SMTP password
+            if(SMTP_PORT==587)
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;     // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+            else
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;        // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+            $mail->Port       = SMTP_PORT;                              // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
         
             //Recipients
-            $mail->setFrom('yyyy', 'Paul Goddard');
+            $mail->setFrom(SMTP_FROM_ADDRESS, SMTP_FROM_NAME);
             $mail->addAddress($to_email, $to_name);     // Add a recipient
         
             // Content

@@ -34,12 +34,12 @@ switch($_GET['page']) {
     case 'item':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
         $item_view = new Item_View();
-        $item_view->print_json();
+        $item_view->print_table_json();
         break;
     case 'content':
         $authenticate_view->page_permissions(CONTENT_MANAGER);
         $content_view = new Content_View($_GET['item_id']);
-        $content_view->print_json();
+        $content_view->print_table_json();
         break;
 }
 ?>

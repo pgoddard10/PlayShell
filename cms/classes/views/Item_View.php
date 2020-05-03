@@ -34,8 +34,24 @@ class Item_View
     public function create_new($modified_by)
     {
         $success = $this->item_controller->create_new($modified_by);
-        if($success==0) $msg = "Successfully created the item.";
-        else $msg = "An unknown error occurred.";
+        switch($success) {
+        case 0:
+            $msg = "Successfully edited the item.";
+            break;
+        case -2:
+            $msg = "The item was. There was a database error editing the item details.";
+            break;
+        case -3:
+            $msg = "The item was not saved. An item with the specified name already exists.";
+            break;
+        case -4:
+            $msg = "The item was not saved. An item with the specified ID already exists.";
+            break;
+        case -1:
+        default:
+            $msg = "The item was not saved. An unknown error occurred.";
+            break;
+        }
         ?>
               <!-- Add Message Card -->
                 <div class="card mb-4 py-3 border-left-<?php if($success==0) echo 'success'; else echo 'danger'; //change colour depending on whether success or not ?>"> 
@@ -60,6 +76,12 @@ class Item_View
                 break;
             case -2:
                 $msg = "Changes for the item were not saved. There was a database error editing the item details.";
+                break;
+            case -3:
+                $msg = "Changes for the item were not saved. An item with the specified name already exists.";
+                break;
+            case -4:
+                $msg = "Changes for the item were not saved. An item with the specified ID already exists.";
                 break;
             case -1:
             default:
@@ -96,13 +118,23 @@ class Item_View
     }
 
 	/**
-	 * method print_json()
+	 * method print_table_json()
 	 * prints the called json
 	 */
-    public function print_json()
+    public function print_table_json()
     {
         header('Content-Type: application/json');
         echo $this->item_controller->JSONify_All_Items();
+    }
+
+	/**
+	 * method print_item_json()
+	 * prints the called json
+	 */
+    public function print_item_json()
+    {
+        header('Content-Type: application/json');
+        echo $this->item_controller->JSONify_item_details();
     }
 
 	/**
