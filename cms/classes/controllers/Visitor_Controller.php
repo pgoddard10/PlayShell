@@ -158,7 +158,7 @@ class Visitor_Controller
             $this_visitor['buttons'] = $this_visitor['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->visitor_id' class='btn_checkOutModal btn-circle btn-sm btn-primary' data-target='#checkOutModalCenter'><i class='fas fa-sign-out-alt'></i></a>";
             $data["data"][] = $this_visitor;
         }
-        return json_encode($data, JSON_HEX_APOS);
+        return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
 
 
@@ -177,7 +177,7 @@ class Visitor_Controller
         $this_visitor['address_4'] =  $this->visitor_model->address_4;
         $this_visitor['address_postcode'] =  $this->visitor_model->address_postcode;
         $data["data"][] = $this_visitor;
-        return json_encode($data, JSON_HEX_APOS);
+        return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
 
 
@@ -224,7 +224,7 @@ class Visitor_Controller
                         //now read the JSON file - is this device ready for a visitor to take out, already in use, or performing a system update?
                         if ($device_ready_json['status']['code']==DEVICE_READY) { //if device is ready, copy over visitor ID in JSON via SFTP
                             $visitor["data"] = array("visitor_id"=>$visitor_id);
-                            $visitor_json = json_encode($visitor, JSON_HEX_APOS);
+                            $visitor_json = json_encode($visitor, JSON_HEX_APOS|JSON_PRETTY_PRINT);
                             
                             $local_file = PUBLISHED_CONTENT_FOLDER."visitor.json";
                             $fp = fopen($local_file, 'w');
@@ -251,7 +251,7 @@ class Visitor_Controller
                             //change the status on the device to 'in use'
                             $local_file = PUBLISHED_CONTENT_FOLDER."status.json";
                             $status_data["status"] = array("code"=>DEVICE_IN_USE, "name"=>"in use");
-                            $status_json = json_encode($status_data, JSON_HEX_APOS);
+                            $status_json = json_encode($status_data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
                             $fp = fopen($local_file, 'w');
                             fwrite($fp, $status_json);
                             fclose($fp);
@@ -285,7 +285,7 @@ class Visitor_Controller
             else
                 $returnValue["data"]["error"] = array("code"=>-2,"description"=>"There are currently no available devices for use. Please ensure any returned devices have been checked-in.");
         }
-        return json_encode($returnValue, JSON_HEX_APOS);
+        return json_encode($returnValue, JSON_HEX_APOS|JSON_PRETTY_PRINT);
 
     }
 

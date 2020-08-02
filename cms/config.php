@@ -15,7 +15,7 @@ define("CHECK_OUT_TAG_ID","88042199");
 
 //display PHP errors (i.e. PHP debugging = on)
 if (!ini_get('display_errors')) {
-    ini_set('display_errors', '1');
+    ini_set('display_errors', '0');
 }
 
 //Email handling details

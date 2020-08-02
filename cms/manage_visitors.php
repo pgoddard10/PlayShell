@@ -38,9 +38,9 @@ $authenticate_view->page_permissions(VISITOR_DB_MANAGER);
               <table class="table table-bordered" id="manage_visitor_data_table" width="100%" cellspacing="0">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Address</th>
+                    <th>Name <sup><a href="#" data-toggle="tooltip" title="Name of the visitor"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
+                    <th>Email <sup><a href="#" data-toggle="tooltip" title="The visitor's email. Used to send (optional) summary emails"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
+                    <th>Address <sup><a href="#" data-toggle="tooltip" title="The visitor's address"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
                     <th>Actions</th>
                   </tr>
                 </thead>

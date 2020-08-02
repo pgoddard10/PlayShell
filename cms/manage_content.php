@@ -51,7 +51,7 @@ $authenticate_view->page_permissions(CONTENT_MANAGER);
                     <th>Name & URL <sup><a href="#" data-toggle="tooltip" title="This item's name, which links to the 'see more' web address to be sent to visitors' email address"><i class="fas fa-fw fa-question-circle"></i></a></sup>
                     <th>Your ID <sup><a href="#" data-toggle="tooltip" title="The unique ID you might be using in other systems"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
                     <th>Location <sup><a href="#" data-toggle="tooltip" title="Where is this item displayed/stored?"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
-                    <th>Active?</th>
+                    <th>Active? <sup><a href="#" data-toggle="tooltip" title="Allow visitors to interact and listen to all content associated with this item?"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
                     <th></th>
                   </tr>
                 </thead>

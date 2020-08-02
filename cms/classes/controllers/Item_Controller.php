@@ -61,8 +61,12 @@ class Item_Controller
 
         foreach($this->all_items as $item=>$details) {
             if((!isset($_GET['item_id']) || ($item_id != $details->item_id))) {
-                if($name == $details->name) return -3;
-                if($heritage_id == $details->heritage_id) return -4;
+                if($name!="") {
+                    if($name == $details->name) return -3;
+                }
+                if($heritage_id!="") {
+                    if($heritage_id == $details->heritage_id) return -4;
+                }
             }
         }
 
@@ -238,7 +242,7 @@ class Item_Controller
                 $individual_item['buttons'] = $individual_item['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->item_id' class='deleteItemModalBox btn-circle btn-sm btn-primary' data-target='#deleteItemModalCenter'><i class='fas fa-trash'></i></a>";
                 $data["data"][] = $individual_item;
             }
-            return json_encode($data, JSON_HEX_APOS);
+            return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
         }
     }
 
@@ -252,7 +256,7 @@ class Item_Controller
         $this_item['location'] = $this->item_model->location;
         $this_item['active'] = $this->item_model->active;
         $data["data"][] = $this_item;
-        return json_encode($data, JSON_HEX_APOS);
+        return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
 
 	/**

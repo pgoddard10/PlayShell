@@ -66,7 +66,7 @@ $(document).ready(function() {
             setmsg(msg,"error");
           }
           else {
-            msg = r.data.hostname + " is ready for use.";
+            msg = "All devices in range have been updated.";
             setmsg(msg,"info");
           } 
       }});

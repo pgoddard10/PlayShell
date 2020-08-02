@@ -20,7 +20,9 @@
                     </div>
                     <div class="card-body">
                         <p>
-                            Put list of both in the GitHub repo.                             
+                            include link to the gitHUB repo for this project
+
+                            Put list of both in the GitHub repo.
 
                             (only required on the visitor device)
                             polarpiberry-MPU6050-C-CPP-Library-for-Raspberry-Pi - https://github.com/polarpiberry/MPU6050-C-CPP-Library-for-Raspberry-Pi/blob/master/License

@@ -38,11 +38,11 @@ $authenticate_view->page_permissions(STAFF_DB_MANAGER);
               <table class="table table-bordered" id="manage_staff_data_table" width="100%" cellspacing="0">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role(s)</th>
-                    <th>Active?</th>
+                    <th>Name <sup><a href="#" data-toggle="tooltip" title="Name of the member of staff"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
+                    <th>Username <sup><a href="#" data-toggle="tooltip" title="Username used to log into this system"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
+                    <th>Email <sup><a href="#" data-toggle="tooltip" title="Staff member's email address"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
+                    <th>Role(s) <sup><a href="#" data-toggle="tooltip" title="Access to areas of this system"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
+                    <th>Active? <sup><a href="#" data-toggle="tooltip" title="Allow this member to login?"><i class="fas fa-fw fa-question-circle"></i></a></sup></th>
                     <th>Actions</th>
                   </tr>
                 </thead>

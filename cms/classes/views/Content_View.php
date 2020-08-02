@@ -196,8 +196,7 @@ class Content_View
                                 Once the audio has finished, which physical gesture needs to be performed?<br />
                                 <select id="new_gesture" name="gesture" class="form-control-sm form-control-user-sm">
                                     <option value selected>None</option>
-                                    <option value="1">Gesture 1</option>
-                                    <option value="2">Gesture 2</option>
+                                    <option value="1">Shake</option>
                                 </select>
                             </div>
                             <div class="form-group new_next_content_options">
@@ -280,8 +279,7 @@ class Content_View
                                 Once the audio has finished, which physical gesture needs to be performed?<br />
                                 <select id="edit_gesture" name="gesture" class="form-control-sm form-control-user-sm">
                                     <option value selected>None</option>
-                                    <option value="1">Gesture 1</option>
-                                    <option value="2">Gesture 2</option>
+                                    <option value="1">Shake</option>
                                 </select>
                             </div>
                             <div class="form-group edit_next_content_options">

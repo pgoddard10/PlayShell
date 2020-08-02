@@ -1,5 +1,5 @@
 var item_table;
-var content_table;
+var content_table = new Array();
 $(document).ready(function() {
 
     //store all the ITems in the local storage
@@ -112,11 +112,11 @@ $(document).ready(function() {
             to_display += '<thead>' +
                 '<tr>' +
                     '<th></th>' +
-                    '<th>Name</th>' +
-                    '<th>NFC Tag ID</th>' +
-                    '<th>Active?</th>' +
-                    '<th>Gesture</th>' +
-                    '<th>Next Content</th>' +
+                    '<th>Name <sup><a href="#" data-toggle="tooltip" title="An identifiable name for the part of the item an NFC tag is associated with"><i class="fas fa-fw fa-question-circle text-gray-100"></i></a></sup></th>' +
+                    '<th>NFC Tag <sup><a href="#" data-toggle="tooltip" title="The ID number of the NFC tag"><i class="fas fa-fw fa-question-circle text-gray-100"></i></a></sup></th>' +
+                    '<th>Active? <sup><a href="#" data-toggle="tooltip" title="Allow visitors to interact and listen to this content?"><i class="fas fa-fw fa-question-circle text-gray-100"></i></a></sup></th>' +
+                    '<th>Gesture <sup><a href="#" data-toggle="tooltip" title="Require a physical motion-based gesture once the initial content has played"><i class="fas fa-fw fa-question-circle text-gray-100"></i></a></sup></th>' +
+                    '<th>Next Content <sup><a href="#" data-toggle="tooltip" title="Automatically play another sound after this one has finished"><i class="fas fa-fw fa-question-circle text-gray-100"></i></a></sup></th>' +
                     '<th></th>' +
                 '</tr>' +
             '</thead>'+
@@ -127,7 +127,7 @@ $(document).ready(function() {
   
             //now start work on the second level table
             //this table will display the Content data, i.e. about NFC tags.
-            content_table = $('#'+child_table_name).DataTable({
+            content_table[d.item_id] = $('#'+child_table_name).DataTable({
               "order": [ 1, "asc" ],
               destroy: true,
               "ajax": {
@@ -148,15 +148,23 @@ $(document).ready(function() {
                   },
                   {
                     "data":         "name",
-                    "width":        "20%"
+                    "width":        "200px"
                   },
                   {
                     "data":         "tag_id",
-                    "width":        "100px"
+                    "width":        "80px"
                   },
-                  { "data": "active" },
-                  { "data": "gesture_name" },
-                  { "data": "next_content_name" },
+                  {
+                    "data": "active",
+                    "width":        "80px"
+                  },
+                  {
+                    "data": "gesture_name",
+                    "width":        "10%"
+                  },
+                  {
+                    "data": "next_content_name"
+                  },
                   { 
                     "data":         "buttons",
                     "searchable":   false,
@@ -184,7 +192,7 @@ $(document).ready(function() {
             //within the second-level table (displaying the Content / NFC tag details), if the plus/minus is clicked
             $('#'+child_table_name+' tbody').on('click', 'td.child-details-control', function () {
               var tr = $(this).closest('tr');
-              var row = content_table.row( tr );
+              var row = content_table[d.item_id].row( tr );
               var tdi = tr.find("i.fa");
         
               if (row.child.isShown() ) {

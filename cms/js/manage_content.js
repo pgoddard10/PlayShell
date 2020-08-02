@@ -38,16 +38,24 @@ $(document).ready(function() {
    * 
    */
   
-  //Fill in the form fields on the Edit Modal Box with the appropriate data passed by clicked in the hyperlink
+  //Fill in the form fields on the New Modal Box with the appropriate data passed by clicked in the hyperlink
   //data is passed in the form of a JSON string.
-  $(document).on("click", ".newContentModalBox", function () { //onclick of the Edit icon/button
-    //grab the JSON data provided on the Edit icon/button and fill in the form input boxes
+  $(document).on("click", ".newContentModalBox", function () { //onclick of the New button
+    
     item_id = $(this).data('id').item_id;
     $(".modal-body #item_id").val($(this).data('id').item_id);
-    var db = JSON.parse(localStorage.getItem('db')); 
-    $.each(db.data[0].content, function (key, c) {
-      $('#new_next_content').append('<option value="'+c.content_id+'">'+c.name+'</option>'); 
-    });
+    // $('#new_next_content').empty();
+    // var db = JSON.parse(localStorage.getItem('db')); 
+    // $.each(db.data[0].content, function (key, c) {
+    //   $('#new_next_content').append('<option value="'+c.content_id+'">'+c.name+'</option>'); 
+    // });
+      $(".modal-body #new_name").val("");
+      $(".modal-body #new_written_text").val("");
+      $("#new_tts_enabled_yes").prop("checked", false);
+      $("#new_tts_enabled_no").prop("checked", false);
+      $(".modal-body #collapseOne").removeClass("show");
+      $(".modal-body #collapseTwo").removeClass("show");
+
   });
 
   $('#form_new_content').submit(function(event){
@@ -73,8 +81,9 @@ $(document).ready(function() {
     }
     
       $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
-        content_table.ajax.reload(); //reload the table with the new data
+        content_table[item_id].ajax.reload(); //reload the table with the new data
         set_localstorage();
+        $('#form_new_content').reset();
       });
       function save_to_database(){ //call the ajax for saving the changes
         return $.ajax({
@@ -105,6 +114,7 @@ $(document).ready(function() {
     content_id = $(this).data('id');
     $.when(ajax_call("ajax.content_actions.php?action=get_content_json&content_id="+content_id)).done(function(result){ //when the ajax request is complete
       var content = result.data[0];
+      item_id = content.item_id;
       $(".modal-body #edit_name").val(content.name);
       $(".modal-body #edit_content_id").val(content_id);
       var tag_id = "";
@@ -131,10 +141,13 @@ $(document).ready(function() {
       $(".modal-body #NFC_tag_details #please_wait").addClass('d-none');
       $(".modal-body #NFC_tag_details #id_and_button").removeClass('d-none');
 
-      var db = JSON.parse(localStorage.getItem('db')); 
-      $.each(db.data[0].content, function (key, c) {
-        $('#edit_next_content').append('<option value="'+c.content_id+'">'+c.name+'</option>'); 
-      });
+      // $('#edit_next_content').empty();
+      // var db = JSON.parse(localStorage.getItem('db')); 
+      // $.each(db.data[0].content, function (key, c) {
+      //   $('#edit_next_content').append('<option value="'+c.content_id+'">'+c.name+'</option>'); 
+      // });
+      
+
       $(".edit_active_options select").val(content.active);
     });
   });
@@ -144,7 +157,6 @@ $(document).ready(function() {
   * Edit Content 
   *    Submission of the data in the Edit content Modal Box
   */
-  var item_id;
   //Collect the form data and 'submit' the form via AJAX
   $('#edit_content_form').submit(function(event){
     event.preventDefault(); //cancels the form submission
@@ -166,7 +178,7 @@ $(document).ready(function() {
 
     //send the data as a GET request to the PHP page specified in direct_to_url
     $.when(save_to_database()).done(function(a1){ //when the ajax request is complete
-      content_table.ajax.reload(); //reload the table with the new data
+      content_table[item_id].ajax.reload(); //reload the table with the new data
       set_localstorage();
     });
     function save_to_database(){ //call the ajax for saving the changes
@@ -198,6 +210,7 @@ $(document).ready(function() {
     content_id = $(this).data('id');
     $.when(ajax_call("ajax.content_actions.php?action=get_content_json&content_id="+content_id)).done(function(result){ //when the ajax request is complete
       var content = result.data[0];
+      item_id = content.item_id;
       name = "'" + content.name + "'";
       $(".modal-body #span_name").text(name);
     });
@@ -207,7 +220,7 @@ $(document).ready(function() {
     //send the data as a GET request to the PHP page specified in direct_to_url
     $.when(ajax_call("ajax.content_actions.php?action=delete_content&content_id="+content_id)).done(function(result){ //when the ajax request is complete
       $("#div1").html(result);
-      content_table.ajax.reload(); //reload the table with the new data
+      content_table[item_id].ajax.reload(); //reload the table with the new data
     });
   });
 

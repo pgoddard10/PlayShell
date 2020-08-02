@@ -86,7 +86,7 @@ class Content_Controller
 
                 $individual_content["data"][] = $content_details_array;
             }
-            return json_encode($individual_content, JSON_HEX_APOS);
+            return json_encode($individual_content, JSON_HEX_APOS|JSON_PRETTY_PRINT);
         }
     }
 
@@ -104,7 +104,7 @@ class Content_Controller
         $this_content['gesture_id'] = $this->content_model->gesture_id;
         $this_content['next_content_id'] = $this->content_model->next_content_id;
         $data["data"][] = $this_content;
-        return json_encode($data, JSON_HEX_APOS);
+        return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
     
     /**
@@ -275,7 +275,7 @@ class Content_Controller
             //convert the content ID into a JSON object and save into a file
             $posts['content_id'] = filter_var($_GET['content_id'], FILTER_VALIDATE_INT);
             $fp = fopen(CONTENT_ID_FILE, 'w');
-            fwrite($fp, json_encode($posts,JSON_HEX_APOS));
+            fwrite($fp, json_encode($posts,JSON_HEX_APOS|JSON_PRETTY_PRINT));
             fclose($fp);
         }
     }
@@ -295,7 +295,7 @@ class Content_Controller
 
             //check that the content_id in the file matches the one provided in the PHP (to ensure no accidental cross-over)
             if($tag_data_json['content_id']==filter_var($_GET['content_id'], FILTER_VALIDATE_INT)) {
-                $returnValue = json_encode(array("tag_id"=>$tag_data_json['nfc_tag'],JSON_HEX_APOS));
+                $returnValue = json_encode(array("tag_id"=>$tag_data_json['nfc_tag'],JSON_HEX_APOS|JSON_PRETTY_PRINT));
             }
         
             //empty the files to prevent accidents on future reads

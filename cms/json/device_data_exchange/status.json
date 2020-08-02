@@ -1,1 +1,6 @@
-{"status":{"code":2,"name":"Device updating"}}
+{
+    "status": {
+        "code": 2,
+        "name": "Device updating"
+    }
+}

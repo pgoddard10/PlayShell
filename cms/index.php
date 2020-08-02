@@ -136,13 +136,13 @@ $authenticate_view->has_session(); //check that the user is logged in
       <!-- End of Main Content -->
       
       <!-- Footer -->
-      <footer class="sticky-footer bg-white">
+      <!-- <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
             <span>Copyright &copy; <a href="?page=about">Paul Goddard - UWE Bristol</a>, 2020</span>
           </div>
         </div>
-      </footer>
+      </footer> -->
       <!-- End of Footer -->
 
     </div>

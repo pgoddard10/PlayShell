@@ -82,7 +82,7 @@ class Staff_Controller
             $this_staff['buttons'] = $this_staff['buttons'] . " <a href='#' data-toggle='modal' data-id='$details->staff_id' class='deleteModalBox btn-circle btn-sm btn-primary' data-target='#deleteModalCenter'><i class='fas fa-trash'></i></a>";
             $data["data"][] = $this_staff;
         }
-        return json_encode($data, JSON_HEX_APOS);
+        return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
 
     
@@ -98,7 +98,7 @@ class Staff_Controller
         $this_staff['roles'] = $this->staff_model->roles;
         $this_staff['active'] = $this->staff_model->active;
         $data["data"][] = $this_staff;
-        return json_encode($data, JSON_HEX_APOS);
+        return json_encode($data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
 
     
@@ -118,7 +118,9 @@ class Staff_Controller
 
         foreach($this->all_staff as $staff_member=>$details) {
             if((!isset($_GET['staff_id']) || ($staff_id != $details->staff_id))) {
-                if($email == $details->email) return -6;
+                if($email!="") {
+                    if($email == $details->email) return -6;
+                }
                 if(isset($_GET['username'])) {
                     if($username == $details->username) return -7;
                 }

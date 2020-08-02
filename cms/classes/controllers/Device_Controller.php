@@ -90,7 +90,7 @@ class Device_Controller
         else
             $returnValue["data"]["error"] = array("code"=>-2,"description"=>"Device not found");
 
-        return json_encode($returnValue, JSON_HEX_APOS);
+        return json_encode($returnValue, JSON_HEX_APOS|JSON_PRETTY_PRINT);
     }
 
 	/**
@@ -120,7 +120,7 @@ class Device_Controller
         else
             $returnValue["data"]["error"] = array("code"=>-2,"description"=>"Device not found");
 
-        $returnValue = json_encode($returnValue, JSON_HEX_APOS);
+        $returnValue = json_encode($returnValue, JSON_HEX_APOS|JSON_PRETTY_PRINT);
         return $returnValue;
     }
 
@@ -137,7 +137,7 @@ class Device_Controller
         else if($status==DEVICE_UPDATING) $name = "Device updating";
         else if($status==CMS_UPDATING) $name = "CMS updating";
         $status_data["status"] = array("code"=>$status, "name"=>$name);
-        $status_json = json_encode($status_data, JSON_HEX_APOS);
+        $status_json = json_encode($status_data, JSON_HEX_APOS|JSON_PRETTY_PRINT);
         $fp = fopen($local_file, 'w');
         fwrite($fp, $status_json);
         fclose($fp);
@@ -249,7 +249,7 @@ class Device_Controller
 
         $this->compose_email();
 
-        $returnValue = json_encode($returnValue, JSON_HEX_APOS);
+        $returnValue = json_encode($returnValue, JSON_HEX_APOS|JSON_PRETTY_PRINT);
         return $returnValue;
     }
 
