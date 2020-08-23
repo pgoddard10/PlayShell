@@ -1,3 +1,4 @@
+
 # PlayShell: A Low-cost, Fun Audio Experience for Heritage Centres
 ## What is PlayShell?
 Various barriers prevent blind and visually impaired people accessing the rich multisensory experiences available at heritage centres. These barriers include large bodies of text and items in glass cases, which are difficult to see. Feedback from the blind community reflects poorly upon the inflexibility of guided tours. Technology-based accessibility tools are often laden with visually heavy interfaces or require storage space or power at each exhibit.
@@ -113,7 +114,7 @@ Restart to ensure all changes take hold
 
 Make the program:
 
-<< cd into the audio_culture/app directory >>
+<< cd into the PlayShell/app directory >>
 
     $ make clean
     $ sudo make
@@ -196,8 +197,8 @@ Change to
 Set the required file permissions for the program’s operation:
 
     $ cd /var/www/html
-    $ git clone https://gitlab.uwe.ac.uk/p3-goddard/audio_culture.git
-    $ cd audio_culture
+    $ git clone https://github.com/pgoddard10/PlayShell.git
+    $ cd PlayShell
     $ sudo chown www-data cms
     $ sudo chmod 775 cms
     $ sudo chown www-data cms/*
@@ -207,10 +208,22 @@ Set the required file permissions for the program’s operation:
     $ sudo chmod 777 cms/json/tag_setup/*.json
     $ sudo chown www-data cms/json/device_data_exchange/*
 
+Compile the app that is responsible for the scanning of tags through the web interface
+
+    $ cd scan_tag_app
+    $ sudo make
+
 Finally, reboot to ensure the changes are loaded
 
     $ sudo reboot
 
 #### Running the software
+##### Audio Device
+<< Browse to your chosen install directory >>
 
-TBC
+    $ ./main.run
+##### Central Management System / Server
+    $ cd /var/www/html/PlayShell/cms/scan_tag_app
+    $ ./main.run
+
+The web interface will run on it's own.
