@@ -1,6 +1,0 @@
-{
-    "symbol-whitelist" : [
-        "null", "false", "self", "array", "string", "int",
-        "Aws\\Polly\\PollyClient"
-    ]
-}
